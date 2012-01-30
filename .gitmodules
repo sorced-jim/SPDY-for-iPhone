@@ -1,3 +1,6 @@
 [submodule "OpenSSL-for-iPhone"]
 	path = OpenSSL-for-iPhone
 	url = ../OpenSSL-for-iPhone
+[submodule "spindly"]
+	path = spindly
+	url = git://github.com/sorced-jim/spindly.git
