@@ -1,0 +1,3 @@
+[submodule "OpenSSL-for-iPhone"]
+	path = OpenSSL-for-iPhone
+	url = ../OpenSSL-for-iPhone
