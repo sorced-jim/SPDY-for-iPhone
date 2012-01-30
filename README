@@ -1,0 +1,7 @@
+This is a project to build an easy to use SPDY library for the iPhone.
+
+The following external libraries are used:
+- spindly
+- openssl (Included until Apple releases iOS with an NPN enabled OpenSSL)
+
+The external libraries are pulled in through git submodules.
