@@ -5,3 +5,5 @@ The following external libraries are used:
 - openssl (Included until Apple releases iOS with an NPN enabled OpenSSL)
 
 The external libraries are pulled in through git submodules.
+
+Another potential spdy library is https://github.com/tatsuhiro-t/spdylay
