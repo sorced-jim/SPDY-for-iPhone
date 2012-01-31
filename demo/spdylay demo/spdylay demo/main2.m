@@ -22,9 +22,12 @@
 #import <Foundation/NSObjCRuntime.h>
 #import <Foundation/NSString.h>
 #import <getopt.h>
+#import <openssl/ssl.h>
 #import <signal.h>
 #import <stdlib.h>
 #import <string.h>
+
+#import "spdycat.h"
 
 static struct option long_options[] = {
     {"show_headers", no_argument, 0, 'v' },
@@ -47,7 +50,7 @@ static struct option long_options[] = {
     while(1) {
         int option_index = 0;
         int c = getopt_long(argc, argv, "Ohv", long_options, &option_index);
-        if(c == -1) {
+        if (c == -1) {
             break;
         }
         switch(c) {
@@ -75,6 +78,13 @@ static struct option long_options[] = {
     sigaction(SIGPIPE, &act, 0);
     
     // Set up SSL.
+    SSL_library_init();
+    spdycat* cat = [spdycat alloc];
+    cat.show_headers = verbose;
+    cat.output_file = output_file;
+    for (int i = optind; i < argc; ++i) {
+        [cat fetch:[NSString stringWithUTF8String: argv[i]]];
+    }
 }
 
 @end

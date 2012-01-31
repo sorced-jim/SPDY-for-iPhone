@@ -8,10 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		384C2DD114D88C8F0091E05D /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2DD014D88C8F0091E05D /* CoreFoundation.framework */; };
-		384C2DDE14D88E5C0091E05D /* main2.m in Sources */ = {isa = PBXBuildFile; fileRef = 384C2DDD14D88E5C0091E05D /* main2.m */; };
+		384C2DDE14D88E5C0091E05D /* main2.m in Sources */ = {isa = PBXBuildFile; fileRef = 384C2DDD14D88E5C0091E05D /* main2.m */; settings = {COMPILER_FLAGS = "-I../../OpenSSL-for-iPhone/include"; }; };
 		384C2E0714D899090091E05D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 384C2E0614D899080091E05D /* main.m */; };
 		384C2E0914D89AB70091E05D /* libobjc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E0814D89AB70091E05D /* libobjc.dylib */; };
 		384C2E0B14D89AF00091E05D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E0A14D89AF00091E05D /* Foundation.framework */; };
+		384C2E2014D8A0F60091E05D /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E1E14D8A0F60091E05D /* libcrypto.a */; };
+		384C2E2114D8A0F60091E05D /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E1F14D8A0F60091E05D /* libssl.a */; };
+		384C2E2414D8A5670091E05D /* spdycat.m in Sources */ = {isa = PBXBuildFile; fileRef = 384C2E2314D8A5670091E05D /* spdycat.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +37,10 @@
 		384C2E0614D899080091E05D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		384C2E0814D89AB70091E05D /* libobjc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libobjc.dylib; path = usr/lib/libobjc.dylib; sourceTree = SDKROOT; };
 		384C2E0A14D89AF00091E05D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		384C2E1E14D8A0F60091E05D /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../OpenSSL-for-iPhone/libcrypto.a"; sourceTree = "<group>"; };
+		384C2E1F14D8A0F60091E05D /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../OpenSSL-for-iPhone/libssl.a"; sourceTree = "<group>"; };
+		384C2E2214D8A5670091E05D /* spdycat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spdycat.h; sourceTree = "<group>"; };
+		384C2E2314D8A5670091E05D /* spdycat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = spdycat.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +48,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				384C2E2014D8A0F60091E05D /* libcrypto.a in Frameworks */,
+				384C2E2114D8A0F60091E05D /* libssl.a in Frameworks */,
 				384C2E0B14D89AF00091E05D /* Foundation.framework in Frameworks */,
 				384C2E0914D89AB70091E05D /* libobjc.dylib in Frameworks */,
 				384C2DD114D88C8F0091E05D /* CoreFoundation.framework in Frameworks */,
@@ -53,6 +62,8 @@
 		384C2DC114D88C8F0091E05D = {
 			isa = PBXGroup;
 			children = (
+				384C2E1E14D8A0F60091E05D /* libcrypto.a */,
+				384C2E1F14D8A0F60091E05D /* libssl.a */,
 				384C2E0A14D89AF00091E05D /* Foundation.framework */,
 				384C2E0814D89AB70091E05D /* libobjc.dylib */,
 				384C2DD214D88C8F0091E05D /* spdylay demo */,
@@ -83,6 +94,8 @@
 				384C2DDC14D88E5C0091E05D /* main2.h */,
 				384C2E0614D899080091E05D /* main.m */,
 				384C2DDD14D88E5C0091E05D /* main2.m */,
+				384C2E2214D8A5670091E05D /* spdycat.h */,
+				384C2E2314D8A5670091E05D /* spdycat.m */,
 			);
 			path = "spdylay demo";
 			sourceTree = "<group>";
@@ -139,6 +152,7 @@
 			files = (
 				384C2DDE14D88E5C0091E05D /* main2.m in Sources */,
 				384C2E0714D899090091E05D /* main.m in Sources */,
+				384C2E2414D8A5670091E05D /* spdycat.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,6 +213,10 @@
 		384C2DDA14D88C8F0091E05D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../OpenSSL-for-iPhone\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -206,6 +224,10 @@
 		384C2DDB14D88C8F0091E05D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../OpenSSL-for-iPhone\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
