@@ -4,3 +4,6 @@
 [submodule "spindly"]
 	path = spindly
 	url = git://github.com/sorced-jim/spindly.git
+[submodule "spdylay"]
+	path = spdylay
+	url = git://github.com/sorced-jim/spdylay.git
