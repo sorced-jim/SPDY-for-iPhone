@@ -14,7 +14,7 @@
 		384C2E0B14D89AF00091E05D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E0A14D89AF00091E05D /* Foundation.framework */; };
 		384C2E2014D8A0F60091E05D /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E1E14D8A0F60091E05D /* libcrypto.a */; };
 		384C2E2114D8A0F60091E05D /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E1F14D8A0F60091E05D /* libssl.a */; };
-		384C2E2414D8A5670091E05D /* spdycat.m in Sources */ = {isa = PBXBuildFile; fileRef = 384C2E2314D8A5670091E05D /* spdycat.m */; };
+		384C2E2414D8A5670091E05D /* spdycat.m in Sources */ = {isa = PBXBuildFile; fileRef = 384C2E2314D8A5670091E05D /* spdycat.m */; settings = {COMPILER_FLAGS = "-I../../OpenSSL-for-iPhone/include"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -213,6 +213,11 @@
 		384C2DDA14D88C8F0091E05D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"/Users/jim/git/t1/SPDY-for-iPhone/demo/spdylay",
+					"demo/../../OpenSSL-for-iPhone/include",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../OpenSSL-for-iPhone\"",
@@ -224,6 +229,11 @@
 		384C2DDB14D88C8F0091E05D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"/Users/jim/git/t1/SPDY-for-iPhone/demo/spdylay",
+					"demo/../../OpenSSL-for-iPhone/include",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../OpenSSL-for-iPhone\"",
