@@ -38,7 +38,7 @@ static struct option long_options[] = {
 
 @implementation main2
 
-+ (void) print_help {
+static void print_help() {
     NSLog(@"\n--show_headers -v\tShow the response headers\n--output -O file\tOutput the response body to file");
     exit(0);    
 }
@@ -58,7 +58,7 @@ static struct option long_options[] = {
                 output_file = [NSString stringWithUTF8String: argv[optind-1]];
                 break;
             case 'h':
-                [main2 print_help];
+                print_help();
             case 'v':
                 verbose = YES;
                 break;
@@ -68,8 +68,8 @@ static struct option long_options[] = {
                 break;
         }
     }
-    if (optind == argc) {
-        [main2 print_help];
+    if (optind > argc) {
+        print_help();
     }
 
     struct sigaction act;
@@ -82,6 +82,7 @@ static struct option long_options[] = {
     spdycat* cat = [spdycat alloc];
     cat.show_headers = verbose;
     cat.output_file = output_file;
+    [cat fetch:@"https://www.google.com"];
     for (int i = optind; i < argc; ++i) {
         [cat fetch:[NSString stringWithUTF8String: argv[i]]];
     }

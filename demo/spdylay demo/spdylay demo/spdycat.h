@@ -27,6 +27,6 @@
 @property BOOL show_headers;
 @property (retain) NSString* output_file;
 
-- (void)fetch:(NSString*) url;
+- (CFSocketRef)fetch:(NSString*) url;
 
 @end
