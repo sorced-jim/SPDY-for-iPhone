@@ -15,6 +15,7 @@
 		384C2E2014D8A0F60091E05D /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E1E14D8A0F60091E05D /* libcrypto.a */; };
 		384C2E2114D8A0F60091E05D /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E1F14D8A0F60091E05D /* libssl.a */; };
 		384C2E2414D8A5670091E05D /* spdycat.m in Sources */ = {isa = PBXBuildFile; fileRef = 384C2E2314D8A5670091E05D /* spdycat.m */; settings = {COMPILER_FLAGS = "-I../../OpenSSL-for-iPhone/include"; }; };
+		384C2E2B14DB31F40091E05D /* libspdylay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E2914DB31540091E05D /* libspdylay.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -41,6 +42,9 @@
 		384C2E1F14D8A0F60091E05D /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../OpenSSL-for-iPhone/libssl.a"; sourceTree = "<group>"; };
 		384C2E2214D8A5670091E05D /* spdycat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spdycat.h; sourceTree = "<group>"; };
 		384C2E2314D8A5670091E05D /* spdycat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = spdycat.m; sourceTree = "<group>"; };
+		384C2E2514DB1E320091E05D /* libspdylay.la */ = {isa = PBXFileReference; lastKnownFileType = text; name = libspdylay.la; path = ../../spdylay/lib/libspdylay.la; sourceTree = "<group>"; };
+		384C2E2714DB1F660091E05D /* libspdylay.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspdylay.a; path = ../../spdylay/build/lib/libspdylay.a; sourceTree = "<group>"; };
+		384C2E2914DB31540091E05D /* libspdylay.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspdylay.a; path = ../../build/lib/libspdylay.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				384C2E2B14DB31F40091E05D /* libspdylay.a in Frameworks */,
 				384C2E2014D8A0F60091E05D /* libcrypto.a in Frameworks */,
 				384C2E2114D8A0F60091E05D /* libssl.a in Frameworks */,
 				384C2E0B14D89AF00091E05D /* Foundation.framework in Frameworks */,
@@ -62,6 +67,9 @@
 		384C2DC114D88C8F0091E05D = {
 			isa = PBXGroup;
 			children = (
+				384C2E2914DB31540091E05D /* libspdylay.a */,
+				384C2E2714DB1F660091E05D /* libspdylay.a */,
+				384C2E2514DB1E320091E05D /* libspdylay.la */,
 				384C2E1E14D8A0F60091E05D /* libcrypto.a */,
 				384C2E1F14D8A0F60091E05D /* libssl.a */,
 				384C2E0A14D89AF00091E05D /* Foundation.framework */,
@@ -215,12 +223,15 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				"HEADER_SEARCH_PATHS[arch=*]" = (
+					../../spdylay/lib/includes,
 					"/Users/jim/git/t1/SPDY-for-iPhone/demo/spdylay",
 					"demo/../../OpenSSL-for-iPhone/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../OpenSSL-for-iPhone\"",
+					"\"$(SRCROOT)/../../spdylay/build/lib\"",
+					"\"$(SRCROOT)/../../build/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -231,12 +242,15 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				"HEADER_SEARCH_PATHS[arch=*]" = (
+					../../spdylay/lib/includes,
 					"/Users/jim/git/t1/SPDY-for-iPhone/demo/spdylay",
 					"demo/../../OpenSSL-for-iPhone/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../OpenSSL-for-iPhone\"",
+					"\"$(SRCROOT)/../../spdylay/build/lib\"",
+					"\"$(SRCROOT)/../../build/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = YES;

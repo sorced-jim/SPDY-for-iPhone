@@ -80,6 +80,7 @@ static void print_help() {
     // Set up SSL.
     SSL_library_init();
     spdycat* cat = [spdycat alloc];
+    [cat init];
     cat.show_headers = verbose;
     cat.output_file = output_file;
     [cat fetch:@"https://www.google.com"];

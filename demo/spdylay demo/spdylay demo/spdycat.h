@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 #include "openssl/ssl.h"
+#include "spdylay/spdylay.h"
 
 @interface spdycat : NSObject {
     BOOL show_headers;
@@ -26,9 +27,11 @@
     CFSocketRef socket;
     SSL* ssl;
     SSL_CTX* ssl_ctx;
+    spdylay_session *session;
 }
 
 @property BOOL show_headers;
+@property spdylay_session *session;
 @property (retain) NSString* output_file;
 
 - (void)fetch:(NSString*) url;

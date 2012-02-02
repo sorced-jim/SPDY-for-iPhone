@@ -22,25 +22,38 @@
 #import <Foundation/Foundation.h>
 #import <CoreServices/CoreServices.h>
 
-#include "openssl/ssl.h"
-#include "openssl/err.h"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netdb.h>
 
+#include "openssl/ssl.h"
+#include "openssl/err.h"
+#include "spdylay/spdylay.h"
 
 @implementation spdycat
 
 @synthesize show_headers;
 @synthesize output_file;
+@synthesize session;
 
 static void MyCallBack (CFSocketRef s,
                         CFSocketCallBackType callbackType,
                         CFDataRef address,
                         const void *data,
                         void *info) {
+    spdycat *cat = (spdycat*)info;
     if (callbackType == kCFSocketWriteCallBack) {
+        const char *nv[] = {
+            "method", "GET",
+            "scheme", "https",
+            "url", "/",
+            "host", "www.google.com",
+            "user-agent", "SPDY obj-c/0.0.0",
+            "version", "HTTP/1.1",
+            NULL
+        };
+        spdylay_submit_request([cat session], 1, nv, NULL);
         NSLog(@"I can write data!");
     }
     return;
@@ -139,7 +152,8 @@ static int connect_to(NSURL* url)
     if (SSL_connect(ssl) < 0) {
         return ssl_error();
     }
-    CFSocketRef s = CFSocketCreateWithNative(NULL, sock, kCFSocketReadCallBack | kCFSocketWriteCallBack, (CFSocketCallBack)&MyCallBack, NULL);
+    CFSocketContext ctx = {0, self, NULL, NULL, NULL};
+    CFSocketRef s = CFSocketCreateWithNative(NULL, sock, kCFSocketReadCallBack | kCFSocketWriteCallBack, (CFSocketCallBack)&MyCallBack, &ctx);
     if (s == nil) {
         return nil;
     }
@@ -155,17 +169,27 @@ static int connect_to(NSURL* url)
     }
     
     socket = [self create_socket:u];
-    CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
-    CFRunLoopRef loop = CFRunLoopGetCurrent();
-    CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
+    if (socket != nil) {
+        CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
+        CFRunLoopRef loop = CFRunLoopGetCurrent();
+        CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
+    }
+}
+
+- (spdycat*) init
+{
+    self = [super init];
+    spdylay_session_client_new(&session, NULL, self);
+    return self;
 }
 
 - (void)dealloc
 {
+    spdylay_session_del(session);
     SSL_shutdown(ssl);
     SSL_free(ssl);
     SSL_CTX_free(ssl_ctx);
-    
+    CFSocketInvalidate(socket);
     socket = nil;
     self.output_file = nil;
     [super dealloc];
