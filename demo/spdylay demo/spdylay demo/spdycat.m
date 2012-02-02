@@ -40,7 +40,9 @@ static void MyCallBack (CFSocketRef s,
                         CFDataRef address,
                         const void *data,
                         void *info) {
-    NSLog(@"MyCallback called");
+    if (callbackType == kCFSocketWriteCallBack) {
+        NSLog(@"I can write data!");
+    }
     return;
 }
 
@@ -64,7 +66,7 @@ static void setup_ssl_ctx(SSL_CTX *ssl_ctx)
 {
     /* Disable SSLv2 and enable all workarounds for buggy servers */
     SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
-    //SSL_CTX_set_mode(ssl_ctx, SSL_MODE_AUTO_RETRY);
+    SSL_CTX_set_mode(ssl_ctx, SSL_MODE_AUTO_RETRY);
     SSL_CTX_set_mode(ssl_ctx, SSL_MODE_RELEASE_BUFFERS);
     SSL_CTX_set_next_proto_select_cb(ssl_ctx, select_next_proto_cb, 0);
 }
@@ -115,19 +117,19 @@ static int connect_to(NSURL* url)
     return fd;
 }
 
-static CFSocketRef create_socket(NSURL* url)
+- (CFSocketRef) create_socket:(NSURL*) url
 {
     // Create SSL Stream
     int sock = connect_to(url);
     if (sock < 0) {
         return nil;
     }
-    SSL_CTX *ssl_ctx = SSL_CTX_new(SSLv23_client_method());
+    ssl_ctx = SSL_CTX_new(SSLv23_client_method());
     if(ssl_ctx == NULL) {
         return ssl_error();
     }
     setup_ssl_ctx(ssl_ctx);
-    SSL *ssl = SSL_new(ssl_ctx);
+    ssl = SSL_new(ssl_ctx);
     if (ssl == NULL) {
         return ssl_error();
     }
@@ -152,14 +154,19 @@ static CFSocketRef create_socket(NSURL* url)
         NSLog(@"Invalid url: %@", url);        
     }
     
-    CFSocketRef s = create_socket(u);
-    CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, s, 0);
+    socket = [self create_socket:u];
+    CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
     CFRunLoopRef loop = CFRunLoopGetCurrent();
     CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
 }
 
 - (void)dealloc
 {
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
+    SSL_CTX_free(ssl_ctx);
+    
+    socket = nil;
     self.output_file = nil;
     [super dealloc];
 }

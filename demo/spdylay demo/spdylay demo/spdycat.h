@@ -18,10 +18,14 @@
 // limitations under the License.
 
 #import <Foundation/Foundation.h>
+#include "openssl/ssl.h"
 
 @interface spdycat : NSObject {
     BOOL show_headers;
     NSString* output_file;
+    CFSocketRef socket;
+    SSL* ssl;
+    SSL_CTX* ssl_ctx;
 }
 
 @property BOOL show_headers;
