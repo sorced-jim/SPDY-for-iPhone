@@ -115,15 +115,10 @@ static int connect_to(NSURL* url)
     return fd;
 }
 
-- (CFSocketRef)fetch:(NSString *)url
+static CFSocketRef create_socket(NSURL* url)
 {
-    NSURL* u = [NSURL URLWithString:url];
-    if (u == nil) {
-        NSLog(@"Invalid url: %@", url);        
-    }
-    
     // Create SSL Stream
-    int sock = connect_to(u);
+    int sock = connect_to(url);
     if (sock < 0) {
         return nil;
     }
@@ -146,8 +141,21 @@ static int connect_to(NSURL* url)
     if (s == nil) {
         return nil;
     }
-    NSLog(@"Created a connection to %@\n", u);
+    NSLog(@"Created a connection to %@\n", url);
     return s;
+}
+
+- (void)fetch:(NSString *)url
+{
+    NSURL* u = [NSURL URLWithString:url];
+    if (u == nil) {
+        NSLog(@"Invalid url: %@", url);        
+    }
+    
+    CFSocketRef s = create_socket(u);
+    CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, s, 0);
+    CFRunLoopRef loop = CFRunLoopGetCurrent();
+    CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
 }
 
 - (void)dealloc

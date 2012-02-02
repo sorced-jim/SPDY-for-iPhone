@@ -17,9 +17,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#import <Foundation/NSAutoreleasePool.h>
 #import "main2.h"
 
 int main(int argc, char* argv[]) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [main2 main2:argc args:argv];
+    [pool release];
     return 0;
 }
