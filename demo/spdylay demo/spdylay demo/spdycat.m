@@ -36,6 +36,7 @@
 @synthesize show_headers;
 @synthesize output_file;
 @synthesize session;
+@synthesize spdy_negotiated;
 
 
 static void MyCallBack(CFSocketRef s,
@@ -59,24 +60,26 @@ static int select_next_proto_cb(SSL* ssl,
                                 const unsigned char *in, unsigned int inlen,
                                 void *arg)
 {
+    spdycat* sc = (spdycat*)arg;
     *out = (unsigned char*)in+1;
     *outlen = in[0];
     for(unsigned int i = 0; i < inlen; i += in[i]+1) {
         if(in[i] == 6 && memcmp(&in[i+1], "spdy/2", in[i]) == 0) {
             *out = (unsigned char*)in+i+1;
             *outlen = in[i];
+            sc.spdy_negotiated = true;
         }
     }
     return SSL_TLSEXT_ERR_OK;
 }
 
-static void setup_ssl_ctx(SSL_CTX *ssl_ctx)
+- (void) setup_ssl_ctx
 {
     /* Disable SSLv2 and enable all workarounds for buggy servers */
     SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
     SSL_CTX_set_mode(ssl_ctx, SSL_MODE_AUTO_RETRY);
     SSL_CTX_set_mode(ssl_ctx, SSL_MODE_RELEASE_BUFFERS);
-    SSL_CTX_set_next_proto_select_cb(ssl_ctx, select_next_proto_cb, 0);
+    SSL_CTX_set_next_proto_select_cb(ssl_ctx, select_next_proto_cb, self);
 }
 
 static CFSocketRef ssl_error() {
@@ -150,7 +153,7 @@ static int connect_to(NSURL* url)
     if(ssl_ctx == NULL) {
         return ssl_error();
     }
-    setup_ssl_ctx(ssl_ctx);
+    [self setup_ssl_ctx];
     ssl = SSL_new(ssl_ctx);
     if (ssl == NULL) {
         return ssl_error();
@@ -236,7 +239,7 @@ static ssize_t recv_callback(spdylay_session *session,
     return SSL_write(ssl, data, len);
 }
 
-ssize_t send_callback(spdylay_session *session,
+static ssize_t send_callback(spdylay_session *session,
                       const uint8_t *data, size_t len, int flags,
                       void *user_data)
 {
@@ -268,7 +271,7 @@ static void on_data_chunk_recv_callback(spdylay_session *session, uint8_t flags,
 
 static void on_stream_close_callback(spdylay_session *session, int32_t stream_id, spdylay_status_code status_code, void *user_data)
 {
-    NSLog(@"Stream %d closed, stopping run loop");
+    NSLog(@"Stream %d closed, stopping run loop", stream_id);
     CFRunLoopStop(CFRunLoopGetMain());
 }
 
@@ -286,6 +289,7 @@ static void on_stream_close_callback(spdylay_session *session, int32_t stream_id
 
     //callbacks->on_ctrl_send_callback = on_ctrl_send_callback3;        
     spdylay_session_client_new(&session, callbacks, self);
+    self.spdy_negotiated = false;
 
     return self;
 }

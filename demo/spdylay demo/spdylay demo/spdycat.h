@@ -29,9 +29,12 @@
     SSL_CTX* ssl_ctx;
     spdylay_session *session;
     spdylay_session_callbacks *callbacks;
+    
+    BOOL spdy_negotiated;
 }
 
 @property BOOL show_headers;
+@property BOOL spdy_negotiated;
 @property spdylay_session *session;
 @property (retain) NSString* output_file;
 
