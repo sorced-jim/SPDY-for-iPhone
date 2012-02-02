@@ -4,4 +4,11 @@ The following external libraries are used:
 - spdylay
 - openssl (Included until Apple releases iOS with an NPN enabled OpenSSL)
 
-The external libraries are pulled in through git submodules.
+The external libraries are pulled in through git submodules.  To build
+the demo, you must first run do the following:
+git submodule init
+git submodule update
+make
+
+Then the demo can be loaded in xcode and run from xcode or from the
+command line.
