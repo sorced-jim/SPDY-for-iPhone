@@ -19,13 +19,12 @@
 
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/Foundation.h>
-#import <Foundation/NSThread.h>
 #import "main2.h"
 
 int main(int argc, char* argv[]) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [main2 main2:argc args:argv];
-    [[NSRunLoop currentRunLoop] run];
+    CFRunLoopRun();
     [pool release];
     return 0;
 }
