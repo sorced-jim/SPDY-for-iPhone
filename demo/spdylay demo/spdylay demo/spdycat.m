@@ -46,11 +46,9 @@ static void MyCallBack(CFSocketRef s,
                        void *info) {
     spdycat *cat = (spdycat*)info;
     if (callbackType & kCFSocketWriteCallBack) {
-        NSLog(@"Try to write!");
         spdylay_session_send([cat session]);
     }
     if (callbackType & kCFSocketReadCallBack) {
-        NSLog(@"Try to read!");
         spdylay_session_recv([cat session]);
     }
  }
@@ -61,14 +59,8 @@ static int select_next_proto_cb(SSL* ssl,
                                 void *arg)
 {
     spdycat* sc = (spdycat*)arg;
-    *out = (unsigned char*)in+1;
-    *outlen = in[0];
-    for(unsigned int i = 0; i < inlen; i += in[i]+1) {
-        if(in[i] == 6 && memcmp(&in[i+1], "spdy/2", in[i]) == 0) {
-            *out = (unsigned char*)in+i+1;
-            *outlen = in[i];
-            sc.spdy_negotiated = true;
-        }
+    if (spdylay_select_next_protocol(out, outlen, in, inlen) > 0) {
+        sc.spdy_negotiated = true;
     }
     return SSL_TLSEXT_ERR_OK;
 }
@@ -235,7 +227,6 @@ static ssize_t recv_callback(spdylay_session *session,
                   len:(size_t) len
                 flags:(int) flags
 {
-    NSLog(@"Cool, sent data");
     return SSL_write(ssl, data, len);
 }
 
