@@ -62,8 +62,8 @@ static int select_next_proto_cb(SSL* ssl,
                                 void *arg)
 {
     spdycat* sc = (spdycat*)arg;
-    if (spdylay_select_next_protocol(out, outlen, in, inlen) > 0) {
-        sc.spdy_negotiated = true;
+    if (spdylay_select_next_protocol(out, outlen, in, inlen) >= 0) {
+        sc.spdy_negotiated = YES;
     }
     return SSL_TLSEXT_ERR_OK;
 }
@@ -77,8 +77,9 @@ static int select_next_proto_cb(SSL* ssl,
     SSL_CTX_set_next_proto_select_cb(ssl_ctx, select_next_proto_cb, self);
 }
 
-static CFSocketRef ssl_error() {
+static CFSocketRef ssl_error(int sock) {
     NSLog(@"%s\n", ERR_error_string(ERR_get_error(), 0));
+    close(sock);
     return nil;
 }
 
@@ -146,18 +147,23 @@ static int connect_to(NSURL* url)
     }
     ssl_ctx = SSL_CTX_new(SSLv23_client_method());
     if(ssl_ctx == NULL) {
-        return ssl_error();
+        return ssl_error(sock);
     }
     [self setup_ssl_ctx];
     ssl = SSL_new(ssl_ctx);
     if (ssl == NULL) {
-        return ssl_error();
+        return ssl_error(sock);
     }
     if (SSL_set_fd(ssl, sock) == 0) {
-        return ssl_error();
+        return ssl_error(sock);
     }
     if (SSL_connect(ssl) < 0) {
-        return ssl_error();
+        return ssl_error(sock);
+    }
+    if ([self spdy_negotiated] == NO) {
+        NSLog(@"Spdy negotiated: %d", [self spdy_negotiated]);
+        close(sock);
+        return nil;
     }
     make_non_block(sock);
     CFSocketContext ctx = {0, self, NULL, NULL, NULL};
@@ -185,6 +191,8 @@ static int connect_to(NSURL* url)
         CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
         CFRunLoopRef loop = CFRunLoopGetCurrent();
         CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
+    } else {
+        exit(1);        
     }
 }
 
@@ -297,7 +305,9 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
 
 - (void)dealloc
 {
-    spdylay_session_del(session);
+    if (session != NULL) {
+        spdylay_session_del(session);
+    }
     SSL_shutdown(ssl);
     SSL_free(ssl);
     SSL_CTX_free(ssl_ctx);

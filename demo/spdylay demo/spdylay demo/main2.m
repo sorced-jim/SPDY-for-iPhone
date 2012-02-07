@@ -83,7 +83,7 @@ static void print_help() {
     [cat init];
     cat.show_headers = verbose;
     cat.output_file = output_file;
-    [cat fetch:@"https://www.google.com/"];
+    [cat fetch:@"https://www.yahoo.com/"];
     for (int i = optind; i < argc; ++i) {
         [cat fetch:[NSString stringWithUTF8String: argv[i]]];
     }
