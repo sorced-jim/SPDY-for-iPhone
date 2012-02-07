@@ -27,6 +27,9 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+
+#import "WSSpdyStream.h"
+
 #include "openssl/ssl.h"
 #include "openssl/err.h"
 #include "spdylay/spdylay.h"
@@ -166,23 +169,6 @@ static int connect_to(NSURL* url)
     return s;
 }
 
-static const char** SerializeHeaders(CFHTTPMessageRef msg)
-{
-    CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
-    CFIndex count = CFDictionaryGetCount(d);
-    
-    CFStringRef *keys = CFAllocatorAllocate(NULL, sizeof(CFStringRef)*count*2, 0);
-    CFTypeRef *values = (CFTypeRef *)(keys + count);
-    CFIndex index;
-    const char** nv = malloc(count * 2 * sizeof(const char*));
-    CFDictionaryGetKeysAndValues(d, (const void **)keys, (const void **)values);
-    for (index = 0; index < count; index ++) {
-        nv[index*2] = CFStringGetCStringPtr(keys[index], kCFStringEncodingUTF8);
-        nv[index*2 + 1] = CFStringGetCStringPtr(values[index], kCFStringEncodingUTF8);
-    }
-    CFAllocatorDeallocate(NULL, keys);
-    return nv;        
-}
 
 - (void)fetch:(NSString *)url
 {
@@ -193,27 +179,20 @@ static const char** SerializeHeaders(CFHTTPMessageRef msg)
     
     socket = [self create_socket:u];
     if (socket != nil) {
-        const char *nv[] = {
-            "method", "GET",
-            "scheme", "https",
-            "url", [[u path] UTF8String],
-            "host", [[u host] UTF8String],
-            "user-agent", "SPDY obj-c/0.0.0",
-            "version", "HTTP/1.1",
-            NULL
-        };
-        spdylay_submit_request(session, 1, nv, NULL, self);
+        WSSpdyStream* stream = [WSSpdyStream createFromNSURL:u];
+        spdylay_submit_request(session, 1, [stream name_values], NULL, stream);
+
         CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
         CFRunLoopRef loop = CFRunLoopGetCurrent();
         CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
     }
 }
 
-- (ssize_t) recv_data:(uint8_t *) data
+- (int) recv_data:(uint8_t *) data
                   len:(size_t) len
                 flags:(int) flags
 {
-    ssize_t r;
+    int r;
     //want_write_ = false;
     r = SSL_read(ssl, data, len);
     if (r < 0) {
@@ -224,24 +203,30 @@ static const char** SerializeHeaders(CFHTTPMessageRef msg)
     return r;
 }
 
+- (BOOL) wouldBlock:(int) r
+{
+    int e = SSL_get_error(ssl, r);
+    return e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE;
+}
+
 static ssize_t recv_callback(spdylay_session *session,
                              uint8_t *data, size_t len, int flags, void *user_data)
 {
     spdycat *sc = (spdycat*)user_data;
-    ssize_t r = [sc recv_data:data len:len flags:flags];
+    int r = [sc recv_data:data len:len flags:flags];
     if (r < 0) {
-        //if(sc->would_block(r)) {
-        //    r = SPDYLAY_ERR_WOULDBLOCK;
-        //} else {
-        //    r = SPDYLAY_ERR_CALLBACK_FAILURE;
-        //}
-    //} else if(r == 0) {
+        if ([sc wouldBlock:r]) {
+            r = SPDYLAY_ERR_WOULDBLOCK;
+        } else {
+            r = SPDYLAY_ERR_CALLBACK_FAILURE;
+        }
+    } else if(r == 0) {
         r = SPDYLAY_ERR_CALLBACK_FAILURE;
     }
     return r;
 }
 
-- (ssize_t) send_data:(const uint8_t*) data
+- (int) send_data:(const uint8_t*) data
                   len:(size_t) len
                 flags:(int) flags
 {
@@ -253,37 +238,44 @@ static ssize_t send_callback(spdylay_session *session,
                       void *user_data)
 {
     spdycat *sc = (spdycat*)user_data;
-    ssize_t r = [sc send_data:data len:len flags:flags];
+    int r = [sc send_data:data len:len flags:flags];
     if (r < 0) {
-        //if (sc->would_block(r)) {
-        //    r = SPDYLAY_ERR_WOULDBLOCK;
-        //} else {
+        if ([sc wouldBlock:r]) {
+            r = SPDYLAY_ERR_WOULDBLOCK;
+        } else {
             r = SPDYLAY_ERR_CALLBACK_FAILURE;
-        //}
+        }
     }
     return r;
 }
 
+// This is kind of weird, but on_data_recv_callback is called after the whole data frame is read.  on_data_chunk_recv_callback may be called as data is read from the stream.
 static void on_data_recv_callback(spdylay_session *session, uint8_t flags, int32_t stream_id, int32_t length, void *user_data)
 {
-    printf(" recv DATA frame (stream_id=%d, flags=%d, length=%d)\n",
-           stream_id, flags, length);
-    
-    fflush(stdout);
 }
 
 static void on_data_chunk_recv_callback(spdylay_session *session, uint8_t flags, int32_t stream_id,
                                         const uint8_t *data, size_t len, void *user_data)
 {
-    printf("%.*s\n", len, (const char*)data);
+    WSSpdyStream *stream = spdylay_session_get_stream_user_data(session, stream_id);
+    [stream writeBytes:data len:len];
 }
 
 static void on_stream_close_callback(spdylay_session *session, int32_t stream_id, spdylay_status_code status_code, void *user_data)
 {
     NSLog(@"Stream %d closed, stopping run loop", stream_id);
+    WSSpdyStream *stream = spdylay_session_get_stream_user_data(session, stream_id);
+    if (stream == NULL) {
+        printf("My user data went away!");
+    }
+    [stream printStream];
     CFRunLoopStop(CFRunLoopGetMain());
 }
 
+static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type type, spdylay_frame *frame, void* user_data)
+{
+    NSLog(@"Received control frame %d", type);
+}
 
 - (spdycat*) init
 {
@@ -292,7 +284,7 @@ static void on_stream_close_callback(spdylay_session *session, int32_t stream_id
     callbacks->send_callback = send_callback;
     callbacks->recv_callback = recv_callback;
     callbacks->on_stream_close_callback = on_stream_close_callback;
-    //callbacks->on_ctrl_recv_callback = on_ctrl_recv_callback;
+    callbacks->on_ctrl_recv_callback = on_ctrl_recv_callback;
     callbacks->on_data_recv_callback = on_data_recv_callback;
     callbacks->on_data_chunk_recv_callback = on_data_chunk_recv_callback;
 

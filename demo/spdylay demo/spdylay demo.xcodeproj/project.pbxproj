@@ -16,6 +16,7 @@
 		384C2E2114D8A0F60091E05D /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E1F14D8A0F60091E05D /* libssl.a */; };
 		384C2E2414D8A5670091E05D /* spdycat.m in Sources */ = {isa = PBXBuildFile; fileRef = 384C2E2314D8A5670091E05D /* spdycat.m */; settings = {COMPILER_FLAGS = "-I../../OpenSSL-for-iPhone/include"; }; };
 		384C2E2B14DB31F40091E05D /* libspdylay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 384C2E2914DB31540091E05D /* libspdylay.a */; };
+		388F4D2714E1945B002F1870 /* WSSpdyStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 388F4D2614E1945B002F1870 /* WSSpdyStream.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,6 +44,8 @@
 		384C2E2214D8A5670091E05D /* spdycat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spdycat.h; sourceTree = "<group>"; };
 		384C2E2314D8A5670091E05D /* spdycat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = spdycat.m; sourceTree = "<group>"; };
 		384C2E2914DB31540091E05D /* libspdylay.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspdylay.a; path = ../../build/lib/libspdylay.a; sourceTree = "<group>"; };
+		388F4D2514E1945B002F1870 /* WSSpdyStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WSSpdyStream.h; sourceTree = "<group>"; };
+		388F4D2614E1945B002F1870 /* WSSpdyStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WSSpdyStream.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +103,8 @@
 				384C2DDD14D88E5C0091E05D /* main2.m */,
 				384C2E2214D8A5670091E05D /* spdycat.h */,
 				384C2E2314D8A5670091E05D /* spdycat.m */,
+				388F4D2514E1945B002F1870 /* WSSpdyStream.h */,
+				388F4D2614E1945B002F1870 /* WSSpdyStream.m */,
 			);
 			path = "spdylay demo";
 			sourceTree = "<group>";
@@ -157,6 +162,7 @@
 				384C2DDE14D88E5C0091E05D /* main2.m in Sources */,
 				384C2E0714D899090091E05D /* main.m in Sources */,
 				384C2E2414D8A5670091E05D /* spdycat.m in Sources */,
+				388F4D2714E1945B002F1870 /* WSSpdyStream.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
