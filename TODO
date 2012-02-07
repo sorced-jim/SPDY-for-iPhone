@@ -1,8 +1,10 @@
+- Worked 14:55 - 15:55
 The following are some of the next steps to be able to create a library
 and use it in ASI HTTP.
-- Return a ReadStream for a given NSURL
+- Return a ReadStream (Actually NSInputStream)for a given NSURL
 - Return an HTTP ReadStream when NPN fails to negotiate spdy.
 - Take an HTTPMessage as input as well as NSURLs
+ - Add a test for multiple headers with the same key.
 - Reuse connections to the same hosts when there is an active request on it.
 - Keep connections open for a bit of time after all active requests are
  done

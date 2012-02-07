@@ -166,6 +166,24 @@ static int connect_to(NSURL* url)
     return s;
 }
 
+static const char** SerializeHeaders(CFHTTPMessageRef msg)
+{
+    CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
+    CFIndex count = CFDictionaryGetCount(d);
+    
+    CFStringRef *keys = CFAllocatorAllocate(NULL, sizeof(CFStringRef)*count*2, 0);
+    CFTypeRef *values = (CFTypeRef *)(keys + count);
+    CFIndex index;
+    const char** nv = malloc(count * 2 * sizeof(const char*));
+    CFDictionaryGetKeysAndValues(d, (const void **)keys, (const void **)values);
+    for (index = 0; index < count; index ++) {
+        nv[index*2] = CFStringGetCStringPtr(keys[index], kCFStringEncodingUTF8);
+        nv[index*2 + 1] = CFStringGetCStringPtr(values[index], kCFStringEncodingUTF8);
+    }
+    CFAllocatorDeallocate(NULL, keys);
+    return nv;        
+}
+
 - (void)fetch:(NSString *)url
 {
     NSURL* u = [NSURL URLWithString:url];
@@ -184,7 +202,7 @@ static int connect_to(NSURL* url)
             "version", "HTTP/1.1",
             NULL
         };
-        spdylay_submit_request(session, 1, nv, NULL);
+        spdylay_submit_request(session, 1, nv, NULL, self);
         CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
         CFRunLoopRef loop = CFRunLoopGetCurrent();
         CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
