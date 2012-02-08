@@ -36,6 +36,22 @@ static struct option long_options[] = {
     {0, 0, 0, 0 }
 };
 
+@interface ShowBody : RequestCallback {
+}
+@end
+
+@implementation ShowBody
+
+- (void)onResponseBody:(NSInputStream *)readStream {
+    uint8_t bytes[1024];
+    while ([readStream hasBytesAvailable]) {
+        NSInteger read = [readStream read:bytes maxLength:1024];
+        printf("%.*s", read, bytes);
+    }
+}
+
+@end
+
 @implementation main2
 
 static void print_help() {
@@ -78,13 +94,10 @@ static void print_help() {
     
     // Set up SSL.
     SSL_library_init();
-    spdycat* cat = [[spdycat alloc]init];
+    spdycat* cat = [[[spdycat alloc]init] autorelease];
     cat.show_headers = verbose;
-    if ([cat connect:@"https://www.google.com/"]) {
-        [cat fetch:@"/"];
-        [cat fetch:@"/imghp"];
-        [cat addToLoop];
-    }
+    [cat fetch:@"https://www.google.com/" delegate:[ShowBody alloc]];
+    [cat fetch:@"https://www.google.com/imghp" delegate:[ShowBody alloc]];
 }
 
 @end

@@ -1,8 +1,8 @@
 //
-//  spdycat.h
+//  WSSpdySession.h
 //  spdylay demo
 //
-//  Created by Jim Morrison on 1/31/12.
+//  Created by Jim Morrison on 2/8/12.
 //  Copyright 2012 Twist Inc.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,21 +23,26 @@
 
 @class RequestCallback;
 
-@interface spdycat : NSObject {
-    BOOL show_headers;
+@interface WSSpdySession : NSObject {
+    NSURL* host;
+    CFSocketRef socket;
+    SSL* ssl;
+    SSL_CTX* ssl_ctx;
+    spdylay_session *session;
+    spdylay_session_callbacks *callbacks;
+    
+    BOOL spdy_negotiated;
+    NSInteger streamCount;
+    NSInteger nextStreamId;
 }
 
-@property BOOL show_headers;
+@property BOOL spdy_negotiated;
+@property NSInteger streamCount;
+@property spdylay_session *session;
+@property (retain) NSURL* host;
 
-- (void)fetch:(NSString*) path delegate:(RequestCallback*)delegate;
-
-@end
-
-@interface RequestCallback : NSObject {
-}
-
-// Methods that implementors should override.
-- (void)onResponseHeaders;
-- (void)onResponseBody:(NSInputStream*)readStream;
+- (BOOL)connect:(NSURL*) host;
+- (void)fetch:(NSURL*) path delegate:(RequestCallback*)delegate;
+- (void)addToLoop;
 
 @end

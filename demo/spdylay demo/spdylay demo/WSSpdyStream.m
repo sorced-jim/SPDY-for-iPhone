@@ -18,14 +18,15 @@
 // limitations under the License.
 
 #import "WSSpdyStream.h"
+#import "spdycat.h"
 
 @implementation WSSpdyStream
 
 @synthesize nameValues;
 @synthesize url;
+@synthesize delegate;
 
-- (id)init
-{
+- (id)init {
     self = [super init];
     if (self == nil) {
         return nil;
@@ -35,40 +36,35 @@
     return self;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     [data release];
     data = nil;
     free(nameValues);
 }
 
-- (size_t)writeBytes:(const uint8_t *)bytes len:(size_t)length
-{
+- (size_t)writeBytes:(const uint8_t *)bytes len:(size_t)length {
     [data appendBytes:bytes length:length];
     return length;
 }
 
-- (void) printStream
-{
+- (void) printStream {
     printf("Calling printStream\n");
     NSLog(@"%@:\n%@", url, data);
 }
 
-- (void) closeStream
-{
+- (void) closeStream {
     streamClosed = YES;
+    [delegate onResponseBody:self];
 }
 
 #pragma mark NSInputStream subclass methods.
 
-- (BOOL)getBuffer:(uint8_t **)buffer length:(NSUInteger *)len
-{
+- (BOOL)getBuffer:(uint8_t **)buffer length:(NSUInteger *)len {
     // I hope to use an array of buffers, to avoid buffering a whole stream in memory.
     return NO;
 }
 
-- (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len
-{
+- (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len {
     NSUInteger rangeLength = len;
     NSUInteger length = [data length];
     if (baseOffset == length)
@@ -87,28 +83,24 @@
     return rangeLength;
 }
 
-- (BOOL) hasBytesAvailable
-{
+- (BOOL) hasBytesAvailable {
     return baseOffset < [data length];
 }
 
 #pragma mark CFReadStream bridge methods
 
-- (void)_scheduleInCFRunLoop:(CFRunLoopRef)runLoop forMode:(CFStringRef)mode
-{
+- (void)_scheduleInCFRunLoop:(CFRunLoopRef)runLoop forMode:(CFStringRef)mode {
     // Don't do anything here.
 }
 
-- (BOOL)_setCFClientFlags:(CFOptionFlags)inFlags callback:(CFReadStreamClientCallBack)callback context:(CFStreamClientContext *)context
-{
+- (BOOL)_setCFClientFlags:(CFOptionFlags)inFlags callback:(CFReadStreamClientCallBack)callback context:(CFStreamClientContext *)context {
     return YES;
 }
 
 #pragma mark Creation methods.
 
 // This is all wrong since the String refs get aren't kept from the CFURL.
-static const char** SerializeHeaders(CFHTTPMessageRef msg)
-{
+static const char** SerializeHeaders(CFHTTPMessageRef msg) {
     CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
     CFIndex count = CFDictionaryGetCount(d);
     
@@ -140,11 +132,11 @@ static const char** SerializeHeaders(CFHTTPMessageRef msg)
     return nv;        
 }
 
-+ (WSSpdyStream*)createFromNSURL:(NSURL *)url
-{
++ (WSSpdyStream*)createFromNSURL:(NSURL *)url delegate:(RequestCallback *)delegate {
     WSSpdyStream *stream = [[WSSpdyStream alloc]init];
     stream.nameValues = malloc(6*2 + 1);
     stream.url = url;
+    stream.delegate = delegate;
     const char** nv = [stream nameValues];
     nv[0] = "method";
     nv[1] = "GET";

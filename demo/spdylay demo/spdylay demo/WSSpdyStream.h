@@ -20,12 +20,15 @@
 
 #import <Foundation/Foundation.h>
 
+@class RequestCallback;
+
 @interface WSSpdyStream : NSInputStream {
     NSMutableData* data;
     const char** nameValues;
     NSURL* url;
     NSUInteger baseOffset;
     BOOL streamClosed;
+    RequestCallback* delegate;
 }
 
 // To be used by the SPDY session.
@@ -33,10 +36,11 @@
 - (void) closeStream;
 
 + (WSSpdyStream*)createFromCFHTTPMessage:(CFHTTPMessageRef) msg;
-+ (WSSpdyStream*)createFromNSURL:(NSURL*) url;
++ (WSSpdyStream*)createFromNSURL:(NSURL*) url delegate:(RequestCallback*)delegate;
 
 @property const char** nameValues;
 @property (retain) NSURL* url;
+@property (retain) RequestCallback* delegate;
 
 @end
 
