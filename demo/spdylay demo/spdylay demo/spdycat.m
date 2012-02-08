@@ -197,7 +197,7 @@ static int connect_to(NSURL* url)
 - (void)fetch:(NSString *)path
 {
     NSURL* u = [NSURL URLWithString:path relativeToURL:host];
-    WSSpdyStream* stream = [WSSpdyStream createFromNSURL:u];
+    WSSpdyStream* stream = [[WSSpdyStream createFromNSURL:u] retain];
     spdylay_submit_request(session, nextStreamId, [stream nameValues], NULL, stream);
     ++streamCount;
     nextStreamId += 2;
@@ -287,6 +287,7 @@ static void on_stream_close_callback(spdylay_session *session, int32_t stream_id
     NSLog(@"Stream %d closed, stopping run loop", stream_id);
     WSSpdyStream *stream = spdylay_session_get_stream_user_data(session, stream_id);
     [stream closeStream];
+    [stream release];
     spdycat *sc = (spdycat *)user_data;
     --sc.streamCount;
     if ([sc streamCount] == 0) {
