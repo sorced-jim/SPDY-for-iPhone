@@ -38,7 +38,7 @@
 - (size_t) writeBytes:(const uint8_t*) data len:(size_t) length;
 - (void) closeStream;
 
-+ (WSSpdyStream*)createFromCFHTTPMessage:(CFHTTPMessageRef) msg;
+//+ (WSSpdyStream*)createFromCFHTTPMessage:(CFHTTPMessageRef) msg;
 + (WSSpdyStream*)createFromNSURL:(NSURL*) url delegate:(RequestCallback*)delegate;
 
 @property const char** nameValues;

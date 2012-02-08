@@ -24,12 +24,12 @@
 @class RequestCallback;
 
 @interface spdycat : NSObject {
-    BOOL show_headers;
+    NSInteger requestCount;
 }
 
-@property BOOL show_headers;
-
+- (id)init:(NSInteger)count;
 - (void)fetch:(NSString*) path delegate:(RequestCallback*)delegate;
+- (BOOL)decrementRequestCount;
 
 @end
 

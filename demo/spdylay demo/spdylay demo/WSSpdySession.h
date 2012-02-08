@@ -22,6 +22,7 @@
 #include "spdylay/spdylay.h"
 
 @class RequestCallback;
+@class WSSpdyStream;
 
 @interface WSSpdySession : NSObject {
     NSURL* host;
@@ -32,17 +33,16 @@
     spdylay_session_callbacks *callbacks;
     
     BOOL spdy_negotiated;
-    NSInteger streamCount;
-    NSInteger nextStreamId;
 }
 
 @property BOOL spdy_negotiated;
-@property NSInteger streamCount;
 @property spdylay_session *session;
 @property (retain) NSURL* host;
 
 - (BOOL)connect:(NSURL*) host;
 - (void)fetch:(NSURL*) path delegate:(RequestCallback*)delegate;
 - (void)addToLoop;
+
+- (void)removeStream:(WSSpdyStream*)stream;
 
 @end

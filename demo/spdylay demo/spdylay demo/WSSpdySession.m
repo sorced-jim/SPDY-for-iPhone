@@ -34,11 +34,13 @@
 #include "openssl/err.h"
 #include "spdylay/spdylay.h"
 
-@implementation WSSpdySession
+@implementation WSSpdySession {
+    NSMutableSet *streams;
+    int32_t nextStreamId;
+}
 
 @synthesize session;
 @synthesize spdy_negotiated;
-@synthesize streamCount;
 @synthesize host;
 
 
@@ -134,7 +136,7 @@ static int connect_to(NSURL* url) {
     return fd;
 }
 
-- (CFSocketRef) createSocket:(NSURL*) url {
+- (CFSocketRef) newSocket:(NSURL*) url {
     // Create SSL Stream
     int sock = connect_to(url);
     if (sock < 0) {
@@ -142,18 +144,22 @@ static int connect_to(NSURL* url) {
     }
     ssl_ctx = SSL_CTX_new(SSLv23_client_method());
     if (ssl_ctx == NULL) {
-        return ssl_error(sock);
+        ssl_error(sock);
+        return nil;
     }
     [self setup_ssl_ctx];
     ssl = SSL_new(ssl_ctx);
     if (ssl == NULL) {
-        return ssl_error(sock);
+        ssl_error(sock);
+        return nil;
     }
     if (SSL_set_fd(ssl, sock) == 0) {
-        return ssl_error(sock);
+        ssl_error(sock);
+        return nil;
     }
     if (SSL_connect(ssl) < 0) {
-        return ssl_error(sock);
+        ssl_error(sock);
+        return nil;
     }
     if ([self spdy_negotiated] == NO) {
         NSLog(@"Spdy negotiated: %d", [self spdy_negotiated]);
@@ -173,7 +179,7 @@ static int connect_to(NSURL* url) {
 
 - (BOOL)connect:(NSURL *)h {
     [self setHost:h];
-    socket = [self createSocket:h];
+    socket = [self newSocket:h];
     if (socket == nil) {
         return NO;
     }
@@ -181,22 +187,22 @@ static int connect_to(NSURL* url) {
 }
 
 - (void)fetch:(NSURL *)u delegate:(RequestCallback *)delegate {
-    WSSpdyStream* stream = [[WSSpdyStream createFromNSURL:u delegate:delegate] retain];
+    WSSpdyStream* stream = [[WSSpdyStream createFromNSURL:u delegate:delegate] autorelease];
     spdylay_submit_request(session, nextStreamId, [stream nameValues], NULL, stream);
-    ++streamCount;
+    [streams addObject:stream];
     nextStreamId += 2;
 }
 
 - (void)addToLoop {
     CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
-    CFRunLoopRef loop = CFRunLoopGetCurrent();
-    CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
+    CFRunLoopAddSource(CFRunLoopGetCurrent(), loop_ref, kCFRunLoopCommonModes);
+    CFRelease(loop_ref);
 }
 
 - (int) recv_data:(uint8_t *)data len:(size_t)len flags:(int)flags {
     int r;
     //want_write_ = false;
-    r = SSL_read(ssl, data, len);
+    r = SSL_read(ssl, data, (int)len);
     if (r < 0) {
         if (SSL_get_error(ssl, r) == SSL_ERROR_WANT_WRITE) {
             //want_write_ = true;
@@ -226,7 +232,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 }
 
 - (int) send_data:(const uint8_t*) data len:(size_t) len flags:(int) flags {
-    return SSL_write(ssl, data, len);
+    return SSL_write(ssl, data, (int)len);
 }
 
 static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data)
@@ -257,17 +263,16 @@ static void on_stream_close_callback(spdylay_session *session, int32_t stream_id
     NSLog(@"Stream %d closed", stream_id);
     WSSpdyStream *stream = spdylay_session_get_stream_user_data(session, stream_id);
     [stream closeStream];
-    [stream release];
     WSSpdySession *ss = (WSSpdySession *)user_data;
-    --ss.streamCount;
-    if ([ss streamCount] == 0) {
-        NSLog(@"Stopping run loop since all streams done for %@\n", [[stream url] host]);
-        CFRunLoopStop(CFRunLoopGetMain());
-    }
+    [ss removeStream:stream];
 }
 
 static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type type, spdylay_frame *frame, void* user_data) {
     NSLog(@"Received control frame %d", type);
+}
+
+- (void)removeStream:(WSSpdyStream *)stream {
+    [streams removeObject:stream];
 }
 
 - (WSSpdySession*) init {
@@ -283,8 +288,9 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     //callbacks->on_ctrl_send_callback = on_ctrl_send_callback3;        
     spdylay_session_client_new(&session, callbacks, self);
     self.spdy_negotiated = false;
-    streamCount = 0;
     nextStreamId = 1;
+    
+    streams = [[NSMutableSet alloc] init];
     
     return self;
 }
@@ -294,6 +300,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
         spdylay_submit_goaway(session);
         spdylay_session_del(session);
     }
+    [streams release];
     SSL_shutdown(ssl);
     SSL_free(ssl);
     SSL_CTX_free(ssl_ctx);

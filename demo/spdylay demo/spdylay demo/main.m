@@ -23,8 +23,8 @@
 
 int main(int argc, char* argv[]) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    [main2 main2:argc args:argv];
+    [[main2 newMain2:argc args:argv] autorelease];
     CFRunLoopRun();
-    [pool release];
+    [pool drain];
     return 0;
 }

@@ -46,22 +46,30 @@ static struct option long_options[] = {
     uint8_t bytes[1024];
     while ([readStream hasBytesAvailable]) {
         NSInteger read = [readStream read:bytes maxLength:1024];
-        printf("%.*s", read, bytes);
+        printf("%.*s", (int)read, bytes);
     }
 }
 
 @end
 
-@implementation main2
+@implementation main2 {
+    spdycat* cat;
+}
 
 static void print_help() {
     NSLog(@"\n--show_headers -v\tShow the response headers\n--output -O file\tOutput the response body to file");
     exit(0);    
 }
 
-+ (void)main2:(int)argc args:(char*[]) argv {
-    NSString* output_file;
-    BOOL verbose = YES;
++ (main2*)newMain2:(int)argc args:(char*[]) argv {
+    main2* m = [main2 alloc];
+    [m run:argc args:argv];
+    return m;
+}
+
+- (void)run:(int)argc args:(char*[])argv {
+    //NSString* output_file;
+    //BOOL verbose = YES;
     while(1) {
         int option_index = 0;
         int c = getopt_long(argc, argv, "Ohv", long_options, &option_index);
@@ -70,12 +78,12 @@ static void print_help() {
         }
         switch(c) {
             case 'O':
-                output_file = [NSString stringWithUTF8String: argv[optind-1]];
+                //output_file = [NSString stringWithUTF8String: argv[optind-1]];
                 break;
             case 'h':
                 print_help();
             case 'v':
-                verbose = YES;
+                //verbose = YES;
                 break;
             case '?':
                 exit(1);
@@ -94,10 +102,13 @@ static void print_help() {
     
     // Set up SSL.
     SSL_library_init();
-    spdycat* cat = [[[spdycat alloc]init] autorelease];
-    cat.show_headers = verbose;
-    [cat fetch:@"https://www.google.com/" delegate:[ShowBody alloc]];
-    [cat fetch:@"https://www.google.com/imghp" delegate:[ShowBody alloc]];
+    cat = [[spdycat alloc]init:2];
+    [cat fetch:@"https://www.google.com/" delegate:[[ShowBody alloc] autorelease]];
+    [cat fetch:@"https://www.google.com/imghp" delegate:[[ShowBody alloc] autorelease]];
+}
+
+-(void)dealloc {
+    [cat release];
 }
 
 @end

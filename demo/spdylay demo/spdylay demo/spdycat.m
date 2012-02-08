@@ -35,11 +35,46 @@
 #include "openssl/err.h"
 #include "spdylay/spdylay.h"
 
-@implementation spdycat {
-    NSMutableDictionary* sessions;
+@interface ExitLoop : RequestCallback {
+    spdycat* _sc;
+    RequestCallback* delegate;
 }
 
-@synthesize show_headers;
+@property (retain) RequestCallback* delegate;
+
+@end
+
+
+@implementation ExitLoop
+
+@synthesize delegate;
+
+- (id)init:(spdycat*) sc delegate:(RequestCallback*)d {
+    self = [super init];
+    _sc = sc;
+    [self setDelegate:d];
+    return self;
+}
+
+- (void)onResponseBody:(NSInputStream *)readStream {
+    [delegate onResponseBody:readStream];
+    if ([_sc decrementRequestCount]) {
+        NSLog(@"Stopping run loop since all streams done.");
+        CFRunLoopStop(CFRunLoopGetMain());
+    }
+}
+
+@end
+
+@implementation spdycat {
+    NSMutableDictionary* sessions;
+    NSMutableArray* delegates;
+}
+
+- (BOOL)decrementRequestCount {
+    --requestCount;
+    return requestCount == 0;
+}
 
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
     NSURL* u = [[NSURL URLWithString:url] autorelease];
@@ -52,16 +87,22 @@
         [sessions setObject:session forKey:[u host]];
         [session addToLoop];
     }
-    [session fetch:u delegate:delegate];
+    ExitLoop* el = [[[ExitLoop alloc]init:self delegate:delegate] autorelease];
+    [delegates addObject:el];
+    [session fetch:u delegate:el];
 }
 
-- (spdycat*) init {
+- (spdycat*) init:(NSInteger)count {
     self = [super init];
-    sessions = [[[NSMutableDictionary alloc]init] autorelease];
+    sessions = [[[NSMutableDictionary alloc]init] retain];
+    delegates = [[[NSMutableArray alloc]initWithCapacity:count] retain];
+    requestCount = count;
     return self;
 }
 
 - (void)dealloc {
+    [sessions release];
+    [delegates release];
 }
 @end
 

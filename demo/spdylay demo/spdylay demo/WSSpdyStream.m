@@ -101,6 +101,7 @@
 #pragma mark Creation methods.
 
 // This is all wrong since the String refs get aren't kept from the CFURL.
+#if 0
 static const char** SerializeHeaders(CFHTTPMessageRef msg) {
     CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
     CFIndex count = CFDictionaryGetCount(d);
@@ -132,6 +133,7 @@ static const char** SerializeHeaders(CFHTTPMessageRef msg) {
     CFAllocatorDeallocate(NULL, keys);
     return nv;        
 }
+#endif
 
 static const char* copyString(NSMutableData* arena, NSString* str) {
     const char* utf8 = [str UTF8String];

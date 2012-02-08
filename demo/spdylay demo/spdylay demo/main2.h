@@ -5,8 +5,8 @@
     
 }
 
-+ (void)main2:(int) argc
-         args:(char* [])argv;
++ (main2*)newMain2:(int)argc args:(char* [])argv;
+- (void)run:(int)argc args:(char*[])argv;
 
 @end
 
