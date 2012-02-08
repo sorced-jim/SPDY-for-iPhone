@@ -180,23 +180,22 @@ static int connect_to(NSURL* url)
 
 - (BOOL)connect:(NSString *)h
 {
-    NSURL* u = [NSURL URLWithString:h];
-    if (u == nil) {
+    [self setHost:[NSURL URLWithString:h]];
+    if ([self host] == nil) {
         NSLog(@"Invalid url: %@", h);
         return NO;
     }
     
-    socket = [self create_socket:u];
+    socket = [self create_socket:[self host]];
     if (socket == nil) {
         return NO;
     }
-    self.host = u;
     return YES;
 }
 
 - (void)fetch:(NSString *)path
 {
-    NSURL* u = [NSURL URLWithString:path relativeToURL:host];
+    NSURL* u = [[NSURL URLWithString:path relativeToURL:host] autorelease];
     WSSpdyStream* stream = [[WSSpdyStream createFromNSURL:u] retain];
     spdylay_submit_request(session, nextStreamId, [stream nameValues], NULL, stream);
     ++streamCount;
@@ -209,9 +208,7 @@ static int connect_to(NSURL* url)
     CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
 }
 
-- (int) recv_data:(uint8_t *) data
-                  len:(size_t) len
-                flags:(int) flags
+- (int) recv_data:(uint8_t *)data len:(size_t)len flags:(int)flags
 {
     int r;
     //want_write_ = false;
@@ -230,8 +227,7 @@ static int connect_to(NSURL* url)
     return e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE;
 }
 
-static ssize_t recv_callback(spdylay_session *session,
-                             uint8_t *data, size_t len, int flags, void *user_data)
+static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len, int flags, void *user_data)
 {
     spdycat *sc = (spdycat*)user_data;
     int r = [sc recv_data:data len:len flags:flags];
@@ -247,16 +243,12 @@ static ssize_t recv_callback(spdylay_session *session,
     return r;
 }
 
-- (int) send_data:(const uint8_t*) data
-                  len:(size_t) len
-                flags:(int) flags
+- (int) send_data:(const uint8_t*) data len:(size_t) len flags:(int) flags
 {
     return SSL_write(ssl, data, len);
 }
 
-static ssize_t send_callback(spdylay_session *session,
-                      const uint8_t *data, size_t len, int flags,
-                      void *user_data)
+static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data)
 {
     spdycat *sc = (spdycat*)user_data;
     int r = [sc send_data:data len:len flags:flags];
