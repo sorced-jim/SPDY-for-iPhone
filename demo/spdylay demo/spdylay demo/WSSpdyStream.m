@@ -21,7 +21,7 @@
 
 @implementation WSSpdyStream
 
-@synthesize name_values;
+@synthesize nameValues;
 @synthesize url;
 
 - (id)init
@@ -30,7 +30,7 @@
     if (self == nil) {
         return nil;
     }
-    
+    streamClosed = NO;
     data = [NSMutableData dataWithCapacity:4096];
     return self;
 }
@@ -39,7 +39,7 @@
 {
     [data release];
     data = nil;
-    free(name_values);
+    free(nameValues);
 }
 
 - (size_t)writeBytes:(const uint8_t *)bytes len:(size_t)length
@@ -53,6 +53,58 @@
     printf("Calling printStream\n");
     NSLog(@"%@:\n%@", url, data);
 }
+
+- (void) closeStream
+{
+    streamClosed = YES;
+}
+
+#pragma mark NSInputStream subclass methods.
+
+- (BOOL)getBuffer:(uint8_t **)buffer length:(NSUInteger *)len
+{
+    // I hope to use an array of buffers, to avoid buffering a whole stream in memory.
+    return NO;
+}
+
+- (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len
+{
+    NSUInteger rangeLength = len;
+    NSUInteger length = [data length];
+    if (baseOffset == length)
+    {
+        if (streamClosed) {
+            return 0;
+        }
+        return -1;
+    }
+    if (baseOffset + rangeLength > length) {
+        rangeLength = [data length] - baseOffset;
+    }
+    NSRange range = NSMakeRange(baseOffset, rangeLength);
+    [data getBytes:buffer range:range];
+    baseOffset += rangeLength;
+    return rangeLength;
+}
+
+- (BOOL) hasBytesAvailable
+{
+    return baseOffset < [data length];
+}
+
+#pragma mark CFReadStream bridge methods
+
+- (void)_scheduleInCFRunLoop:(CFRunLoopRef)runLoop forMode:(CFStringRef)mode
+{
+    // Don't do anything here.
+}
+
+- (BOOL)_setCFClientFlags:(CFOptionFlags)inFlags callback:(CFReadStreamClientCallBack)callback context:(CFStreamClientContext *)context
+{
+    return YES;
+}
+
+#pragma mark Creation methods.
 
 // This is all wrong since the String refs get aren't kept from the CFURL.
 static const char** SerializeHeaders(CFHTTPMessageRef msg)
@@ -91,9 +143,9 @@ static const char** SerializeHeaders(CFHTTPMessageRef msg)
 + (WSSpdyStream*)createFromNSURL:(NSURL *)url
 {
     WSSpdyStream *stream = [[WSSpdyStream alloc]init];
-    stream.name_values = malloc(6*2 + 1);
+    stream.nameValues = malloc(6*2 + 1);
     stream.url = url;
-    const char** nv = [stream name_values];
+    const char** nv = [stream nameValues];
     nv[0] = "method";
     nv[1] = "GET";
     nv[2] = "scheme";

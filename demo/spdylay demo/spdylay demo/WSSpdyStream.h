@@ -22,19 +22,20 @@
 
 @interface WSSpdyStream : NSInputStream {
     NSMutableData* data;
-    const char** name_values;
+    const char** nameValues;
     NSURL* url;
+    NSUInteger baseOffset;
+    BOOL streamClosed;
 }
 
 // To be used by the SPDY session.
-- (size_t) writeBytes:(const uint8_t*) data
-                  len:(size_t) length;
-- (void) printStream;
+- (size_t) writeBytes:(const uint8_t*) data len:(size_t) length;
+- (void) closeStream;
 
 + (WSSpdyStream*)createFromCFHTTPMessage:(CFHTTPMessageRef) msg;
 + (WSSpdyStream*)createFromNSURL:(NSURL*) url;
 
-@property const char** name_values;
+@property const char** nameValues;
 @property (retain) NSURL* url;
 
 @end

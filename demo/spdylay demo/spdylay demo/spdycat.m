@@ -40,6 +40,8 @@
 @synthesize output_file;
 @synthesize session;
 @synthesize spdy_negotiated;
+@synthesize streamCount;
+@synthesize host;
 
 
 static void MyCallBack(CFSocketRef s,
@@ -176,24 +178,35 @@ static int connect_to(NSURL* url)
 }
 
 
-- (void)fetch:(NSString *)url
+- (BOOL)connect:(NSString *)h
 {
-    NSURL* u = [NSURL URLWithString:url];
+    NSURL* u = [NSURL URLWithString:h];
     if (u == nil) {
-        NSLog(@"Invalid url: %@", url);        
+        NSLog(@"Invalid url: %@", h);
+        return NO;
     }
     
     socket = [self create_socket:u];
-    if (socket != nil) {
-        WSSpdyStream* stream = [WSSpdyStream createFromNSURL:u];
-        spdylay_submit_request(session, 1, [stream name_values], NULL, stream);
-
-        CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
-        CFRunLoopRef loop = CFRunLoopGetCurrent();
-        CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
-    } else {
-        exit(1);        
+    if (socket == nil) {
+        return NO;
     }
+    self.host = u;
+    return YES;
+}
+
+- (void)fetch:(NSString *)path
+{
+    NSURL* u = [NSURL URLWithString:path relativeToURL:host];
+    WSSpdyStream* stream = [WSSpdyStream createFromNSURL:u];
+    spdylay_submit_request(session, nextStreamId, [stream nameValues], NULL, stream);
+    ++streamCount;
+    nextStreamId += 2;
+}
+- (void)addToLoop
+{
+    CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
+    CFRunLoopRef loop = CFRunLoopGetCurrent();
+    CFRunLoopAddSource(loop, loop_ref, kCFRunLoopCommonModes);
 }
 
 - (int) recv_data:(uint8_t *) data
@@ -273,11 +286,12 @@ static void on_stream_close_callback(spdylay_session *session, int32_t stream_id
 {
     NSLog(@"Stream %d closed, stopping run loop", stream_id);
     WSSpdyStream *stream = spdylay_session_get_stream_user_data(session, stream_id);
-    if (stream == NULL) {
-        printf("My user data went away!");
+    [stream closeStream];
+    spdycat *sc = (spdycat *)user_data;
+    --sc.streamCount;
+    if ([sc streamCount] == 0) {
+        CFRunLoopStop(CFRunLoopGetMain());
     }
-    [stream printStream];
-    CFRunLoopStop(CFRunLoopGetMain());
 }
 
 static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type type, spdylay_frame *frame, void* user_data)
@@ -299,13 +313,16 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     //callbacks->on_ctrl_send_callback = on_ctrl_send_callback3;        
     spdylay_session_client_new(&session, callbacks, self);
     self.spdy_negotiated = false;
-
+    streamCount = 0;
+    nextStreamId = 1;
+    
     return self;
 }
 
 - (void)dealloc
 {
     if (session != NULL) {
+        spdylay_submit_goaway(session);
         spdylay_session_del(session);
     }
     SSL_shutdown(ssl);

@@ -43,8 +43,7 @@ static void print_help() {
     exit(0);    
 }
 
-+ (void)main2:(int)argc
-         args:(char*[]) argv {
++ (void)main2:(int)argc args:(char*[]) argv {
     NSString* output_file;
     BOOL verbose = YES;
     while(1) {
@@ -79,13 +78,12 @@ static void print_help() {
     
     // Set up SSL.
     SSL_library_init();
-    spdycat* cat = [spdycat alloc];
-    [cat init];
+    spdycat* cat = [[spdycat alloc]init];
     cat.show_headers = verbose;
-    cat.output_file = output_file;
-    [cat fetch:@"https://www.yahoo.com/"];
-    for (int i = optind; i < argc; ++i) {
-        [cat fetch:[NSString stringWithUTF8String: argv[i]]];
+    if ([cat connect:@"https://www.google.com/"]) {
+        [cat fetch:@"/"];
+        [cat fetch:@"/imghp"];
+        [cat addToLoop];
     }
 }
 

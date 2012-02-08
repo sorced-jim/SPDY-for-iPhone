@@ -24,6 +24,7 @@
 @interface spdycat : NSObject {
     BOOL show_headers;
     NSString* output_file;
+    NSURL* host;
     CFSocketRef socket;
     SSL* ssl;
     SSL_CTX* ssl_ctx;
@@ -31,13 +32,19 @@
     spdylay_session_callbacks *callbacks;
     
     BOOL spdy_negotiated;
+    NSInteger streamCount;
+    NSInteger nextStreamId;
 }
 
 @property BOOL show_headers;
 @property BOOL spdy_negotiated;
+@property NSInteger streamCount;
 @property spdylay_session *session;
 @property (retain) NSString* output_file;
+@property (retain) NSURL* host;
 
-- (void)fetch:(NSString*) url;
+- (BOOL)connect:(NSString*) host;
+- (void)fetch:(NSString*) path;
+- (void)addToLoop;
 
 @end
