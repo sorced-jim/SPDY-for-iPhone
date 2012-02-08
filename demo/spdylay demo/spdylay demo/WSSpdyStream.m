@@ -25,6 +25,7 @@
 @synthesize nameValues;
 @synthesize url;
 @synthesize delegate;
+@synthesize stringArena;
 
 - (id)init {
     self = [super init];
@@ -132,20 +133,29 @@ static const char** SerializeHeaders(CFHTTPMessageRef msg) {
     return nv;        
 }
 
+static const char* copyString(NSMutableData* arena, NSString* str) {
+    const char* utf8 = [str UTF8String];
+    unsigned long length = strlen(utf8) + 1;
+    NSInteger arenaLength = [arena length];
+    [arena appendBytes:utf8 length:length];
+    return (const char*)[arena mutableBytes] + arenaLength;
+}
+
 + (WSSpdyStream*)createFromNSURL:(NSURL *)url delegate:(RequestCallback *)delegate {
     WSSpdyStream *stream = [[WSSpdyStream alloc]init];
     stream.nameValues = malloc(6*2 + 1);
     stream.url = url;
     stream.delegate = delegate;
+    [stream setStringArena:[NSMutableData dataWithCapacity:100]];
     const char** nv = [stream nameValues];
     nv[0] = "method";
     nv[1] = "GET";
     nv[2] = "scheme";
-    nv[3] = [[url scheme] UTF8String];
+    nv[3] = copyString([stream stringArena], [url scheme]);
     nv[4] = "url";
-    nv[5] = [[url path] UTF8String];
+    nv[5] = copyString([stream stringArena], [url path]);
     nv[6] = "host";
-    nv[7] = [[url host] UTF8String];
+    nv[7] = copyString([stream stringArena], [url host]);
     nv[8] = "user-agent";
     nv[9] = "SPDY obj-c/0.0.0";
     nv[10] = "version";

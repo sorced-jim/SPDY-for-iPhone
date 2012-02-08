@@ -29,6 +29,9 @@
     NSUInteger baseOffset;
     BOOL streamClosed;
     RequestCallback* delegate;
+    
+    @private
+    NSMutableData* stringArena;
 }
 
 // To be used by the SPDY session.
@@ -41,6 +44,7 @@
 @property const char** nameValues;
 @property (retain) NSURL* url;
 @property (retain) RequestCallback* delegate;
+@property (retain) NSMutableData* stringArena; 
 
 @end
 

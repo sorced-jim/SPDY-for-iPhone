@@ -134,7 +134,7 @@ static int connect_to(NSURL* url) {
     return fd;
 }
 
-- (CFSocketRef) create_socket:(NSURL*) url {
+- (CFSocketRef) createSocket:(NSURL*) url {
     // Create SSL Stream
     int sock = connect_to(url);
     if (sock < 0) {
@@ -173,7 +173,7 @@ static int connect_to(NSURL* url) {
 
 - (BOOL)connect:(NSURL *)h {
     [self setHost:h];
-    socket = [self create_socket:h];
+    socket = [self createSocket:h];
     if (socket == nil) {
         return NO;
     }
