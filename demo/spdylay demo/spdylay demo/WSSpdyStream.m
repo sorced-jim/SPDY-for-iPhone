@@ -130,7 +130,7 @@ static const char** SerializeHeaders(CFHTTPMessageRef msg) {
         nv[index*2] = CFStringGetCStringPtr(keys[index], kCFStringEncodingUTF8);
         nv[index*2 + 1] = CFStringGetCStringPtr(values[index], kCFStringEncodingUTF8);
     }
-    nv[-1] = NULL;
+    nv[count*2+6*2] = NULL;
     CFAllocatorDeallocate(NULL, keys);
     return nv;        
 }
@@ -146,7 +146,7 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
 
 + (WSSpdyStream*)createFromNSURL:(NSURL *)url delegate:(RequestCallback *)delegate {
     WSSpdyStream *stream = [[WSSpdyStream alloc]init];
-    stream.nameValues = malloc(6*2 + 1);
+    stream.nameValues = malloc(sizeof(const char*)* (6*2 + 1));
     stream.url = url;
     stream.delegate = delegate;
     [stream setStringArena:[NSMutableData dataWithCapacity:100]];
