@@ -27,7 +27,7 @@
     NSInteger requestCount;
     
     NSMutableDictionary* sessions;
-    NSMutableArray* delegates;
+    NSMutableArray* delegates;  // This array shouldn't exist.
 }
 
 - (id)init:(NSInteger)count;

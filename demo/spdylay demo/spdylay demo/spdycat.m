@@ -98,8 +98,8 @@
 
 - (spdycat*) init:(NSInteger)count {
     self = [super init];
-    sessions = [[[NSMutableDictionary alloc]init] retain];
-    delegates = [[[NSMutableArray alloc]initWithCapacity:count] retain];
+    sessions = [[NSMutableDictionary alloc]init];
+    delegates = [[NSMutableArray alloc]initWithCapacity:count];
     requestCount = count;
     return self;
 }
