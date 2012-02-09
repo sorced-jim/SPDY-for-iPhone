@@ -36,7 +36,7 @@ static struct option long_options[] = {
     {0, 0, 0, 0 }
 };
 
-@interface ShowBody : RequestCallback {
+@interface ShowBody : BufferedCallback {
     main2 *main;
 }
 
@@ -61,13 +61,11 @@ static struct option long_options[] = {
     [[self main] decrementRequests];
 }
 
-- (void)onResponseBody:(NSInputStream *)readStream {
-    uint8_t bytes[1024];
-    while ([readStream hasBytesAvailable]) {
-        NSInteger read = [readStream read:bytes maxLength:1024];
-        printf("%.*s", (int)read, bytes);
-    }
+- (void)onResponse:(CFHTTPMessageRef)response {
+    CFDataRef body = CFHTTPMessageCopyBody(response);
+    printf("%.*s", (int)CFDataGetLength(body), CFDataGetBytePtr(body));
     [[self main] decrementRequests];
+    CFRelease(body);
 }
 
 @end

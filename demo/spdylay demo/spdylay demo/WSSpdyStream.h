@@ -22,8 +22,7 @@
 
 @class RequestCallback;
 
-@interface WSSpdyStream : NSInputStream {
-    NSMutableData* data;
+@interface WSSpdyStream : NSObject {
     const char** nameValues;
     NSURL* url;
     NSUInteger baseOffset;
@@ -34,6 +33,7 @@
 }
 
 // To be used by the SPDY session.
+- (void) parseHeaders:(const char**) nameValuePairs;
 - (size_t) writeBytes:(const uint8_t*) data len:(size_t) length;
 - (void) closeStream;
 

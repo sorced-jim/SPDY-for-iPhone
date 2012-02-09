@@ -20,7 +20,9 @@
 #import "WSSpdyStream.h"
 #import "spdycat.h"
 
-@implementation WSSpdyStream
+@implementation WSSpdyStream {
+    CFHTTPMessageRef response;
+}
 
 @synthesize nameValues;
 @synthesize url;
@@ -32,71 +34,39 @@
     if (self == nil) {
         return nil;
     }
+    response = CFHTTPMessageCreateEmpty(NULL, NO);
     streamClosed = NO;
-    data = [NSMutableData dataWithCapacity:4096];
     return self;
 }
 
 - (void)dealloc {
-    [data release];
-    data = nil;
-    
     free(nameValues);
 }
 
+- (void)parseHeaders:(const char **)nameValuePairs {
+    while (*nameValuePairs != NULL) {
+        CFStringRef key = CFStringCreateWithCString(NULL, nameValuePairs[0], kCFStringEncodingUTF8);
+        CFStringRef value = CFStringCreateWithCString(NULL, nameValuePairs[1], kCFStringEncodingUTF8);
+        nameValuePairs += 2;
+        CFHTTPMessageSetHeaderFieldValue(response, key, value);
+        CFRelease(key);
+        CFRelease(value);
+    }
+    [delegate onResponseHeaders:response];
+}
+
 - (size_t)writeBytes:(const uint8_t *)bytes len:(size_t)length {
-    [data appendBytes:bytes length:length];
-    return length;
+    return [delegate onResponseData:bytes length:length];
 }
 
 - (void) printStream {
     printf("Calling printStream\n");
-    NSLog(@"%@:\n%@", url, data);
+    NSLog(@"%@\n", url);
 }
 
 - (void) closeStream {
     streamClosed = YES;
-    [delegate onResponseBody:self];
-}
-
-#pragma mark NSInputStream subclass methods.
-
-- (BOOL)getBuffer:(uint8_t **)buffer length:(NSUInteger *)len {
-    // I hope to use an array of buffers, to avoid buffering a whole stream in memory.
-    return NO;
-}
-
-- (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len {
-    NSUInteger rangeLength = len;
-    NSUInteger length = [data length];
-    if (baseOffset == length)
-    {
-        if (streamClosed) {
-            return 0;
-        }
-        return -1;
-    }
-    if (baseOffset + rangeLength > length) {
-        rangeLength = [data length] - baseOffset;
-    }
-    NSRange range = NSMakeRange(baseOffset, rangeLength);
-    [data getBytes:buffer range:range];
-    baseOffset += rangeLength;
-    return rangeLength;
-}
-
-- (BOOL) hasBytesAvailable {
-    return baseOffset < [data length];
-}
-
-#pragma mark CFReadStream bridge methods
-
-- (void)_scheduleInCFRunLoop:(CFRunLoopRef)runLoop forMode:(CFStringRef)mode {
-    // Don't do anything here.
-}
-
-- (BOOL)_setCFClientFlags:(CFOptionFlags)inFlags callback:(CFReadStreamClientCallBack)callback context:(CFStreamClientContext *)context {
-    return YES;
+    [delegate onStreamClose];
 }
 
 #pragma mark Creation methods.

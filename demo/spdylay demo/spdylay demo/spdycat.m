@@ -21,6 +21,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreServices/CoreServices.h>
+#import <CoreFoundation/CoreFoundation.h>
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -72,11 +73,54 @@
 
 @implementation RequestCallback
 
-- (void)onResponseBody:(NSInputStream *)readStream {
+- (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length {
+    return length;
+}
+
+- (void)onResponseHeaders:(CFHTTPMessageRef)headers {
+}
+
+- (void)onError {
     
 }
 
-- (void)onResponseHeaders {
+- (void)onStreamClose {
+    
+}
+@end
+
+@implementation BufferedCallback {
+    CFMutableDataRef body;
+    CFHTTPMessageRef headers;
+}
+
+- (id)init {
+    self = [super init];
+    body = CFDataCreateMutable(NULL, 0);
+    return self;
+}
+
+- (void)dealloc {
+    CFRelease(body);
+    CFRelease(headers);
+}
+
+-(void)onResponseHeaders:(CFHTTPMessageRef)h {
+    headers = CFHTTPMessageCreateCopy(NULL, h);
+    CFRetain(headers);
+}
+
+- (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length {
+    CFDataAppendBytes(body, bytes, length);
+    return length;
+}
+
+- (void)onStreamClose {
+    CFHTTPMessageSetBody(headers, body);
+    [self onResponse:headers];
+}
+
+- (void)onResponse:(CFHTTPMessageRef)response {
     
 }
 

@@ -35,8 +35,18 @@
 }
 
 // Methods that implementors should override.
-- (void)onResponseHeaders;
-- (void)onResponseBody:(NSInputStream*)readStream;
+- (void)onResponseHeaders:(CFHTTPMessageRef)headers;
+- (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length;
+- (void)onStreamClose;
+- (void)onError;
+
+@end
+
+@interface BufferedCallback : RequestCallback {
+}
+
+// Derived classses should override these methods since BufferedCallback overrides the rest of the callbacks from RequestCallback.
+- (void)onResponse:(CFHTTPMessageRef)response;
 - (void)onError;
 
 @end
