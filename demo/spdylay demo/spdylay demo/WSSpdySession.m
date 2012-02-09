@@ -198,6 +198,13 @@ static int connect_to(NSURL* url) {
     nextStreamId += 2;
 }
 
+- (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate {
+    WSSpdyStream* stream = [[WSSpdyStream createFromCFHTTPMessage:request delegate:delegate] autorelease];
+    spdylay_submit_request(session, nextStreamId, [stream nameValues], NULL, stream);
+    [streams addObject:stream];
+    nextStreamId += 2;
+}
+
 - (void)addToLoop {
     CFRunLoopSourceRef loop_ref = CFSocketCreateRunLoopSource (NULL, socket, 0);
     CFRunLoopAddSource(CFRunLoopGetCurrent(), loop_ref, kCFRunLoopCommonModes);

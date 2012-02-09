@@ -37,6 +37,7 @@
 
 - (BOOL)connect:(NSURL*) host;
 - (void)fetch:(NSURL*) path delegate:(RequestCallback*)delegate;
+- (void)fetchFromMessage:(CFHTTPMessageRef) request delegate:(RequestCallback *)delegate;
 - (void)addToLoop;
 
 - (void)removeStream:(WSSpdyStream*)stream;

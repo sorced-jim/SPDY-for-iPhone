@@ -40,24 +40,42 @@
     NSMutableDictionary* sessions;
 }
 
+- (WSSpdySession*)getSession:(NSURL*) url {
+    WSSpdySession* session = [sessions objectForKey:[url host]];
+    if (session == nil) {
+        session = [[[WSSpdySession alloc]init] autorelease];
+        if (![session connect:url]) {
+            return nil;
+        }
+        [sessions setObject:session forKey:[url host]];
+        [session addToLoop];
+    }
+    return session;
+}
+
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
     NSURL* u = [[NSURL URLWithString:url] autorelease];
     if (u == nil) {
         [delegate onError];
         return;
     }
-    
-    WSSpdySession* session = [sessions objectForKey:[u host]];
+    WSSpdySession *session = [self getSession:u];
     if (session == nil) {
-        session = [[[WSSpdySession alloc]init] autorelease];
-        if (![session connect:u]) {
-            [delegate onError];
-            return;
-        }
-        [sessions setObject:session forKey:[u host]];
-        [session addToLoop];
+        [delegate onError];
+        return;
     }
     [session fetch:u delegate:delegate];
+}
+
+- (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate {
+    CFURLRef url = CFHTTPMessageCopyRequestURL(request);
+    WSSpdySession* session = [self getSession:url];
+    if (session == nil) {
+        [delegate onError];
+    } else {
+        [session fetchFromMessage:request delegate:delegate];
+    }
+    CFRelease(url);
 }
 
 - (spdycat*) init {

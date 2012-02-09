@@ -69,49 +69,67 @@
     [delegate onStreamClose];
 }
 
-#pragma mark Creation methods.
-
-// This is all wrong since the String refs get aren't kept from the CFURL.
-#if 0
-static const char** SerializeHeaders(CFHTTPMessageRef msg) {
-    CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
-    CFIndex count = CFDictionaryGetCount(d);
-    
-    CFStringRef *keys = CFAllocatorAllocate(NULL, sizeof(CFStringRef)*count*2, 0);
-    CFTypeRef *values = (CFTypeRef *)(keys + count);
-    CFIndex index;
-    const char** nv = malloc((count * 2 + 6*2 + 1) * sizeof(const char*));
-    CFDictionaryGetKeysAndValues(d, (const void **)keys, (const void **)values);
-    nv[0] = "method";
-    nv[1] = CFStringGetCStringPtr(CFHTTPMessageCopyRequestMethod(msg), kCFStringEncodingUTF8);
-    nv[2] = "user-agent";
-    nv[3] = "SPDY objc-0.0.1";
-    nv[4] = "version";
-    nv[5] = "HTTP/1.";
-    CFURLRef url = CFHTTPMessageCopyRequestURL(msg);
-    nv[6] = "scheme";
-    nv[7] = CFStringGetCStringPtr(CFURLCopyScheme(url), kCFStringEncodingUTF8);
-    nv[8] = "host";
-    nv[9] = CFStringGetCStringPtr(CFURLCopyHostName(url), kCFStringEncodingUTF8);
-    nv[10] = "url";
-    // This is wrong since the query parameters are missing.
-    nv[11] = CFStringGetCStringPtr(CFURLCopyPath(url), kCFStringEncodingUTF8);
-    for (index = 0; index < count; index ++) {
-        nv[index*2] = CFStringGetCStringPtr(keys[index], kCFStringEncodingUTF8);
-        nv[index*2 + 1] = CFStringGetCStringPtr(values[index], kCFStringEncodingUTF8);
-    }
-    nv[count*2+6*2] = NULL;
-    CFAllocatorDeallocate(NULL, keys);
-    return nv;        
-}
-#endif
-
 static const char* copyString(NSMutableData* arena, NSString* str) {
     const char* utf8 = [str UTF8String];
     unsigned long length = strlen(utf8) + 1;
     NSInteger arenaLength = [arena length];
     [arena appendBytes:utf8 length:length];
     return (const char*)[arena mutableBytes] + arenaLength;
+}
+
+- (const char*) copyCFString:(CFStringRef) str {
+    const char* utf8 = CFStringGetCStringPtr(str, kCFStringEncodingUTF8);
+    unsigned long length = strlen(utf8) + 1;
+    NSInteger arenaLength = [stringArena length];
+    [stringArena appendBytes:utf8 length:length];
+    CFRelease(str);
+    return (const char*)[stringArena mutableBytes] + arenaLength;
+}
+
+- (void)serializeHeaders:(CFHTTPMessageRef) msg {
+    CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
+    CFIndex count = CFDictionaryGetCount(d);
+    
+    CFStringRef *keys = CFAllocatorAllocate(NULL, sizeof(CFStringRef)*count*2, 0);
+    CFTypeRef *values = (CFTypeRef *)(keys + count);
+    CFIndex index;
+    nameValues = malloc((count * 2 + 6*2 + 1) * sizeof(const char*));
+    const char** nv = nameValues;
+    CFDictionaryGetKeysAndValues(d, (const void **)keys, (const void **)values);
+    nv[0] = "method";
+    nv[1] = [self copyCFString:CFHTTPMessageCopyRequestMethod(msg)];
+    nv[2] = "user-agent";
+    nv[3] = "SPDY objc-0.0.1";
+    nv[4] = "version";
+    nv[5] = "HTTP/1.";
+    CFURLRef u = CFHTTPMessageCopyRequestURL(msg);
+    nv[6] = "scheme";
+    nv[7] = [self copyCFString:CFURLCopyScheme(u)];
+    nv[8] = "host";
+    nv[9] = [self copyCFString:CFURLCopyHostName(u)];
+    nv[10] = "url";
+    // This is wrong since the query parameters are missing.
+    nv[11] = [self copyCFString:CFURLCopyPath(u)];
+    for (index = 12; index < count+12; ++index) {
+        nv[index*2] = [self copyCFString:keys[index]];
+        nv[index*2 + 1] = [self copyCFString:values[index]];
+    }
+    nv[count*2+6*2] = NULL;
+    CFRelease(u);
+    CFAllocatorDeallocate(NULL, keys);
+    CFRelease(d);
+}
+
+#pragma mark Creation methods.
+
++ (WSSpdyStream*)createFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback*) delegate {
+    WSSpdyStream *stream = [[WSSpdyStream alloc]init];
+    stream.nameValues = malloc(sizeof(const char*)* (6*2 + 1));
+    stream.url = nil;
+    stream.delegate = delegate;
+    [stream setStringArena:[NSMutableData dataWithCapacity:100]];
+    [stream serializeHeaders:msg];
+    return nil;
 }
 
 + (WSSpdyStream*)createFromNSURL:(NSURL *)url delegate:(RequestCallback *)delegate {
