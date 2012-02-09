@@ -78,10 +78,16 @@
 
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
     NSURL* u = [[NSURL URLWithString:url] autorelease];
+    if (u == nil) {
+        [self decrementRequestCount];
+        return;
+    }
+    
     WSSpdySession* session = [sessions objectForKey:[u host]];
     if (session == nil) {
         session = [[[WSSpdySession alloc]init] autorelease];
         if (![session connect:u]) {
+            [self decrementRequestCount];
             return;
         }
         [sessions setObject:session forKey:[u host]];

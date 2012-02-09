@@ -63,7 +63,7 @@ static int select_next_proto_cb(SSL* ssl,
                                 const unsigned char *in, unsigned int inlen,
                                 void *arg) {
     WSSpdySession* sc = (WSSpdySession*)arg;
-    if (spdylay_select_next_protocol(out, outlen, in, inlen) >= 0) {
+    if (spdylay_select_next_protocol(out, outlen, in, inlen) > 0) {
         sc.spdy_negotiated = YES;
     }
     return SSL_TLSEXT_ERR_OK;

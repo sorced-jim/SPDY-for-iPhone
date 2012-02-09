@@ -40,6 +40,7 @@
 - (void)dealloc {
     [data release];
     data = nil;
+    
     free(nameValues);
 }
 

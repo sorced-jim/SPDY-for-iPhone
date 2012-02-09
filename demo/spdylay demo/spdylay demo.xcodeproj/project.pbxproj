@@ -241,6 +241,7 @@
 					"\"$(SRCROOT)/../../build/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_CLANG_STATIC_ANALYZER = YES;
 			};
 			name = Debug;
 		};
@@ -259,6 +260,7 @@
 					"\"$(SRCROOT)/../../build/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;

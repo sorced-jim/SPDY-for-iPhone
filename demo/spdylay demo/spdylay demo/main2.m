@@ -102,9 +102,11 @@ static void print_help() {
     
     // Set up SSL.
     SSL_library_init();
-    cat = [[spdycat alloc]init:2];
+    cat = [[spdycat alloc]init:4];
     [cat fetch:@"https://www.google.com/" delegate:[[ShowBody alloc] autorelease]];
     [cat fetch:@"https://www.google.com/imghp" delegate:[[ShowBody alloc] autorelease]];
+    [cat fetch:@"https://images.google.com/imghp" delegate:[[ShowBody alloc] autorelease]];
+    [cat fetch:@"https://www.yahoo.com/" delegate:[[ShowBody alloc] autorelease]];
 }
 
 -(void)dealloc {
