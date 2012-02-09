@@ -37,6 +37,11 @@
 @implementation WSSpdySession {
     NSMutableSet *streams;
     int32_t nextStreamId;
+    
+    CFSocketRef socket;
+    SSL* ssl;
+    SSL_CTX* ssl_ctx;
+    spdylay_session_callbacks *callbacks;
 }
 
 @synthesize session;

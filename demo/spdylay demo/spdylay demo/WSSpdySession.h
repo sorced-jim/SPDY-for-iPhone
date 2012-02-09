@@ -26,11 +26,7 @@
 
 @interface WSSpdySession : NSObject {
     NSURL* host;
-    CFSocketRef socket;
-    SSL* ssl;
-    SSL_CTX* ssl_ctx;
     spdylay_session *session;
-    spdylay_session_callbacks *callbacks;
     
     BOOL spdy_negotiated;
 }
