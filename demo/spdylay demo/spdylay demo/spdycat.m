@@ -67,8 +67,6 @@
 @end
 
 @implementation spdycat {
-    NSMutableDictionary* sessions;
-    NSMutableArray* delegates;
 }
 
 - (BOOL)decrementRequestCount {

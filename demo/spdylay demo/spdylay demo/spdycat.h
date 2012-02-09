@@ -25,6 +25,9 @@
 
 @interface spdycat : NSObject {
     NSInteger requestCount;
+    
+    NSMutableDictionary* sessions;
+    NSMutableArray* delegates;
 }
 
 - (id)init:(NSInteger)count;
