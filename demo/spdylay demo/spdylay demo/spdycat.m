@@ -61,7 +61,7 @@
     }
     WSSpdySession *session = [self getSession:u];
     if (session == nil) {
-        [delegate onError];
+        [delegate onNotSpdyError];
         return;
     }
     [session fetch:u delegate:delegate];
@@ -71,7 +71,7 @@
     CFURLRef url = CFHTTPMessageCopyRequestURL(request);
     WSSpdySession* session = [self getSession:url];
     if (session == nil) {
-        [delegate onError];
+        [delegate onNotSpdyError];
     } else {
         [session fetchFromMessage:request delegate:delegate];
     }
@@ -99,6 +99,10 @@
 }
 
 - (void)onError {
+    
+}
+
+- (void)onNotSpdyError {
     
 }
 

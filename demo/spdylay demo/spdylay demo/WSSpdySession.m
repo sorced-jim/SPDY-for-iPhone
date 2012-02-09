@@ -130,7 +130,7 @@ static int connect_to(NSURL* url) {
         if(fd == -1) {
             continue;
         }
-        while((r = connect(fd, rp->ai_addr, rp->ai_addrlen)) == -1 && errno == EINTR);
+        while ((r = connect(fd, rp->ai_addr, rp->ai_addrlen)) == -1 && errno == EINTR);
         if(r == 0) {
             break;
         }

@@ -61,6 +61,11 @@ static struct option long_options[] = {
     [[self main] decrementRequests];
 }
 
+- (void)onNotSpdyError {
+    NSLog(@"Not spdy!");
+    [[self main] decrementRequests];
+}
+
 - (void)onResponse:(CFHTTPMessageRef)response {
     CFDataRef body = CFHTTPMessageCopyBody(response);
     printf("%.*s", (int)CFDataGetLength(body), CFDataGetBytePtr(body));

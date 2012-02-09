@@ -39,6 +39,7 @@
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers;
 - (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length;
 - (void)onStreamClose;
+- (void)onNotSpdyError;
 - (void)onError;
 
 @end
