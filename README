@@ -12,3 +12,9 @@ make
 
 Then the demo can be loaded in xcode and run from xcode or from the
 command line.
+
+To actually build the code the following packages from ports are needed:
+- pkgconfig
+- automake
+- autoconf
+- libtool
