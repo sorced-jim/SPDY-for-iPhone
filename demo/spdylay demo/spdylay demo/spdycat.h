@@ -26,6 +26,7 @@
 @interface spdycat : NSObject {
 }
 
+// A reference to delegate is kept until the stream is closed.  The caller will get an onError or onResponseBody before the stream is closed.
 - (void)fetch:(NSString*) path delegate:(RequestCallback*)delegate;
 
 @end
