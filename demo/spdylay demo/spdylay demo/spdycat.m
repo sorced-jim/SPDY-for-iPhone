@@ -35,7 +35,9 @@
 #include "openssl/err.h"
 #include "spdylay/spdylay.h"
 
-@implementation spdycat
+@implementation spdycat {
+    NSMutableDictionary* sessions;
+}
 
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
     NSURL* u = [[NSURL URLWithString:url] autorelease];

@@ -24,7 +24,6 @@
 @class RequestCallback;
 
 @interface spdycat : NSObject {
-    NSMutableDictionary* sessions;
 }
 
 - (void)fetch:(NSString*) path delegate:(RequestCallback*)delegate;
