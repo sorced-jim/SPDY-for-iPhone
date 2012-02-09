@@ -24,15 +24,10 @@
 @class RequestCallback;
 
 @interface spdycat : NSObject {
-    NSInteger requestCount;
-    
     NSMutableDictionary* sessions;
-    NSMutableArray* delegates;  // This array shouldn't exist.
 }
 
-- (id)init:(NSInteger)count;
 - (void)fetch:(NSString*) path delegate:(RequestCallback*)delegate;
-- (BOOL)decrementRequestCount;
 
 @end
 
@@ -42,5 +37,6 @@
 // Methods that implementors should override.
 - (void)onResponseHeaders;
 - (void)onResponseBody:(NSInputStream*)readStream;
+- (void)onError;
 
 @end

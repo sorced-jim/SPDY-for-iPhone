@@ -37,10 +37,29 @@ static struct option long_options[] = {
 };
 
 @interface ShowBody : RequestCallback {
+    main2 *main;
 }
+
+@property (retain) main2 *main;
+
+- (id)init:(main2*)main;
+
 @end
 
 @implementation ShowBody
+
+@synthesize main;
+
+- (id)init:(main2*)m {
+    self = [super init];
+    [self setMain:m];
+    return self;
+}
+
+- (void)onError {
+    NSLog(@"Got an error!");
+    [[self main] decrementRequests];
+}
 
 - (void)onResponseBody:(NSInputStream *)readStream {
     uint8_t bytes[1024];
@@ -48,12 +67,14 @@ static struct option long_options[] = {
         NSInteger read = [readStream read:bytes maxLength:1024];
         printf("%.*s", (int)read, bytes);
     }
+    [[self main] decrementRequests];
 }
 
 @end
 
 @implementation main2 {
     spdycat* cat;
+    NSInteger requestCount;
 }
 
 static void print_help() {
@@ -65,6 +86,14 @@ static void print_help() {
     main2* m = [main2 alloc];
     [m run:argc args:argv];
     return m;
+}
+
+- (void)decrementRequests {
+    --requestCount;
+    if (requestCount == 0) {
+        NSLog(@"Stopping run loop since all streams done.");
+        CFRunLoopStop(CFRunLoopGetMain());
+    }
 }
 
 - (void)run:(int)argc args:(char*[])argv {
@@ -102,11 +131,12 @@ static void print_help() {
     
     // Set up SSL.
     SSL_library_init();
-    cat = [[spdycat alloc]init:4];
-    [cat fetch:@"https://www.google.com/" delegate:[[ShowBody alloc] autorelease]];
-    [cat fetch:@"https://www.google.com/imghp" delegate:[[ShowBody alloc] autorelease]];
-    [cat fetch:@"https://images.google.com/imghp" delegate:[[ShowBody alloc] autorelease]];
-    [cat fetch:@"https://www.yahoo.com/" delegate:[[ShowBody alloc] autorelease]];
+    requestCount = 4;
+    cat = [[spdycat alloc]init];
+    [cat fetch:@"https://www.google.com/" delegate:[[[ShowBody alloc]init:self] autorelease]];
+    [cat fetch:@"https://www.google.com/imghp" delegate:[[[ShowBody alloc]init:self] autorelease]];
+    [cat fetch:@"https://images.google.com/imghp" delegate:[[[ShowBody alloc]init:self] autorelease]];
+    [cat fetch:@"https://www.yahoo.com/" delegate:[[[ShowBody alloc]init:self] autorelease]];
 }
 
 -(void)dealloc {

@@ -35,49 +35,12 @@
 #include "openssl/err.h"
 #include "spdylay/spdylay.h"
 
-@interface ExitLoop : RequestCallback {
-    spdycat* _sc;
-    RequestCallback* delegate;
-}
-
-@property (retain) RequestCallback* delegate;
-
-@end
-
-
-@implementation ExitLoop
-
-@synthesize delegate;
-
-- (id)init:(spdycat*) sc delegate:(RequestCallback*)d {
-    self = [super init];
-    _sc = sc;
-    [self setDelegate:d];
-    return self;
-}
-
-- (void)onResponseBody:(NSInputStream *)readStream {
-    [delegate onResponseBody:readStream];
-    if ([_sc decrementRequestCount]) {
-        NSLog(@"Stopping run loop since all streams done.");
-        CFRunLoopStop(CFRunLoopGetMain());
-    }
-}
-
-@end
-
-@implementation spdycat {
-}
-
-- (BOOL)decrementRequestCount {
-    --requestCount;
-    return requestCount == 0;
-}
+@implementation spdycat
 
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
     NSURL* u = [[NSURL URLWithString:url] autorelease];
     if (u == nil) {
-        [self decrementRequestCount];
+        [delegate onError];
         return;
     }
     
@@ -85,28 +48,23 @@
     if (session == nil) {
         session = [[[WSSpdySession alloc]init] autorelease];
         if (![session connect:u]) {
-            [self decrementRequestCount];
+            [delegate onError];
             return;
         }
         [sessions setObject:session forKey:[u host]];
         [session addToLoop];
     }
-    ExitLoop* el = [[[ExitLoop alloc]init:self delegate:delegate] autorelease];
-    [delegates addObject:el];
-    [session fetch:u delegate:el];
+    [session fetch:u delegate:delegate];
 }
 
-- (spdycat*) init:(NSInteger)count {
+- (spdycat*) init {
     self = [super init];
     sessions = [[NSMutableDictionary alloc]init];
-    delegates = [[NSMutableArray alloc]initWithCapacity:count];
-    requestCount = count;
     return self;
 }
 
 - (void)dealloc {
     [sessions release];
-    [delegates release];
 }
 @end
 
@@ -117,6 +75,10 @@
 }
 
 - (void)onResponseHeaders {
+    
+}
+
+- (void)onError {
     
 }
 @end
