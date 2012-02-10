@@ -122,6 +122,7 @@ export CC="$DEVROOT/usr/bin/llvm-gcc-${GCC_VERSION}"
 export CXX="$DEVROOT/usr/bin/llvm-g++-${GCC_VERSION}"
 export LD="$DEVROOT/usr/bin/ld"
 export STRIP="$DEVROOT/usr/bin/strip"
+export ac_cv_func_malloc_0_nonnull=yes
 
 ./configure \
     --prefix="$prefix" \

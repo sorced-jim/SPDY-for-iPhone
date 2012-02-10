@@ -10,13 +10,13 @@ build/lib/libcrypto.a: OpenSSL-for-iPhone/build-libssl.sh
 openssl: build/lib/libcrypto.a
 
 
-spdylay/configure: spdylay/configure.ac zlib openssl
+spdylay/configure: spdylay/configure.ac build/lib/libz.a build/lib/libcrypto.a
 	cd spdylay && autoreconf -i && automake && autoconf
 
-spdylay/Makefile: spdylay/configure
+spdylay/Makefile: spdylay/configure ios-configure
 	cd spdylay && ../ios-configure -p "$(BUILD)" iphone
 
-spdylay: spdylay/Makefile
+build/lib/libspdylay.a: spdylay/Makefile
 	cd spdylay && make install
 
 spdylay: build/lib/libspdylay.a
