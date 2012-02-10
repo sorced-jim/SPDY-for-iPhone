@@ -1,18 +1,11 @@
 BUILD:=$(shell pwd)/build
 
-all: OpenSSL-for-iPhone/libcrypto.a spindly spdylay
+all: build/lib/libcrypto.a spdylay
 
 
-OpenSSL-for-iPhone/libcrypto.a: OpenSSL-for-iPhone/build-libssl.sh
-	cd OpenSSL-for-iPhone && ./build-libssl.sh
+build/lib/libcrypto.a: OpenSSL-for-iPhone/build-libssl.sh
+	cd OpenSSL-for-iPhone && INSTALL_DIR=$(BUILD) ./build-libssl.sh
 
-
-spindly/Makefile: spindly/configure
-	cd spindly && ./configure
-
-
-spindly: spindly/Makefile
-	cd spindly && make
 
 
 spdylay/configure: spdylay/configure.ac

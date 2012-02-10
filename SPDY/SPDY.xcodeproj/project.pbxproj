@@ -1,0 +1,453 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3800CADD14E48BC800B85319 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3800CADC14E48BC800B85319 /* MobileCoreServices.framework */; };
+		3800CAE214E48CAE00B85319 /* SpdySession.h in Headers */ = {isa = PBXBuildFile; fileRef = 3800CADE14E48CAE00B85319 /* SpdySession.h */; };
+		3800CAE314E48CAE00B85319 /* SpdySession.m in Sources */ = {isa = PBXBuildFile; fileRef = 3800CADF14E48CAE00B85319 /* SpdySession.m */; };
+		3800CAE414E48CAE00B85319 /* SpdyStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 3800CAE014E48CAE00B85319 /* SpdyStream.h */; };
+		3800CAE514E48CAE00B85319 /* SpdyStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 3800CAE114E48CAE00B85319 /* SpdyStream.m */; };
+		3800CAE714E491F800B85319 /* libspdylay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3800CAE614E491F800B85319 /* libspdylay.a */; };
+		3800CAF214E499D400B85319 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3800CAF114E499D400B85319 /* libssl.a */; };
+		3800CAF414E499E200B85319 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3800CAF314E499E200B85319 /* libcrypto.a */; };
+		3870AF5614E47F8E009D8118 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF5514E47F8E009D8118 /* Foundation.framework */; };
+		3870AF5C14E47F8E009D8118 /* SPDY.m in Sources */ = {isa = PBXBuildFile; fileRef = 3870AF5B14E47F8E009D8118 /* SPDY.m */; };
+		3870AF6414E47F8E009D8118 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF6314E47F8E009D8118 /* SenTestingKit.framework */; };
+		3870AF6614E47F8E009D8118 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF6514E47F8E009D8118 /* UIKit.framework */; };
+		3870AF6714E47F8E009D8118 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF5514E47F8E009D8118 /* Foundation.framework */; };
+		3870AF6A14E47F8E009D8118 /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF5214E47F8E009D8118 /* libSPDY.a */; };
+		3870AF7014E47F8E009D8118 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3870AF6E14E47F8E009D8118 /* InfoPlist.strings */; };
+		3870AF7314E47F8E009D8118 /* SPDYTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3870AF7214E47F8E009D8118 /* SPDYTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3870AF6814E47F8E009D8118 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3870AF4914E47F8E009D8118 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3870AF5114E47F8E009D8118;
+			remoteInfo = SPDY;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3800CADC14E48BC800B85319 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		3800CADE14E48CAE00B85319 /* SpdySession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdySession.h; sourceTree = "<group>"; };
+		3800CADF14E48CAE00B85319 /* SpdySession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdySession.m; sourceTree = "<group>"; };
+		3800CAE014E48CAE00B85319 /* SpdyStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyStream.h; sourceTree = "<group>"; };
+		3800CAE114E48CAE00B85319 /* SpdyStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyStream.m; sourceTree = "<group>"; };
+		3800CAE614E491F800B85319 /* libspdylay.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspdylay.a; path = ../build/lib/libspdylay.a; sourceTree = "<group>"; };
+		3800CAE814E4920E00B85319 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../OpenSSL-for-iPhone/libcrypto.a"; sourceTree = "<group>"; };
+		3800CAE914E4920E00B85319 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../OpenSSL-for-iPhone/libssl.a"; sourceTree = "<group>"; };
+		3800CAF114E499D400B85319 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = ../build/lib/libssl.a; sourceTree = "<group>"; };
+		3800CAF314E499E200B85319 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = ../build/lib/libcrypto.a; sourceTree = "<group>"; };
+		3870AF5214E47F8E009D8118 /* libSPDY.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSPDY.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3870AF5514E47F8E009D8118 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		3870AF5914E47F8E009D8118 /* SPDY-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPDY-Prefix.pch"; sourceTree = "<group>"; };
+		3870AF5A14E47F8E009D8118 /* SPDY.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPDY.h; sourceTree = "<group>"; };
+		3870AF5B14E47F8E009D8118 /* SPDY.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPDY.m; sourceTree = "<group>"; };
+		3870AF6214E47F8E009D8118 /* SPDYTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SPDYTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3870AF6314E47F8E009D8118 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		3870AF6514E47F8E009D8118 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		3870AF6D14E47F8E009D8118 /* SPDYTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SPDYTests-Info.plist"; sourceTree = "<group>"; };
+		3870AF6F14E47F8E009D8118 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		3870AF7114E47F8E009D8118 /* SPDYTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPDYTests.h; sourceTree = "<group>"; };
+		3870AF7214E47F8E009D8118 /* SPDYTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPDYTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3870AF4F14E47F8E009D8118 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3800CAF414E499E200B85319 /* libcrypto.a in Frameworks */,
+				3800CAF214E499D400B85319 /* libssl.a in Frameworks */,
+				3800CAE714E491F800B85319 /* libspdylay.a in Frameworks */,
+				3800CADD14E48BC800B85319 /* MobileCoreServices.framework in Frameworks */,
+				3870AF5614E47F8E009D8118 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3870AF5E14E47F8E009D8118 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3870AF6414E47F8E009D8118 /* SenTestingKit.framework in Frameworks */,
+				3870AF6614E47F8E009D8118 /* UIKit.framework in Frameworks */,
+				3870AF6714E47F8E009D8118 /* Foundation.framework in Frameworks */,
+				3870AF6A14E47F8E009D8118 /* libSPDY.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3870AF4714E47F8E009D8118 = {
+			isa = PBXGroup;
+			children = (
+				3800CAF314E499E200B85319 /* libcrypto.a */,
+				3800CAF114E499D400B85319 /* libssl.a */,
+				3800CAE814E4920E00B85319 /* libcrypto.a */,
+				3800CAE914E4920E00B85319 /* libssl.a */,
+				3800CAE614E491F800B85319 /* libspdylay.a */,
+				3800CADC14E48BC800B85319 /* MobileCoreServices.framework */,
+				3870AF5714E47F8E009D8118 /* SPDY */,
+				3870AF6B14E47F8E009D8118 /* SPDYTests */,
+				3870AF5414E47F8E009D8118 /* Frameworks */,
+				3870AF5314E47F8E009D8118 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3870AF5314E47F8E009D8118 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3870AF5214E47F8E009D8118 /* libSPDY.a */,
+				3870AF6214E47F8E009D8118 /* SPDYTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3870AF5414E47F8E009D8118 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3870AF5514E47F8E009D8118 /* Foundation.framework */,
+				3870AF6314E47F8E009D8118 /* SenTestingKit.framework */,
+				3870AF6514E47F8E009D8118 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3870AF5714E47F8E009D8118 /* SPDY */ = {
+			isa = PBXGroup;
+			children = (
+				3870AF5A14E47F8E009D8118 /* SPDY.h */,
+				3870AF5B14E47F8E009D8118 /* SPDY.m */,
+				3800CADE14E48CAE00B85319 /* SpdySession.h */,
+				3800CADF14E48CAE00B85319 /* SpdySession.m */,
+				3800CAE014E48CAE00B85319 /* SpdyStream.h */,
+				3800CAE114E48CAE00B85319 /* SpdyStream.m */,
+				3870AF5814E47F8E009D8118 /* Supporting Files */,
+			);
+			path = SPDY;
+			sourceTree = "<group>";
+		};
+		3870AF5814E47F8E009D8118 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				3870AF5914E47F8E009D8118 /* SPDY-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		3870AF6B14E47F8E009D8118 /* SPDYTests */ = {
+			isa = PBXGroup;
+			children = (
+				3870AF7114E47F8E009D8118 /* SPDYTests.h */,
+				3870AF7214E47F8E009D8118 /* SPDYTests.m */,
+				3870AF6C14E47F8E009D8118 /* Supporting Files */,
+			);
+			path = SPDYTests;
+			sourceTree = "<group>";
+		};
+		3870AF6C14E47F8E009D8118 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				3870AF6D14E47F8E009D8118 /* SPDYTests-Info.plist */,
+				3870AF6E14E47F8E009D8118 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		3870AF5014E47F8E009D8118 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3800CAE214E48CAE00B85319 /* SpdySession.h in Headers */,
+				3800CAE414E48CAE00B85319 /* SpdyStream.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		3870AF5114E47F8E009D8118 /* SPDY */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3870AF7614E47F8E009D8118 /* Build configuration list for PBXNativeTarget "SPDY" */;
+			buildPhases = (
+				3870AF4E14E47F8E009D8118 /* Sources */,
+				3870AF4F14E47F8E009D8118 /* Frameworks */,
+				3870AF5014E47F8E009D8118 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SPDY;
+			productName = SPDY;
+			productReference = 3870AF5214E47F8E009D8118 /* libSPDY.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		3870AF6114E47F8E009D8118 /* SPDYTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3870AF7914E47F8E009D8118 /* Build configuration list for PBXNativeTarget "SPDYTests" */;
+			buildPhases = (
+				3870AF5D14E47F8E009D8118 /* Sources */,
+				3870AF5E14E47F8E009D8118 /* Frameworks */,
+				3870AF5F14E47F8E009D8118 /* Resources */,
+				3870AF6014E47F8E009D8118 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3870AF6914E47F8E009D8118 /* PBXTargetDependency */,
+			);
+			name = SPDYTests;
+			productName = SPDYTests;
+			productReference = 3870AF6214E47F8E009D8118 /* SPDYTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3870AF4914E47F8E009D8118 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
+			buildConfigurationList = 3870AF4C14E47F8E009D8118 /* Build configuration list for PBXProject "SPDY" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 3870AF4714E47F8E009D8118;
+			productRefGroup = 3870AF5314E47F8E009D8118 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3870AF5114E47F8E009D8118 /* SPDY */,
+				3870AF6114E47F8E009D8118 /* SPDYTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3870AF5F14E47F8E009D8118 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3870AF7014E47F8E009D8118 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3870AF6014E47F8E009D8118 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3870AF4E14E47F8E009D8118 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3870AF5C14E47F8E009D8118 /* SPDY.m in Sources */,
+				3800CAE314E48CAE00B85319 /* SpdySession.m in Sources */,
+				3800CAE514E48CAE00B85319 /* SpdyStream.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3870AF5D14E47F8E009D8118 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3870AF7314E47F8E009D8118 /* SPDYTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3870AF6914E47F8E009D8118 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3870AF5114E47F8E009D8118 /* SPDY */;
+			targetProxy = 3870AF6814E47F8E009D8118 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3870AF6E14E47F8E009D8118 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3870AF6F14E47F8E009D8118 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3870AF7414E47F8E009D8118 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"ADDITIONAL_SDKS[arch=*]" = "";
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		3870AF7514E47F8E009D8118 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3870AF7714E47F8E009D8118 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/SPDY.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../build/include";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../build/lib\"",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		3870AF7814E47F8E009D8118 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/SPDY.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../build/include";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../build/lib\"",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		3870AF7A14E47F8E009D8118 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
+				INFOPLIST_FILE = "SPDYTests/SPDYTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		3870AF7B14E47F8E009D8118 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
+				INFOPLIST_FILE = "SPDYTests/SPDYTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3870AF4C14E47F8E009D8118 /* Build configuration list for PBXProject "SPDY" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3870AF7414E47F8E009D8118 /* Debug */,
+				3870AF7514E47F8E009D8118 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3870AF7614E47F8E009D8118 /* Build configuration list for PBXNativeTarget "SPDY" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3870AF7714E47F8E009D8118 /* Debug */,
+				3870AF7814E47F8E009D8118 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3870AF7914E47F8E009D8118 /* Build configuration list for PBXNativeTarget "SPDYTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3870AF7A14E47F8E009D8118 /* Debug */,
+				3870AF7B14E47F8E009D8118 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3870AF4914E47F8E009D8118 /* Project object */;
+}
