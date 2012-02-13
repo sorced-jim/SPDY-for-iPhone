@@ -59,15 +59,17 @@
         [delegate onNotSpdyError];
         return;
     }
+    [delegate onConnect];
     [session fetch:u delegate:delegate];
 }
 
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate {
     CFURLRef url = CFHTTPMessageCopyRequestURL(request);
-    SpdySession* session = [self getSession:url];
+    SpdySession* session = [self getSession:(NSURL*)url];
     if (session == nil) {
         [delegate onNotSpdyError];
     } else {
+        [delegate onConnect];
         [session fetchFromMessage:request delegate:delegate];
     }
     CFRelease(url);
@@ -102,6 +104,10 @@
 }
 
 - (void)onStreamClose {
+    
+}
+
+- (void)onConnect {
     
 }
 @end
