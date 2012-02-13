@@ -23,6 +23,7 @@
 		3870AF6A14E47F8E009D8118 /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF5214E47F8E009D8118 /* libSPDY.a */; };
 		3870AF7014E47F8E009D8118 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3870AF6E14E47F8E009D8118 /* InfoPlist.strings */; };
 		3870AF7314E47F8E009D8118 /* SPDYTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3870AF7214E47F8E009D8118 /* SPDYTests.m */; };
+		38FFF69414E9A303001A974E /* SPDY.h in Headers */ = {isa = PBXBuildFile; fileRef = 3870AF5A14E47F8E009D8118 /* SPDY.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -170,6 +171,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38FFF69414E9A303001A974E /* SPDY.h in Headers */,
 				3800CAE214E48CAE00B85319 /* SpdySession.h in Headers */,
 				3800CAE414E48CAE00B85319 /* SpdyStream.h in Headers */,
 			);
@@ -315,6 +317,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
+				DSTROOT = "$(SRCROOT)/../build/lib";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -339,6 +342,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
+				DSTROOT = "$(SRCROOT)/../build/lib";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -354,36 +358,46 @@
 		3870AF7714E47F8E009D8118 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DSTROOT = /tmp/SPDY.dst;
+				CURRENT_PROJECT_VERSION = 0.1;
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = "$(SRCROOT)/../build/";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../build/include";
+				INSTALL_PATH = /lib;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../build/lib\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = ../include/SPDY;
 				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "";
 			};
 			name = Debug;
 		};
 		3870AF7814E47F8E009D8118 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DSTROOT = /tmp/SPDY.dst;
+				CURRENT_PROJECT_VERSION = 0.1;
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = "$(SRCROOT)/../build/";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../build/include";
+				INSTALL_PATH = /lib;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../build/lib\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = ../include/SPDY;
 				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "";
 			};
 			name = Release;
 		};

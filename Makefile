@@ -1,7 +1,7 @@
 BUILD:=$(shell pwd)/build
 PKG_CONFIG_PATH=$(BUILD)/lib/pkgconfig
 
-all: spdylay
+all: SPDY
 
 
 build/lib/libcrypto.a: OpenSSL-for-iPhone/build-libssl.sh
@@ -28,4 +28,10 @@ build/lib/libz.a: zlib/build-zlib.sh
 zlib: build/lib/libz.a
 
 
-.PHONY: all spdylay zlib openssl
+SPDY/build/UninstalledProducts/libSPDY.a: spdylay
+	cd SPDY && xcodebuild install
+
+SPDY: SPDY/build/UninstalledProducts/libSPDY.a
+
+
+.PHONY: all spdylay zlib openssl SPDY
