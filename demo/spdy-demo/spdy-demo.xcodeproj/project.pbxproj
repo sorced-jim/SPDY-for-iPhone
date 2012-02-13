@@ -1,0 +1,520 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		38E9E0E114E597FA0085531C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E9E0E014E597FA0085531C /* UIKit.framework */; };
+		38E9E0E314E597FA0085531C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E9E0E214E597FA0085531C /* Foundation.framework */; };
+		38E9E0E514E597FA0085531C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E9E0E414E597FA0085531C /* CoreGraphics.framework */; };
+		38E9E0EB14E597FA0085531C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 38E9E0E914E597FA0085531C /* InfoPlist.strings */; };
+		38E9E0ED14E597FA0085531C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E9E0EC14E597FA0085531C /* main.m */; };
+		38E9E0F114E597FA0085531C /* WSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E9E0F014E597FA0085531C /* WSAppDelegate.m */; };
+		38E9E0F414E597FA0085531C /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38E9E0F214E597FA0085531C /* MainStoryboard.storyboard */; };
+		38E9E0F714E597FA0085531C /* WSMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E9E0F614E597FA0085531C /* WSMasterViewController.m */; };
+		38E9E0FA14E597FA0085531C /* WSDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E9E0F914E597FA0085531C /* WSDetailViewController.m */; };
+		38E9E10214E597FA0085531C /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E9E10114E597FA0085531C /* SenTestingKit.framework */; };
+		38E9E10314E597FA0085531C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E9E0E014E597FA0085531C /* UIKit.framework */; };
+		38E9E10414E597FA0085531C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E9E0E214E597FA0085531C /* Foundation.framework */; };
+		38E9E10C14E597FA0085531C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 38E9E10A14E597FA0085531C /* InfoPlist.strings */; };
+		38E9E10F14E597FA0085531C /* spdy_demoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E9E10E14E597FA0085531C /* spdy_demoTests.m */; };
+		38FFF69014E99702001A974E /* FetchedUrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 38FFF68F14E99702001A974E /* FetchedUrl.m */; };
+		38FFF69C14E9B892001A974E /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38FFF69B14E9B892001A974E /* libSPDY.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		38E9E10514E597FA0085531C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 38E9E0D314E597FA0085531C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 38E9E0DB14E597FA0085531C;
+			remoteInfo = "spdy-demo";
+		};
+		38E9E12014E5981C0085531C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 38E9E11814E5981B0085531C /* SPDY.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3870AF5214E47F8E009D8118;
+			remoteInfo = SPDY;
+		};
+		38E9E12214E5981C0085531C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 38E9E11814E5981B0085531C /* SPDY.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3870AF6214E47F8E009D8118;
+			remoteInfo = SPDYTests;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		38E9E0DC14E597FA0085531C /* spdy-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "spdy-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		38E9E0E014E597FA0085531C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		38E9E0E214E597FA0085531C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		38E9E0E414E597FA0085531C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		38E9E0E814E597FA0085531C /* spdy-demo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "spdy-demo-Info.plist"; sourceTree = "<group>"; };
+		38E9E0EA14E597FA0085531C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		38E9E0EC14E597FA0085531C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		38E9E0EE14E597FA0085531C /* spdy-demo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "spdy-demo-Prefix.pch"; sourceTree = "<group>"; };
+		38E9E0EF14E597FA0085531C /* WSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WSAppDelegate.h; sourceTree = "<group>"; };
+		38E9E0F014E597FA0085531C /* WSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WSAppDelegate.m; sourceTree = "<group>"; };
+		38E9E0F314E597FA0085531C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
+		38E9E0F514E597FA0085531C /* WSMasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WSMasterViewController.h; sourceTree = "<group>"; };
+		38E9E0F614E597FA0085531C /* WSMasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WSMasterViewController.m; sourceTree = "<group>"; };
+		38E9E0F814E597FA0085531C /* WSDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WSDetailViewController.h; sourceTree = "<group>"; };
+		38E9E0F914E597FA0085531C /* WSDetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WSDetailViewController.m; sourceTree = "<group>"; };
+		38E9E10014E597FA0085531C /* spdy-demoTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "spdy-demoTests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		38E9E10114E597FA0085531C /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		38E9E10914E597FA0085531C /* spdy-demoTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "spdy-demoTests-Info.plist"; sourceTree = "<group>"; };
+		38E9E10B14E597FA0085531C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		38E9E10D14E597FA0085531C /* spdy_demoTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spdy_demoTests.h; sourceTree = "<group>"; };
+		38E9E10E14E597FA0085531C /* spdy_demoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = spdy_demoTests.m; sourceTree = "<group>"; };
+		38E9E11814E5981B0085531C /* SPDY.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SPDY.xcodeproj; path = ../../SPDY/SPDY.xcodeproj; sourceTree = "<group>"; };
+		38FFF68E14E99702001A974E /* FetchedUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FetchedUrl.h; sourceTree = "<group>"; };
+		38FFF68F14E99702001A974E /* FetchedUrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FetchedUrl.m; sourceTree = "<group>"; };
+		38FFF69B14E9B892001A974E /* libSPDY.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSPDY.a; path = ../../SPDY/build/UninstalledProducts/libSPDY.a; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		38E9E0D914E597FA0085531C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38FFF69C14E9B892001A974E /* libSPDY.a in Frameworks */,
+				38E9E0E114E597FA0085531C /* UIKit.framework in Frameworks */,
+				38E9E0E314E597FA0085531C /* Foundation.framework in Frameworks */,
+				38E9E0E514E597FA0085531C /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		38E9E0FC14E597FA0085531C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38E9E10214E597FA0085531C /* SenTestingKit.framework in Frameworks */,
+				38E9E10314E597FA0085531C /* UIKit.framework in Frameworks */,
+				38E9E10414E597FA0085531C /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		38E9E0D114E597FA0085531C = {
+			isa = PBXGroup;
+			children = (
+				38FFF69B14E9B892001A974E /* libSPDY.a */,
+				38E9E11814E5981B0085531C /* SPDY.xcodeproj */,
+				38E9E0E614E597FA0085531C /* spdy-demo */,
+				38E9E10714E597FA0085531C /* spdy-demoTests */,
+				38E9E0DF14E597FA0085531C /* Frameworks */,
+				38E9E0DD14E597FA0085531C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		38E9E0DD14E597FA0085531C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				38E9E0DC14E597FA0085531C /* spdy-demo.app */,
+				38E9E10014E597FA0085531C /* spdy-demoTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		38E9E0DF14E597FA0085531C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				38E9E0E014E597FA0085531C /* UIKit.framework */,
+				38E9E0E214E597FA0085531C /* Foundation.framework */,
+				38E9E0E414E597FA0085531C /* CoreGraphics.framework */,
+				38E9E10114E597FA0085531C /* SenTestingKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		38E9E0E614E597FA0085531C /* spdy-demo */ = {
+			isa = PBXGroup;
+			children = (
+				38E9E0EF14E597FA0085531C /* WSAppDelegate.h */,
+				38E9E0F014E597FA0085531C /* WSAppDelegate.m */,
+				38E9E0F214E597FA0085531C /* MainStoryboard.storyboard */,
+				38E9E0F514E597FA0085531C /* WSMasterViewController.h */,
+				38E9E0F614E597FA0085531C /* WSMasterViewController.m */,
+				38E9E0F814E597FA0085531C /* WSDetailViewController.h */,
+				38E9E0F914E597FA0085531C /* WSDetailViewController.m */,
+				38FFF68E14E99702001A974E /* FetchedUrl.h */,
+				38FFF68F14E99702001A974E /* FetchedUrl.m */,
+				38E9E0E714E597FA0085531C /* Supporting Files */,
+			);
+			path = "spdy-demo";
+			sourceTree = "<group>";
+		};
+		38E9E0E714E597FA0085531C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				38E9E0E814E597FA0085531C /* spdy-demo-Info.plist */,
+				38E9E0E914E597FA0085531C /* InfoPlist.strings */,
+				38E9E0EC14E597FA0085531C /* main.m */,
+				38E9E0EE14E597FA0085531C /* spdy-demo-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		38E9E10714E597FA0085531C /* spdy-demoTests */ = {
+			isa = PBXGroup;
+			children = (
+				38E9E10D14E597FA0085531C /* spdy_demoTests.h */,
+				38E9E10E14E597FA0085531C /* spdy_demoTests.m */,
+				38E9E10814E597FA0085531C /* Supporting Files */,
+			);
+			path = "spdy-demoTests";
+			sourceTree = "<group>";
+		};
+		38E9E10814E597FA0085531C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				38E9E10914E597FA0085531C /* spdy-demoTests-Info.plist */,
+				38E9E10A14E597FA0085531C /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		38E9E11914E5981B0085531C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				38E9E12114E5981C0085531C /* libSPDY.a */,
+				38E9E12314E5981C0085531C /* SPDYTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		38E9E0DB14E597FA0085531C /* spdy-demo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 38E9E11214E597FA0085531C /* Build configuration list for PBXNativeTarget "spdy-demo" */;
+			buildPhases = (
+				38E9E0D814E597FA0085531C /* Sources */,
+				38E9E0D914E597FA0085531C /* Frameworks */,
+				38E9E0DA14E597FA0085531C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "spdy-demo";
+			productName = "spdy-demo";
+			productReference = 38E9E0DC14E597FA0085531C /* spdy-demo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		38E9E0FF14E597FA0085531C /* spdy-demoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 38E9E11514E597FA0085531C /* Build configuration list for PBXNativeTarget "spdy-demoTests" */;
+			buildPhases = (
+				38E9E0FB14E597FA0085531C /* Sources */,
+				38E9E0FC14E597FA0085531C /* Frameworks */,
+				38E9E0FD14E597FA0085531C /* Resources */,
+				38E9E0FE14E597FA0085531C /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				38E9E10614E597FA0085531C /* PBXTargetDependency */,
+			);
+			name = "spdy-demoTests";
+			productName = "spdy-demoTests";
+			productReference = 38E9E10014E597FA0085531C /* spdy-demoTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		38E9E0D314E597FA0085531C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
+			buildConfigurationList = 38E9E0D614E597FA0085531C /* Build configuration list for PBXProject "spdy-demo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 38E9E0D114E597FA0085531C;
+			productRefGroup = 38E9E0DD14E597FA0085531C /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 38E9E11914E5981B0085531C /* Products */;
+					ProjectRef = 38E9E11814E5981B0085531C /* SPDY.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				38E9E0DB14E597FA0085531C /* spdy-demo */,
+				38E9E0FF14E597FA0085531C /* spdy-demoTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		38E9E12114E5981C0085531C /* libSPDY.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSPDY.a;
+			remoteRef = 38E9E12014E5981C0085531C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		38E9E12314E5981C0085531C /* SPDYTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = SPDYTests.octest;
+			remoteRef = 38E9E12214E5981C0085531C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		38E9E0DA14E597FA0085531C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38E9E0EB14E597FA0085531C /* InfoPlist.strings in Resources */,
+				38E9E0F414E597FA0085531C /* MainStoryboard.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		38E9E0FD14E597FA0085531C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38E9E10C14E597FA0085531C /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		38E9E0FE14E597FA0085531C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		38E9E0D814E597FA0085531C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38E9E0ED14E597FA0085531C /* main.m in Sources */,
+				38E9E0F114E597FA0085531C /* WSAppDelegate.m in Sources */,
+				38E9E0F714E597FA0085531C /* WSMasterViewController.m in Sources */,
+				38E9E0FA14E597FA0085531C /* WSDetailViewController.m in Sources */,
+				38FFF69014E99702001A974E /* FetchedUrl.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		38E9E0FB14E597FA0085531C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38E9E10F14E597FA0085531C /* spdy_demoTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		38E9E10614E597FA0085531C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 38E9E0DB14E597FA0085531C /* spdy-demo */;
+			targetProxy = 38E9E10514E597FA0085531C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		38E9E0E914E597FA0085531C /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				38E9E0EA14E597FA0085531C /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		38E9E0F214E597FA0085531C /* MainStoryboard.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				38E9E0F314E597FA0085531C /* en */,
+			);
+			name = MainStoryboard.storyboard;
+			sourceTree = "<group>";
+		};
+		38E9E10A14E597FA0085531C /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				38E9E10B14E597FA0085531C /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		38E9E11014E597FA0085531C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		38E9E11114E597FA0085531C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		38E9E11314E597FA0085531C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "spdy-demo/spdy-demo-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SPDY/build/include";
+				INFOPLIST_FILE = "spdy-demo/spdy-demo-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../SPDY/build/UninstalledProducts\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		38E9E11414E597FA0085531C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "spdy-demo/spdy-demo-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SPDY/build/include";
+				INFOPLIST_FILE = "spdy-demo/spdy-demo-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../SPDY/build/UninstalledProducts\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		38E9E11614E597FA0085531C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/spdy-demo.app/spdy-demo";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "spdy-demo/spdy-demo-Prefix.pch";
+				INFOPLIST_FILE = "spdy-demoTests/spdy-demoTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		38E9E11714E597FA0085531C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/spdy-demo.app/spdy-demo";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "spdy-demo/spdy-demo-Prefix.pch";
+				INFOPLIST_FILE = "spdy-demoTests/spdy-demoTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		38E9E0D614E597FA0085531C /* Build configuration list for PBXProject "spdy-demo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38E9E11014E597FA0085531C /* Debug */,
+				38E9E11114E597FA0085531C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		38E9E11214E597FA0085531C /* Build configuration list for PBXNativeTarget "spdy-demo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38E9E11314E597FA0085531C /* Debug */,
+				38E9E11414E597FA0085531C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		38E9E11514E597FA0085531C /* Build configuration list for PBXNativeTarget "spdy-demoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38E9E11614E597FA0085531C /* Debug */,
+				38E9E11714E597FA0085531C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 38E9E0D314E597FA0085531C /* Project object */;
+}
