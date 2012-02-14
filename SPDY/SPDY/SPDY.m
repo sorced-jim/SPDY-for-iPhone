@@ -27,7 +27,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-
+#include "openssl/ssl.h"
 #import "SpdySession.h"
 
 
@@ -77,6 +77,7 @@
 }
 
 - (SPDY*) init {
+    SSL_library_init();
     self = [super init];
     sessions = [[NSMutableDictionary alloc]init];
     return self;
