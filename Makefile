@@ -28,10 +28,10 @@ build/lib/libz.a: zlib/build-zlib.sh
 zlib: build/lib/libz.a
 
 
-SPDY/build/UninstalledProducts/libSPDY.a: spdylay
-	cd SPDY && xcodebuild install
+build/lib/libSPDY.a: build/lib/libspdylay.a
+	cd SPDY && make
 
-SPDY: SPDY/build/UninstalledProducts/libSPDY.a
+SPDY: build/lib/libSPDY.a
 
 
 .PHONY: all spdylay zlib openssl SPDY
