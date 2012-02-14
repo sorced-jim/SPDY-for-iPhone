@@ -316,13 +316,16 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
         spdylay_session_del(session);
     }
     [streams release];
-    SSL_shutdown(ssl);
-    SSL_free(ssl);
-    SSL_CTX_free(ssl_ctx);
-    CFSocketInvalidate(socket);
-    CFRelease(socket);
-    free(callbacks);
+    if (ssl != NULL) {
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        SSL_CTX_free(ssl_ctx);
+    }
+    if (socket != nil) {
+        CFSocketInvalidate(socket);
+        CFRelease(socket);
+    }
     socket = nil;
-    [super dealloc];
+    free(callbacks);
 }
 @end

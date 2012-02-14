@@ -40,6 +40,7 @@
     if (session == nil) {
         session = [[[SpdySession alloc]init] autorelease];
         if (![session connect:url]) {
+            NSLog(@"Could not connect to %@", url);
             return nil;
         }
         [sessions setObject:session forKey:[url host]];
