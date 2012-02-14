@@ -64,7 +64,6 @@
 }
 
 - (void)dealloc {
-    //[delegate release];
-    delegate = nil;
+    [delegate release];
 }
 @end

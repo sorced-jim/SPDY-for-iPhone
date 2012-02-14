@@ -39,7 +39,7 @@
 	// Do any additional setup after loading the view, typically from a nib.
 
     self.urlsFetched = [NSMutableArray arrayWithCapacity:4];
-    self.spdy = [[SPDY alloc]init];
+    self.spdy = [[[SPDY alloc]init] autorelease];
     self.urlTable.dataSource = self;
     self.urlTable.delegate = self;
 }
@@ -49,8 +49,10 @@
     [self setUrlInput:nil];
     [self setUrlTable:nil];
     [super viewDidUnload];
+
     // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
+    self.spdy = nil;
+    self.urlsFetched = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -84,20 +86,7 @@
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-
-
-
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source.
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
-    }   
+    return NO;
 }
 
 - (IBAction)fetchUrl:(id)sender {
@@ -105,7 +94,7 @@
     if (url == nil) {
         return;
     }
-    FetchedUrl *u = [[FetchedUrl alloc]init:url spdy:self.spdy];
+    FetchedUrl *u = [[[FetchedUrl alloc]init:url spdy:self.spdy] autorelease];
     [self.urlsFetched addObject:u];
     NSArray* insertPath = [NSArray arrayWithObjects: [NSIndexPath indexPathForRow:[self.urlsFetched count]-1 inSection:0], nil];
     

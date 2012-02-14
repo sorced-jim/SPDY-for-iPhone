@@ -14,8 +14,8 @@
 
 - (IBAction)fetchUrl:(id)sender;
 
-@property (weak, nonatomic) IBOutlet UITableView *urlTable;
-@property (weak, nonatomic) IBOutlet UITextField *urlInput;
+@property (retain, nonatomic) IBOutlet UITableView *urlTable;
+@property (retain, nonatomic) IBOutlet UITextField *urlInput;
 @property (retain) NSMutableArray *urlsFetched;
 @property (retain) SPDY *spdy;
 
