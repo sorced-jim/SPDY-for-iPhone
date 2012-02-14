@@ -32,6 +32,7 @@ Usage: ${0##*/} [-h] [-p prefix] target [configure_args]
   -h      Print help message
   -p      Installation prefix
           (default: `pwd`/build/[target]-[version])
+  -k      The pkgconfig directory.
 
 The target must be one of "iphone", "ipad", or "simulator". Any additional 
 arguments are passed to configure.
@@ -46,10 +47,12 @@ The following environment variables affect the build process:
 EOF
 }
 
-while getopts ":hp:t" opt; do
+extra_pkg_config=""
+while getopts ":hp:tk:" opt; do
     case $opt in
         h  ) usage ; exit 0 ;;
         p  ) prefix="$OPTARG" ;;
+        k  ) extra_pkg_config="$OPTARG:" ;;
         \? ) usage ; exit 2 ;;
     esac
 done
@@ -105,8 +108,7 @@ if [ ! \( -x "./configure" \) ] ; then
     exit 1
 fi
 
-export PKG_CONFIG_PATH="$SDKROOT/usr/lib/pkgconfig:$prefix/lib/pkgconfig"
-echo $PKG_CONFIG_PATH
+export PKG_CONFIG_PATH="${extra_pkg_config}$SDKROOT/usr/lib/pkgconfig"
 export PKG_CONFIG_LIBDIR="$PKG_CONFIG_PATH"
 export AS="$DEVROOT/usr/bin/as"
 export ASCPP="$DEVROOT/usr/bin/as"
