@@ -7,8 +7,10 @@
 //
 
 #import "WSMasterViewController.h"
+
 #import "FetchedUrl.h"
 #import "SPDY/SPDY.h"
+#import "WSDetailViewController.h"
 
 @implementation WSMasterViewController {
     NSMutableArray *_urlsFetched;
@@ -129,5 +131,12 @@
     return [self.urlsFetched count];
 }
 
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    NSUInteger selectedIndex = [self.urlTable indexPathForSelectedRow].row;
+	if ([segue.identifier isEqualToString:@"viewPageSeque"]) {
+        WSDetailViewController *webViewController = segue.destinationViewController;
+        webViewController.url = [self.urlsFetched objectAtIndex:selectedIndex];
+	}
+}
 
 @end

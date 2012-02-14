@@ -78,7 +78,7 @@
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <connections>
-                                            <segue destination="21" kind="push" id="C2b-cf-uya"/>
+                                            <segue destination="21" kind="push" identifier="viewPageSeque" id="C2b-cf-uya"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -114,27 +114,15 @@
                     <navigationItem key="navigationItem" title="View" id="C6D-je-41Z">
                         <barButtonItem key="backBarButtonItem" title="Back" id="z24-SG-zDh"/>
                     </navigationItem>
+                    <connections>
+                        <outlet property="navTitle" destination="C6D-je-41Z" id="AF9-hv-r6E"/>
+                        <outlet property="webView" destination="oLI-eY-0q8" id="AgF-HU-cbh"/>
+                    </connections>
                 </viewController>
             </objects>
             <point key="canvasLocation" x="1006" y="181"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="WSDetailViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WSDetailViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="detailDescriptionLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="WSMasterViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WSMasterViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="fetchUrl:"/>
-                <relationship kind="outlet" name="urlInput" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="urlTable" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

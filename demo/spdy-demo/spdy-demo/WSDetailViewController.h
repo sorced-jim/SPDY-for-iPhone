@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+@class FetchedUrl;
+
 @interface WSDetailViewController : UIViewController
+@property (retain, nonatomic) IBOutlet UINavigationItem *navTitle;
+@property (retain, nonatomic) IBOutlet UIWebView *webView;
+@property (retain) FetchedUrl* url;
 
-@property (strong, nonatomic) id detailItem;
-
-@property (strong, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
 
 @end

@@ -7,34 +7,39 @@
 //
 
 #import "WSDetailViewController.h"
+#import "FetchedUrl.h"
 
 @interface WSDetailViewController ()
 - (void)configureView;
 @end
 
-@implementation WSDetailViewController
+@implementation WSDetailViewController {
+    FetchedUrl *_url;
+}
+@synthesize navTitle = _navTitle;
+@synthesize webView = _webView;
 
-@synthesize detailItem = _detailItem;
-@synthesize detailDescriptionLabel = _detailDescriptionLabel;
 
-#pragma mark - Managing the detail item
+#pragma mark - Managing the url.
 
-- (void)setDetailItem:(id)newDetailItem
-{
-    if (_detailItem != newDetailItem) {
-        _detailItem = newDetailItem;
-        
+- (void)setUrl:(FetchedUrl*)u {
+    if (_url != u) {
+        _url = u;
         // Update the view.
         [self configureView];
     }
+}
+
+- (FetchedUrl*)url {
+    return _url;
 }
 
 - (void)configureView
 {
     // Update the user interface for the detail item.
 
-    if (self.detailItem) {
-        self.detailDescriptionLabel.text = [self.detailItem description];
+    if (self.url != nil) {
+        self.navTitle.title = self.url.url;
     }
 }
 
@@ -50,14 +55,18 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    self.url = nil;
     [self configureView];
 }
 
 - (void)viewDidUnload
 {
+    [self setWebView:nil];
+    [self setTitle:nil];
+    [self setNavTitle:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
+    self.url = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -86,4 +95,10 @@
     return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
 
+- (void)dealloc {
+    self.url = nil;
+    [_webView release];
+    [_navTitle release];
+    [super dealloc];
+}
 @end
