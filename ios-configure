@@ -68,9 +68,9 @@ shift
 
 case $target in
     iphone )
-        arch=armv6
+        arch=armv7
         platform=iPhoneOS
-        host=arm-apple-darwin9
+        host=arm-apple-darwin10
         ;;
     
     ipad )

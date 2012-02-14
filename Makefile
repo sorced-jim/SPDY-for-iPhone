@@ -29,13 +29,13 @@ build/lib/libspdylay.a: build/armv7/lib/libspdylay.a build/armv7/lib/libspdylay.
 spdylay: build/lib/libspdylay.a
 
 
-build/lib/i386/lib/libz.a: zlib/build-zlib.sh
+build/i386/lib/libz.a: zlib/build-zlib.sh
 	cd zlib && PLATFORM=iPhoneSimulator ARCH=i386 ROOTDIR=$(BUILD)/i386 ./build-zlib.sh
 
-build/lib/armv7/lib/libz.a: zlib/build-zlib.sh
+build/armv7/lib/libz.a: zlib/build-zlib.sh
 	cd zlib && PLATFORM=iPhoneOS ARCH=armv7 ROOTDIR=$(BUILD)/armv7 ./build-zlib.sh
 
-build/lib/libz.a: build/lib/i386/lib/libz.a build/lib/armv7/lib/libz.a
+build/lib/libz.a: build/i386/lib/libz.a build/armv7/lib/libz.a
 	lipo -create build/armv7/lib/libz.a build/i386/lib/libz.a -output build/lib/libz.a
 
 zlib: build/lib/libz.a
