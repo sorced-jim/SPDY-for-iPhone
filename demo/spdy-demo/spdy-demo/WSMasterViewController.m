@@ -12,14 +12,14 @@
 #import "SPDY/SPDY.h"
 #import "WSDetailViewController.h"
 
+static SPDY* spdy = NULL;
+
 @implementation WSMasterViewController {
     NSMutableArray *_urlsFetched;
-    SPDY *_spdy;
 }
 @synthesize urlTable;
 @synthesize urlInput;
 @synthesize urlsFetched = _urlsFetched;
-@synthesize spdy = _spdy;
 
 
 - (void)awakeFromNib
@@ -41,7 +41,9 @@
 	// Do any additional setup after loading the view, typically from a nib.
 
     self.urlsFetched = [NSMutableArray arrayWithCapacity:4];
-    self.spdy = [[[SPDY alloc]init] autorelease];
+    if (spdy == NULL) {
+        spdy = [[SPDY alloc]init];        
+    }
     self.urlTable.dataSource = self;
     self.urlTable.delegate = self;
 }
@@ -53,7 +55,6 @@
     [super viewDidUnload];
 
     // Release any retained subviews of the main view.
-    self.spdy = nil;
     self.urlsFetched = nil;
 }
 
@@ -96,7 +97,7 @@
     if (url == nil) {
         return;
     }
-    FetchedUrl *u = [[[FetchedUrl alloc]init:url spdy:self.spdy] autorelease];
+    FetchedUrl *u = [[[FetchedUrl alloc]init:url spdy:spdy table:self.urlTable] autorelease];
     [self.urlsFetched addObject:u];
     NSArray* insertPath = [NSArray arrayWithObjects: [NSIndexPath indexPathForRow:[self.urlsFetched count]-1 inSection:0], nil];
     

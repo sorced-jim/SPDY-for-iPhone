@@ -10,9 +10,9 @@
 #import "SPDY/SPDY.h"
 
 @interface Callback : BufferedCallback {
-    FetchedUrl *url;
+    FetchedUrl *fetchedUrl;
 }
-- (id)init:(FetchedUrl*) url;
+- (id)init:(FetchedUrl*) fetchedUrl;
 @end
 
 @implementation Callback {
@@ -21,24 +21,38 @@
 
 - (id)init:(FetchedUrl*) u {
     self = [super init];
-    url = u;
+    fetchedUrl = u;
+
     return self;
 }
 
 - (void)onNotSpdyError {
-    url.state = @"Host does not support SPDY";
+    fetchedUrl.state = @"Host does not support SPDY";
 }
 
 - (void)onError {
-    url.state = @"Error";
+    fetchedUrl.state = @"Error";
+}
+
+- (void)onConnect:(NSURL*)u {
+    [super onConnect:u];
+    fetchedUrl.state = @"connected";
+    fetchedUrl.baseUrl = u;
+}
+
+- (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length {
+    fetchedUrl.state = @"Loading";
+    [fetchedUrl.parent reloadData];
+    return [super onResponseData:bytes length:length];
 }
 
 - (void)onResponse:(CFHTTPMessageRef)response {
-    url.state = @"loaded";
-}
+    CFDataRef b = CFHTTPMessageCopyBody(response);
+    fetchedUrl.body = (NSData*)b;
+    CFRelease(b);
 
-- (void)onConnect {
-    url.state = @"connected";
+    fetchedUrl.state = @"loaded";
+    [fetchedUrl.parent reloadData];
 }
 
 @end
@@ -47,23 +61,32 @@
     NSString *_url;
     NSString *_state;
     NSData *_body;
+    NSURL* _baseUrl;
     Callback *delegate;
+    UITableView *_parent;
 }
 
 @synthesize url = _url;
 @synthesize state = _state;
 @synthesize body = _body;
+@synthesize baseUrl = _baseUrl;
+@synthesize parent = _parent;
 
-- (id)init:(NSString*)u spdy:(SPDY*)spdy {
+- (id)init:(NSString*)u spdy:(SPDY*)spdy table:(UITableView*)table {
     self = [super init];
     delegate = [[Callback alloc]init:self];
     self.url = u;
+    self.parent = table;
     self.state = @"connecting";
     [spdy fetch:u delegate:delegate];
     return self;
 }
 
 - (void)dealloc {
+    self.url = nil;
+    self.baseUrl = nil;
+    self.body = nil;
+    self.state = nil;
     [delegate release];
 }
 @end

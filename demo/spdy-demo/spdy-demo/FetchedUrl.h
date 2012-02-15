@@ -12,9 +12,11 @@
 
 @interface FetchedUrl : NSObject
 
-- (id)init:(NSString*)url spdy:(SPDY*)spdy;
+- (id)init:(NSString*)url spdy:(SPDY*)spdy table:(UITableView*)table;
 
 @property (retain) NSString* url;
 @property (retain) NSString* state;
+@property (retain) NSURL* baseUrl;
 @property (retain) NSData* body;
+@property (retain) UITableView* parent;
 @end

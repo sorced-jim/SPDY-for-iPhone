@@ -15,6 +15,7 @@
 
 @implementation WSDetailViewController {
     FetchedUrl *_url;
+    NSString* _state;
 }
 @synthesize navTitle = _navTitle;
 @synthesize webView = _webView;
@@ -40,6 +41,9 @@
 
     if (self.url != nil) {
         self.navTitle.title = self.url.url;
+        if (self.url.state == @"loaded") {
+            [self.webView loadData:self.url.body MIMEType:@"text/html" textEncodingName:@"utf-8" baseURL:self.url.baseUrl];
+        }
     }
 }
 
