@@ -12,6 +12,7 @@ openssl: build/lib/libcrypto.a
 
 spdylay/configure: spdylay/configure.ac build/lib/libz.a build/lib/libcrypto.a
 	cd spdylay && autoreconf -i && automake && autoconf
+	touch spdylay/configure
 
 build/armv7/lib/libspdylay.a: spdylay/configure ios-configure
 	cd spdylay && make clean
@@ -23,8 +24,9 @@ build/i386/lib/libspdylay.a: spdylay/configure ios-configure
 	cd spdylay && ../ios-configure -p "$(BUILD)/i386" -k $(PKG_CONFIG_PATH) simulator
 	cd spdylay && make install
 
-build/lib/libspdylay.a: build/armv7/lib/libspdylay.a build/armv7/lib/libspdylay.a
+build/lib/libspdylay.a: build/armv7/lib/libspdylay.a build/i386/lib/libspdylay.a
 	lipo -create "build/armv7/lib/libspdylay.a" "build/i386/lib/libspdylay.a" -output "build/lib/libspdylay.a"
+	cp -r build/armv7/include/* build/include
 
 spdylay: build/lib/libspdylay.a
 
@@ -37,7 +39,7 @@ build/armv7/lib/libz.a: zlib/build-zlib.sh
 
 build/lib/libz.a: build/i386/lib/libz.a build/armv7/lib/libz.a
 	-mkdir -p build/lib
-	lipo -create build/armv7/lib/libz.a build/i386/lib/libz.a -output build/lib/libz.a
+	sed -e 's,prefix=\(.*\)/armv7,prefix=\1,g' build/armv7/lib/pkgconfig/zlib.pc > build/lib/pkgconfig/zlib.pc
 
 zlib: build/lib/libz.a
 
