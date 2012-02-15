@@ -55,7 +55,7 @@ static int countItems(const char** nv) {
     stream = [SpdyStream createFromNSURL:url delegate:delegate];
     const char** nv = [stream nameValues];
     int items = countItems(nv);
-    STAssertEquals(12, items, @"There should only be twelve pairs");
+    STAssertEquals(12, items, @"There should only be 6 pairs");
     STAssertEquals(0, items % 2, @"There must be an even number of pairs.");
     STAssertEquals(0, strcmp(nv[0], "method"), @"First value is not method");
     STAssertEquals(0, strcmp(nv[1], "GET"), @"A NSURL uses get");
@@ -70,11 +70,44 @@ static int countItems(const char** nv) {
     STAssertEquals(0, strcmp(nv[11], "HTTP/1.1"), @"Yup, 1.1 for the proxies.");
 }
 
-- (void)testCloseStream
-{
+- (void)testCloseStream {
     stream = [SpdyStream createFromNSURL:url delegate:delegate];
     [stream closeStream];
     STAssertTrue(delegate.closeCalled, @"Delegate not called on stream closed.");
+}
+
+- (void)testSerializeHeaders {
+    CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("OPTIONS"), (CFURLRef)url, CFSTR("HTTP/1.0"));
+    CFHTTPMessageSetHeaderFieldValue(msg, CFSTR("Boy"), CFSTR("Bad"));
+    stream = [SpdyStream createFromCFHTTPMessage:msg delegate:delegate];
+    const char **nv = [stream nameValues];
+    STAssertTrue(nv != NULL, @"nameValues should be allocated");
+    if (nv == NULL) {
+        return;
+    }
+    int items = countItems(nv);
+    STAssertEquals(14, items, @"At least 7 pairs.");
+    if (items < 14) {
+        return;
+    }
+    STAssertEquals(0, items % 2, @"There must be an even number of pairs.");
+    STAssertEquals(0, strcmp(nv[0], "method"), @"First value is not method");
+    STAssertEquals(0, strcmp(nv[1], "OPTIONS"), @"Pull the method from the message '%s'.", nv[1]);
+    STAssertEquals(0, strcmp(nv[2], "user-agent"), @"The user-agent value doesn't matter.");
+    
+    STAssertEquals(0, strcmp(nv[4], "version"), @"We'll send http/1.1");
+    STAssertEquals(0, strcmp(nv[5], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[5]);
+    
+    STAssertEquals(0, strcmp(nv[6], "scheme"), @"The scheme exists: '%s'", nv[4]);
+    STAssertEquals(0, strcmp(nv[7], "http"), @"It's pulled from the url.");
+    STAssertEquals(0, strcmp(nv[8], "host"), @"The host is separate.");
+    STAssertEquals(0, strcmp(nv[9], "example.com"), @"No www here.");
+
+    STAssertEquals(0, strcmp(nv[10], "url"), @"");
+    STAssertEquals(0, strcmp(nv[11], "/bar;foo?q=123&q=bar&j=3"), @"The path and query parameters must be in the url: '%s'", nv[11]);
+    STAssertEquals(0, strcmp(nv[12], "Boy"), @"Boy is a header.");
+    STAssertEquals(0, strcmp(nv[13], "Bad"), @"The boy was bad.");
+    CFRelease(msg);
 }
 
 @end

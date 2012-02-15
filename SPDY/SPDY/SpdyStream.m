@@ -73,7 +73,12 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
 }
 
 - (const char*) copyCFString:(CFStringRef) str {
-    const char* utf8 = CFStringGetCStringPtr(str, kCFStringEncodingUTF8);
+    const char* utf8 = CFStringGetCStringPtr(str, CFStringGetFastestEncoding(str));
+    if (utf8 == NULL) {
+        NSLog(@"Can't get raw version of %@: %@", str, CFStringGetFastestEncoding(str));
+        return "";
+    }
+    
     unsigned long length = strlen(utf8) + 1;
     NSInteger arenaLength = [stringArena length];
     [stringArena appendBytes:utf8 length:length];
@@ -96,18 +101,21 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     nv[2] = "user-agent";
     nv[3] = "SPDY objc-0.0.1";
     nv[4] = "version";
-    nv[5] = "HTTP/1.";
+    nv[5] = [self copyCFString:CFHTTPMessageCopyVersion(msg)];
     CFURLRef u = CFHTTPMessageCopyRequestURL(msg);
     nv[6] = "scheme";
     nv[7] = [self copyCFString:CFURLCopyScheme(u)];
+    const char* host = [self copyCFString:CFURLCopyHostName(u)];
     nv[8] = "host";
-    nv[9] = [self copyCFString:CFURLCopyHostName(u)];
+    nv[9] = host;
     nv[10] = "url";
-    // This is wrong since the query parameters are missing.
-    nv[11] = [self copyCFString:CFURLCopyPath(u)];
-    for (index = 12; index < count+12; ++index) {
-        nv[index*2] = [self copyCFString:keys[index]];
-        nv[index*2 + 1] = [self copyCFString:values[index]];
+    const char* path = [self copyCFString:CFURLCopyPath(u)];
+    [stringArena setLength:[stringArena length] - 1];  // Remove the \0 from path.
+    [self copyCFString:CFURLCopyResourceSpecifier(u)];
+    nv[11] = path;
+    for (index = 0; index < count; ++index) {
+        nv[index*2 + 12] = [self copyCFString:keys[index]];
+        nv[index*2 + 13] = [self copyCFString:values[index]];
     }
     nv[count*2+6*2] = NULL;
     CFRelease(u);
@@ -124,7 +132,7 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     stream.delegate = delegate;
     [stream setStringArena:[NSMutableData dataWithCapacity:100]];
     [stream serializeHeaders:msg];
-    return nil;
+    return stream;
 }
 
 + (SpdyStream*)createFromNSURL:(NSURL *)url delegate:(RequestCallback *)delegate {
