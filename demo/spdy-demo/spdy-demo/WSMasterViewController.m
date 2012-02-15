@@ -118,6 +118,7 @@ static SPDY* spdy = NULL;
     FetchedUrl *url = [self.urlsFetched objectAtIndex:indexPath.row];
     cell.textLabel.text = url.url;
     cell.detailTextLabel.text = url.state;
+    [self.view endEditing:YES];
     return cell;
 }
 
