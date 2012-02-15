@@ -36,6 +36,7 @@ build/armv7/lib/libz.a: zlib/build-zlib.sh
 	cd zlib && PLATFORM=iPhoneOS ARCH=armv7 ROOTDIR=$(BUILD)/armv7 ./build-zlib.sh
 
 build/lib/libz.a: build/i386/lib/libz.a build/armv7/lib/libz.a
+	-mkdir -p build/lib
 	lipo -create build/armv7/lib/libz.a build/i386/lib/libz.a -output build/lib/libz.a
 
 zlib: build/lib/libz.a
@@ -47,4 +48,7 @@ build/lib/libSPDY.a: build/lib/libspdylay.a
 SPDY: build/lib/libSPDY.a
 
 
-.PHONY: all spdylay zlib openssl SPDY
+clean:
+	-rm -r build
+	cd spdylay && make clean
+.PHONY: all spdylay zlib openssl SPDY clean

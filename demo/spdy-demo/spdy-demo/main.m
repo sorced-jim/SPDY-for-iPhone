@@ -3,7 +3,7 @@
 //  spdy-demo
 //
 //  Created by Jim Morrison on 2/10/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Twist Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

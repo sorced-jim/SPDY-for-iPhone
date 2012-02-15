@@ -31,15 +31,17 @@
 #include <netdb.h>
 
 
+#import "SPDY.h"
 #import "SpdyStream.h"
 
 #include "openssl/ssl.h"
 #include "openssl/err.h"
 #include "spdylay/spdylay.h"
 
+static const int priority = 1;
+
 @implementation SpdySession {
     NSMutableSet *streams;
-    int32_t nextStreamId;
     
     CFSocketRef socket;
     SSL* ssl;
@@ -201,16 +203,20 @@ static int connect_to(NSURL* url) {
 
 - (void)fetch:(NSURL *)u delegate:(RequestCallback *)delegate {
     SpdyStream* stream = [[SpdyStream createFromNSURL:u delegate:delegate] autorelease];
-    spdylay_submit_request(session, nextStreamId, [stream nameValues], NULL, stream);
-    [streams addObject:stream];
-    nextStreamId += 2;
+    if (spdylay_submit_request(session, priority, [stream nameValues], NULL, stream) < 0) {
+        [delegate onError];
+    } else {
+        [streams addObject:stream];
+    }
 }
 
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate {
     SpdyStream* stream = [[SpdyStream createFromCFHTTPMessage:request delegate:delegate] autorelease];
-    spdylay_submit_request(session, nextStreamId, [stream nameValues], NULL, stream);
-    [streams addObject:stream];
-    nextStreamId += 2;
+    if (spdylay_submit_request(session, priority, [stream nameValues], NULL, stream) < 0) {
+        [delegate onError];
+    } else {
+        [streams addObject:stream];
+    }
 }
 
 - (void)addToLoop {
@@ -310,7 +316,6 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     //callbacks->on_ctrl_send_callback = on_ctrl_send_callback3;        
     spdylay_session_client_new(&session, callbacks, self);
     self.spdy_negotiated = false;
-    nextStreamId = 1;
     
     streams = [[NSMutableSet alloc] init];
     
