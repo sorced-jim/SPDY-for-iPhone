@@ -38,10 +38,9 @@
 - (void)configureView
 {
     // Update the user interface for the detail item.
-
     if (self.url != nil) {
         self.navTitle.title = self.url.url;
-        if (self.url.state == @"loaded") {
+        if ([self.url.state isEqualToString:@"loaded"]) {
             [self.webView loadData:self.url.body MIMEType:@"text/html" textEncodingName:@"utf-8" baseURL:self.url.baseUrl];
         }
     }
@@ -59,7 +58,6 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    self.url = nil;
     [self configureView];
 }
 
@@ -70,31 +68,25 @@
     [self setNavTitle:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
-    self.url = nil;
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
 }
 
-- (void)viewDidDisappear:(BOOL)animated
-{
+- (void)viewDidDisappear:(BOOL)animated {
 	[super viewDidDisappear:animated];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Return YES for supported orientations
     return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
