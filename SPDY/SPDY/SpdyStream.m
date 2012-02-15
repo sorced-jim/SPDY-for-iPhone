@@ -26,6 +26,7 @@
 
 @synthesize nameValues;
 @synthesize url;
+@synthesize body;
 @synthesize delegate;
 @synthesize stringArena;
 
@@ -129,6 +130,11 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     SpdyStream *stream = [[SpdyStream alloc]init];
     stream.nameValues = malloc(sizeof(const char*)* (6*2 + 1));
     stream.url = (NSURL*)CFHTTPMessageCopyRequestURL(msg);
+    CFDataRef body = CFHTTPMessageCopyBody(msg);
+    if (body != nil) {
+        stream.body = (NSData*)body;
+        CFRelease(body);
+    }
     stream.delegate = delegate;
     [stream setStringArena:[NSMutableData dataWithCapacity:100]];
     [stream serializeHeaders:msg];

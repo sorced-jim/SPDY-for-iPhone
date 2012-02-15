@@ -24,10 +24,10 @@
 
 @interface SpdyStream : NSObject {
     const char** nameValues;
-    NSURL* url;
-    NSUInteger baseOffset;
+    NSURL *url;
+    NSData *body;   
     BOOL streamClosed;
-    RequestCallback* delegate;
+    RequestCallback *delegate;
     
     NSMutableData *stringArena;
 }
@@ -44,6 +44,7 @@
 @property (retain) NSURL* url;
 @property (retain) RequestCallback* delegate;
 @property (retain) NSMutableData *stringArena;
+@property (retain) NSData *body;
 
 @end
 

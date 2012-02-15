@@ -68,6 +68,8 @@ static int countItems(const char** nv) {
     STAssertEquals(0, strcmp(nv[8], "user-agent"), @"The user-agent value doesn't matter.");
     STAssertEquals(0, strcmp(nv[10], "version"), @"We'll send http/1.1");
     STAssertEquals(0, strcmp(nv[11], "HTTP/1.1"), @"Yup, 1.1 for the proxies.");
+    
+    STAssertNil(stream.body, @"No body for NSURL.");
 }
 
 - (void)testCloseStream {
@@ -107,7 +109,17 @@ static int countItems(const char** nv) {
     STAssertEquals(0, strcmp(nv[11], "/bar;foo?q=123&q=bar&j=3"), @"The path and query parameters must be in the url: '%s'", nv[11]);
     STAssertEquals(0, strcmp(nv[12], "Boy"), @"Boy is a header.");
     STAssertEquals(0, strcmp(nv[13], "Bad"), @"The boy was bad.");
+    STAssertNil(stream.body, @"No Body.");
     CFRelease(msg);
 }
 
+- (void)testSetBody {
+    NSData* data = [NSData dataWithBytesNoCopy:"hi=bye" length:6 freeWhenDone:NO];
+    CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("POST"), (CFURLRef)url, CFSTR("HTTP/1.2"));
+    CFHTTPMessageSetBody(msg, (CFDataRef)data);
+    stream = [SpdyStream createFromCFHTTPMessage:msg delegate:delegate];
+    STAssertNotNil(stream.body, @"Stream has a body.");
+    [data release];
+    CFRelease(msg);
+}
 @end

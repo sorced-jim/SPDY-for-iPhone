@@ -210,9 +210,25 @@ static int connect_to(NSURL* url) {
     }
 }
 
+static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, size_t length, int *eof, spdylay_data_source *source, void *user_data) {
+    NSInputStream* stream = (NSInputStream*)source->ptr;
+    NSUInteger bytesRead = [stream read:buf maxLength:length];
+    if (![stream hasBytesAvailable]) {
+        *eof = 1;
+        [stream release];
+    }
+    return bytesRead;
+}
+
+
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate {
     SpdyStream* stream = [[SpdyStream createFromCFHTTPMessage:request delegate:delegate] autorelease];
-    if (spdylay_submit_request(session, priority, [stream nameValues], NULL, stream) < 0) {
+    spdylay_data_provider data_prd = {-1, NULL};
+    if (stream.body != nil) {
+        data_prd.source.ptr = [NSInputStream inputStreamWithData:stream.body];
+        data_prd.read_callback = read_from_data_callback;        
+    }
+    if (spdylay_submit_request(session, priority, [stream nameValues], &data_prd, stream) < 0) {
         [delegate onError];
     } else {
         [streams addObject:stream];
