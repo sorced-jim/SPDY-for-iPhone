@@ -15,6 +15,12 @@
 		3800CAE714E491F800B85319 /* libspdylay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3800CAE614E491F800B85319 /* libspdylay.a */; };
 		3800CAF214E499D400B85319 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3800CAF114E499D400B85319 /* libssl.a */; };
 		3800CAF414E499E200B85319 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3800CAF314E499E200B85319 /* libcrypto.a */; };
+		380A212814EC30F200262B13 /* SpdyStreamTests.h in Headers */ = {isa = PBXBuildFile; fileRef = 380A212614EC30F200262B13 /* SpdyStreamTests.h */; };
+		380A212A14EC312300262B13 /* SpdyStreamTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 380A212714EC30F200262B13 /* SpdyStreamTests.m */; };
+		380A212D14EC348B00262B13 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3800CADC14E48BC800B85319 /* MobileCoreServices.framework */; };
+		380A212F14EC34C200262B13 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A212E14EC34C200262B13 /* libz.a */; };
+		380A213614EC364A00262B13 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A213414EC362800262B13 /* CFNetwork.framework */; };
+		380A213714EC366100262B13 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A213414EC362800262B13 /* CFNetwork.framework */; };
 		3870AF5614E47F8E009D8118 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF5514E47F8E009D8118 /* Foundation.framework */; };
 		3870AF5C14E47F8E009D8118 /* SPDY.m in Sources */ = {isa = PBXBuildFile; fileRef = 3870AF5B14E47F8E009D8118 /* SPDY.m */; };
 		3870AF6414E47F8E009D8118 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF6314E47F8E009D8118 /* SenTestingKit.framework */; };
@@ -47,6 +53,12 @@
 		3800CAE914E4920E00B85319 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../OpenSSL-for-iPhone/libssl.a"; sourceTree = "<group>"; };
 		3800CAF114E499D400B85319 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = ../build/lib/libssl.a; sourceTree = "<group>"; };
 		3800CAF314E499E200B85319 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = ../build/lib/libcrypto.a; sourceTree = "<group>"; };
+		380A212614EC30F200262B13 /* SpdyStreamTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyStreamTests.h; sourceTree = "<group>"; };
+		380A212714EC30F200262B13 /* SpdyStreamTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyStreamTests.m; sourceTree = "<group>"; };
+		380A212B14EC345500262B13 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		380A212E14EC34C200262B13 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../build/lib/libz.a; sourceTree = "<group>"; };
+		380A213214EC360900262B13 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/CFNetwork.framework; sourceTree = DEVELOPER_DIR; };
+		380A213414EC362800262B13 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		3870AF5214E47F8E009D8118 /* libSPDY.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSPDY.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3870AF5514E47F8E009D8118 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		3870AF5914E47F8E009D8118 /* SPDY-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPDY-Prefix.pch"; sourceTree = "<group>"; };
@@ -70,6 +82,7 @@
 				3800CAF214E499D400B85319 /* libssl.a in Frameworks */,
 				3800CAE714E491F800B85319 /* libspdylay.a in Frameworks */,
 				3800CADD14E48BC800B85319 /* MobileCoreServices.framework in Frameworks */,
+				380A213614EC364A00262B13 /* CFNetwork.framework in Frameworks */,
 				3870AF5614E47F8E009D8118 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -78,10 +91,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3870AF6A14E47F8E009D8118 /* libSPDY.a in Frameworks */,
+				380A212F14EC34C200262B13 /* libz.a in Frameworks */,
 				3870AF6414E47F8E009D8118 /* SenTestingKit.framework in Frameworks */,
 				3870AF6614E47F8E009D8118 /* UIKit.framework in Frameworks */,
+				380A212D14EC348B00262B13 /* MobileCoreServices.framework in Frameworks */,
+				380A213714EC366100262B13 /* CFNetwork.framework in Frameworks */,
 				3870AF6714E47F8E009D8118 /* Foundation.framework in Frameworks */,
-				3870AF6A14E47F8E009D8118 /* libSPDY.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,6 +107,10 @@
 		3870AF4714E47F8E009D8118 = {
 			isa = PBXGroup;
 			children = (
+				380A213414EC362800262B13 /* CFNetwork.framework */,
+				380A213214EC360900262B13 /* CFNetwork.framework */,
+				380A212E14EC34C200262B13 /* libz.a */,
+				380A212B14EC345500262B13 /* CoreFoundation.framework */,
 				3800CAF314E499E200B85319 /* libcrypto.a */,
 				3800CAF114E499D400B85319 /* libssl.a */,
 				3800CAE814E4920E00B85319 /* libcrypto.a */,
@@ -150,6 +170,8 @@
 			children = (
 				3870AF7114E47F8E009D8118 /* SPDYTests.h */,
 				3870AF7214E47F8E009D8118 /* SPDYTests.m */,
+				380A212614EC30F200262B13 /* SpdyStreamTests.h */,
+				380A212714EC30F200262B13 /* SpdyStreamTests.m */,
 				3870AF6C14E47F8E009D8118 /* Supporting Files */,
 			);
 			path = SPDYTests;
@@ -174,6 +196,7 @@
 				38FFF69414E9A303001A974E /* SPDY.h in Headers */,
 				3800CAE214E48CAE00B85319 /* SpdySession.h in Headers */,
 				3800CAE414E48CAE00B85319 /* SpdyStream.h in Headers */,
+				380A212814EC30F200262B13 /* SpdyStreamTests.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,6 +308,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3870AF7314E47F8E009D8118 /* SPDYTests.m in Sources */,
+				380A212A14EC312300262B13 /* SpdyStreamTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,14 +440,21 @@
 		3870AF7A14E47F8E009D8118 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"\"$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
 				INFOPLIST_FILE = "SPDYTests/SPDYTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../build/lib\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "i386 armv6 armv7";
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
@@ -431,14 +462,21 @@
 		3870AF7B14E47F8E009D8118 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"\"$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
 				INFOPLIST_FILE = "SPDYTests/SPDYTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../build/lib\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "i386 armv6 armv7";
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;

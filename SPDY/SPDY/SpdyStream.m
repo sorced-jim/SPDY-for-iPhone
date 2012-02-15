@@ -59,11 +59,6 @@
     return [delegate onResponseData:bytes length:length];
 }
 
-- (void) printStream {
-    printf("Calling printStream\n");
-    NSLog(@"%@\n", url);
-}
-
 - (void) closeStream {
     streamClosed = YES;
     [delegate onStreamClose];
