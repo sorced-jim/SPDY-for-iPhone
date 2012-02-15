@@ -67,10 +67,10 @@ static void MyCallBack(CFSocketRef s,
     }
     
     if (callbackType & kCFSocketWriteCallBack) {
-        spdylay_session_send([session session]);
+        spdylay_session_send(laySession);
     }
     if (callbackType & kCFSocketReadCallBack) {
-        spdylay_session_recv([session session]);
+        spdylay_session_recv(laySession);
     }
 }
 
