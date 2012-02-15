@@ -38,7 +38,8 @@ build/armv7/lib/libz.a: zlib/build-zlib.sh
 	cd zlib && PLATFORM=iPhoneOS ARCH=armv7 ROOTDIR=$(BUILD)/armv7 ./build-zlib.sh
 
 build/lib/libz.a: build/i386/lib/libz.a build/armv7/lib/libz.a
-	-mkdir -p build/lib
+	-mkdir -p build/lib/pkgconfig
+	lipo -create build/armv7/lib/libz.a build/i386/lib/libz.a -output build/lib/libz.a
 	sed -e 's,prefix=\(.*\)/armv7,prefix=\1,g' build/armv7/lib/pkgconfig/zlib.pc > build/lib/pkgconfig/zlib.pc
 
 zlib: build/lib/libz.a
