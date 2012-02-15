@@ -125,7 +125,7 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
 + (SpdyStream*)createFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback*) delegate {
     SpdyStream *stream = [[SpdyStream alloc]init];
     stream.nameValues = malloc(sizeof(const char*)* (6*2 + 1));
-    stream.url = nil;
+    stream.url = (NSURL*)CFHTTPMessageCopyRequestURL(msg);
     stream.delegate = delegate;
     [stream setStringArena:[NSMutableData dataWithCapacity:100]];
     [stream serializeHeaders:msg];

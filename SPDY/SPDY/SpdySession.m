@@ -57,7 +57,15 @@ static void MyCallBack(CFSocketRef s,
                        CFDataRef address,
                        const void *data,
                        void *info) {
+    if (info == NULL) {
+        return;
+    }
     SpdySession *session = (SpdySession*)info;
+    spdylay_session* laySession = [session session];
+    if (laySession == NULL) {
+        return;
+    }
+    
     if (callbackType & kCFSocketWriteCallBack) {
         spdylay_session_send([session session]);
     }
@@ -247,8 +255,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
     return SSL_write(ssl, data, (int)len);
 }
 
-static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data)
-{
+static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data) {
     SpdySession *ss = (SpdySession*)user_data;
     int r = [ss send_data:data len:len flags:flags];
     if (r < 0) {
@@ -314,6 +321,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     if (session != NULL) {
         spdylay_submit_goaway(session);
         spdylay_session_del(session);
+        session = NULL;
     }
     [streams release];
     if (ssl != NULL) {

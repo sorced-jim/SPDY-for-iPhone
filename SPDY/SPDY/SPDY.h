@@ -34,7 +34,7 @@
 }
 
 // Methods that implementors should override.
-- (void)onConnect;
+- (void)onConnect:(NSURL*)url;
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers;
 - (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length;
 - (void)onStreamClose;
@@ -49,5 +49,7 @@
 // Derived classses should override these methods since BufferedCallback overrides the rest of the callbacks from RequestCallback.
 - (void)onResponse:(CFHTTPMessageRef)response;
 - (void)onError;
+
+@property (retain) NSURL* url;
 
 @end

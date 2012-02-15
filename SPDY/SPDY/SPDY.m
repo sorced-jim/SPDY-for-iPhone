@@ -60,7 +60,7 @@
         [delegate onNotSpdyError];
         return;
     }
-    [delegate onConnect];
+    [delegate onConnect:u];
     [session fetch:u delegate:delegate];
 }
 
@@ -70,7 +70,7 @@
     if (session == nil) {
         [delegate onNotSpdyError];
     } else {
-        [delegate onConnect];
+        [delegate onConnect:(NSURL*)url];
         [session fetchFromMessage:request delegate:delegate];
     }
     CFRelease(url);
@@ -109,7 +109,7 @@
     
 }
 
-- (void)onConnect {
+- (void)onConnect:(NSURL*)url {
     
 }
 @end
@@ -117,17 +117,26 @@
 @implementation BufferedCallback {
     CFMutableDataRef body;
     CFHTTPMessageRef headers;
+    NSURL* _url;
 }
+
+@synthesize url = _url;
 
 - (id)init {
     self = [super init];
+    self.url = nil;
     body = CFDataCreateMutable(NULL, 0);
     return self;
 }
 
 - (void)dealloc {
+    self.url = nil;
     CFRelease(body);
     CFRelease(headers);
+}
+
+- (void)onConnect:(NSURL*)u {
+    self.url = u;
 }
 
 -(void)onResponseHeaders:(CFHTTPMessageRef)h {
