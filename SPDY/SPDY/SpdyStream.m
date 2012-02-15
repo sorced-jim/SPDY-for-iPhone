@@ -139,9 +139,11 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     nv[2] = "scheme";
     nv[3] = copyString([stream stringArena], [url scheme]);
     nv[4] = "url";
-    nv[5] = copyString([stream stringArena], [url path]);
+    const char* pathPlus = copyString([stream stringArena], [url resourceSpecifier]);
+    const char* host = copyString([stream stringArena], [url host]);
+    nv[5] = pathPlus + strlen(host) + 2;
     nv[6] = "host";
-    nv[7] = copyString([stream stringArena], [url host]);
+    nv[7] = host;
     nv[8] = "user-agent";
     nv[9] = "SPDY obj-c/0.0.0";
     nv[10] = "version";
