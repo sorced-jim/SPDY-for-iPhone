@@ -46,6 +46,8 @@ static const int priority = 1;
 
 @interface SpdySession ()
 
+- (void)connectTo:(NSURL*) url;
+- (void)invalidateSocket;
 - (void)setup_ssl_ctx;
 - (void)sslConnect;
 - (void)sslHandshake;
@@ -85,6 +87,16 @@ static int select_next_proto_cb(SSL* ssl,
     return SSL_TLSEXT_ERR_OK;
 }
 
+- (void)invalidateSocket {
+  if (socket == nil) {
+    return;
+  }
+
+  CFSocketInvalidate(socket);
+  CFRelease(socket);
+  socket = nil;
+}
+
 - (void)setup_ssl_ctx {
     /* Disable SSLv2 and enable all workarounds for buggy servers */
     SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
@@ -95,8 +107,7 @@ static int select_next_proto_cb(SSL* ssl,
 
 - (void)sslError {
     NSLog(@"%s", ERR_error_string(ERR_get_error(), 0));
-    CFSocketInvalidate(socket);
-    socket = nil;
+    [self invalidateSocket];
 }
 
 static int make_non_block(int fd) {
@@ -148,7 +159,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
         CFSocketContext ctx = {0, self, NULL, NULL, NULL};
         NSLog(@"Address length %d", rp->ai_addrlen);
         CFDataRef address = CFDataCreate(NULL, (const uint8_t*)rp->ai_addr, rp->ai_addrlen);
-        socket = CFSocketCreate(NULL, PF_INET, SOCK_STREAM, IPPROTO_TCP, kCFSocketConnectCallBack,
+        socket = CFSocketCreate(NULL, PF_INET, SOCK_STREAM, IPPROTO_TCP, kCFSocketConnectCallBack | kCFSocketReadCallBack | kCFSocketWriteCallBack,
                                 &sessionCallBack, &ctx);
         CFSocketConnectToAddress(socket, address, -1);
         CFRelease(address);
@@ -196,6 +207,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
         self.connectState = CONNECTED;
         if (!self.spdy_negotiated) {
             [self notSpdyError];
+            [self invalidateSocket];
             return;
         }
         NSEnumerator *enumerator = [streams objectEnumerator];
@@ -209,12 +221,15 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
     }
     if (r == 0) {
         self.connectState = ERROR;
+        [self notSpdyError];
+        [self invalidateSocket];
     }
 }
 
 - (void)setUpSSL {
     // Create SSL Stream
     int sock = CFSocketGetNative(socket);
+    make_non_block(sock);
     ssl_ctx = SSL_CTX_new(SSLv23_client_method());
     if (ssl_ctx == NULL) {
         [self sslError];
@@ -391,11 +406,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
         SSL_free(ssl);
         SSL_CTX_free(ssl_ctx);
     }
-    if (socket != nil) {
-        CFSocketInvalidate(socket);
-        CFRelease(socket);
-    }
-    socket = nil;
+    [self invalidateSocket];
     free(callbacks);
 }
 @end
@@ -410,7 +421,7 @@ static void sessionCallBack(CFSocketRef s,
     }
     SpdySession *session = (SpdySession*)info;
     spdylay_session* laySession = [session session];
-    NSLog(@"Callback type is %lu, state is %d", callbackType, session.connectState);
+    NSLog(@"Callback type is %lu (read = %d, write = %d), state is %d, laySession = %p", callbackType, kCFSocketReadCallBack, kCFSocketWriteCallBack, session.connectState, laySession);
     if (laySession == NULL) {
         return;
     }
@@ -418,8 +429,10 @@ static void sessionCallBack(CFSocketRef s,
         NSLog(@"Data is %p", data);
         if (data != NULL) {
             session.connectState = ERROR;
+            [session invalidateSocket];
             return;
         }
+        session.connectState = SSL_HANDSHAKE;
         [session sslConnect];
         return;
     }
