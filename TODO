@@ -1,10 +1,6 @@
 - Pass in a timeout to SPDY:fetch.
-- Make the connect asynchronous.
-- SpdySession should keep track of the connection status.
-- SpdySession will need a list of pending SpdyStreams to
-  send when a connection is established.
-
 - Write tests for SpdySession
+- Convert spdycat demo to use libSPDY.a
 
 The following are some of the next steps to be able to create a library
 and use it in ASI HTTP.
