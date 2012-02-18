@@ -23,17 +23,26 @@
 @class SpdyStream;
 
 struct spdylay_session;
+enum ConnectState {
+    NOT_CONNECTED,
+    CONNECTING,
+    SSL_HANDSHAKE,
+    CONNECTED,
+    ERROR,
+};
 
 @interface SpdySession : NSObject {
     NSURL* host;
     struct spdylay_session *session;
     
     BOOL spdy_negotiated;
+    enum ConnectState connectState;
 }
 
 @property BOOL spdy_negotiated;
 @property struct spdylay_session *session;
 @property (retain) NSURL* host;
+@property enum ConnectState connectState;
 
 - (BOOL)connect:(NSURL*) host;
 - (void)fetch:(NSURL*) path delegate:(RequestCallback*)delegate;

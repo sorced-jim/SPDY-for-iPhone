@@ -65,6 +65,14 @@
     [delegate onStreamClose];
 }
 
+- (void)notSpdyError {
+    [delegate onNotSpdyError];
+}
+
+- (void)connectionError {
+    [delegate onError];
+}
+
 static const char* copyString(NSMutableData* arena, NSString* str) {
     const char* utf8 = [str UTF8String];
     unsigned long length = strlen(utf8) + 1;

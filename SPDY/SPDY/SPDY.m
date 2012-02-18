@@ -60,7 +60,6 @@
         [delegate onNotSpdyError];
         return;
     }
-    [delegate onConnect:u];
     [session fetch:u delegate:delegate];
 }
 
@@ -70,7 +69,6 @@
     if (session == nil) {
         [delegate onNotSpdyError];
     } else {
-        [delegate onConnect:(NSURL*)url];
         [session fetchFromMessage:request delegate:delegate];
     }
     CFRelease(url);

@@ -37,6 +37,10 @@
 - (size_t) writeBytes:(const uint8_t*) data len:(size_t) length;
 - (void) closeStream;
 
+// Error case handlers used by the SPDY session.
+- (void)notSpdyError;
+- (void)connectionError;
+
 + (SpdyStream*)createFromCFHTTPMessage:(CFHTTPMessageRef) msg delegate:(RequestCallback*) delegate;
 + (SpdyStream*)createFromNSURL:(NSURL*) url delegate:(RequestCallback*) delegate;
 
