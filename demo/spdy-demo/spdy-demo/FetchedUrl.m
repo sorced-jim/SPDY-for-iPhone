@@ -28,16 +28,20 @@
 
 - (void)onNotSpdyError {
     fetchedUrl.state = @"Host does not support SPDY";
+    [fetchedUrl.parent reloadData];
 }
 
 - (void)onError {
     fetchedUrl.state = @"Error";
+    [fetchedUrl.parent reloadData];
 }
 
 - (void)onConnect:(NSURL*)u {
     [super onConnect:u];
     fetchedUrl.state = @"connected";
     fetchedUrl.baseUrl = u;
+    [fetchedUrl.parent reloadData];
+
 }
 
 - (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length {
