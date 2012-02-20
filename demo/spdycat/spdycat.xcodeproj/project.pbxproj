@@ -21,6 +21,8 @@
 		380A219214F2B5E600262B13 /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218D14F2B5E600262B13 /* libSPDY.a */; };
 		380A219714F2BAA200262B13 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219614F2BAA200262B13 /* CFNetwork.framework */; };
 		380A219D14F2CDFB00262B13 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219014F2B5E600262B13 /* libz.a */; };
+		380A21A214F2D67200262B13 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218F14F2B5E600262B13 /* libssl.a */; };
+		380A21A314F2D67E00262B13 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218C14F2B5E600262B13 /* libcrypto.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,8 +65,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				380A219D14F2CDFB00262B13 /* libz.a in Frameworks */,
 				380A219214F2B5E600262B13 /* libSPDY.a in Frameworks */,
+				380A21A214F2D67200262B13 /* libssl.a in Frameworks */,
+				380A21A314F2D67E00262B13 /* libcrypto.a in Frameworks */,
+				380A219D14F2CDFB00262B13 /* libz.a in Frameworks */,
 				380A219714F2BAA200262B13 /* CFNetwork.framework in Frameworks */,
 				380A215E14F2B56E00262B13 /* UIKit.framework in Frameworks */,
 				380A216014F2B56E00262B13 /* Foundation.framework in Frameworks */,
