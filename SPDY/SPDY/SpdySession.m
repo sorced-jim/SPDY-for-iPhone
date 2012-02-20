@@ -49,8 +49,8 @@ static const int priority = 1;
 - (void)connectTo:(NSURL*) url;
 - (void)invalidateSocket;
 - (void)setup_ssl_ctx;
-- (void)sslConnect;
-- (void)sslHandshake;
+- (BOOL)sslConnect;
+- (BOOL)sslHandshake;  // Returns true if the handshake completed.
 - (void)sslError;
 @end
 
@@ -199,12 +199,9 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
     return YES;
 }
 
-- (void)sslHandshake {
+- (BOOL)sslHandshake {
     int r = SSL_connect(ssl);
     NSLog(@"Tried ssl connect %d", r);
-    if (r == -1) {
-        return;
-    }
     if (r == 1) {
         self.connectState = CONNECTED;
         if (!self.spdy_negotiated) {
@@ -217,15 +214,17 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
         
         while ((stream = [enumerator nextObject])) {
             if (![self submitRequest:stream]) {
-                //[streams removeObject:stream];
+                [streams removeObject:stream];
             }
         }
+        return YES;
     }
     if (r == 0) {
         self.connectState = ERROR;
         [self notSpdyError];
         [self invalidateSocket];
     }
+    return NO;
 }
 
 - (void)setUpSSL {
@@ -249,11 +248,11 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
     }
 }
 
-- (void)sslConnect {
+- (BOOL)sslConnect {
     [self setUpSSL];
     NSLog(@"Enable read and write callbacks.");
     CFSocketEnableCallBacks(socket, kCFSocketReadCallBack | kCFSocketWriteCallBack);
-    [self sslHandshake];
+    return [self sslHandshake];
 }
 
 
@@ -277,6 +276,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
         if (![self submitRequest:stream]) {
             return;
         }
+        spdylay_session_send(self.session);
     }
     [streams addObject:stream];
 }
@@ -329,6 +329,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
         } else {
             r = SPDYLAY_ERR_CALLBACK_FAILURE;
         }
+        NSLog(@"Returning error %d, block is %d", r, SPDYLAY_ERR_WOULDBLOCK);
     } else if(r == 0) {
         r = SPDYLAY_ERR_CALLBACK_FAILURE;
     }
@@ -336,7 +337,9 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 }
 
 - (int) send_data:(const uint8_t*) data len:(size_t) len flags:(int) flags {
-    return SSL_write(ssl, data, (int)len);
+    int r = SSL_write(ssl, data, (int)len);
+    NSLog(@"SSL_write returned %d", r);
+    return r;
 }
 
 static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data) {
@@ -440,12 +443,16 @@ static void sessionCallBack(CFSocketRef s,
             return;
         }
         session.connectState = SSL_HANDSHAKE;
-        [session sslConnect];
-        return;
+        if (![session sslConnect]) {
+            return;
+        }
+        callbackType |= kCFSocketWriteCallBack;
     }
     if (session.connectState == SSL_HANDSHAKE) {
-        [session sslHandshake];
-        return;
+        if (![session sslHandshake]) {
+            return;
+        }
+        callbackType |= kCFSocketWriteCallBack;
     }
     
     if (callbackType & kCFSocketWriteCallBack) {

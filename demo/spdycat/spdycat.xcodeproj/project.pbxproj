@@ -18,12 +18,9 @@
 		380A217814F2B56E00262B13 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A215F14F2B56E00262B13 /* Foundation.framework */; };
 		380A218014F2B56E00262B13 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 380A217E14F2B56E00262B13 /* InfoPlist.strings */; };
 		380A218314F2B56E00262B13 /* spdycatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 380A218214F2B56E00262B13 /* spdycatTests.m */; };
-		380A219114F2B5E600262B13 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218C14F2B5E600262B13 /* libcrypto.a */; };
 		380A219214F2B5E600262B13 /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218D14F2B5E600262B13 /* libSPDY.a */; };
-		380A219314F2B5E600262B13 /* libspdylay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218E14F2B5E600262B13 /* libspdylay.a */; };
-		380A219414F2B5E600262B13 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218F14F2B5E600262B13 /* libssl.a */; };
-		380A219514F2B5E600262B13 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219014F2B5E600262B13 /* libz.a */; };
 		380A219714F2BAA200262B13 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219614F2BAA200262B13 /* CFNetwork.framework */; };
+		380A219D14F2CDFB00262B13 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219014F2B5E600262B13 /* libz.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,11 +63,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				380A219114F2B5E600262B13 /* libcrypto.a in Frameworks */,
+				380A219D14F2CDFB00262B13 /* libz.a in Frameworks */,
 				380A219214F2B5E600262B13 /* libSPDY.a in Frameworks */,
-				380A219314F2B5E600262B13 /* libspdylay.a in Frameworks */,
-				380A219414F2B5E600262B13 /* libssl.a in Frameworks */,
-				380A219514F2B5E600262B13 /* libz.a in Frameworks */,
 				380A219714F2BAA200262B13 /* CFNetwork.framework in Frameworks */,
 				380A215E14F2B56E00262B13 /* UIKit.framework in Frameworks */,
 				380A216014F2B56E00262B13 /* Foundation.framework in Frameworks */,
@@ -444,6 +438,7 @@
 				380A218814F2B56E00262B13 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		380A218914F2B56E00262B13 /* Build configuration list for PBXNativeTarget "spdycatTests" */ = {
 			isa = XCConfigurationList;
@@ -452,6 +447,7 @@
 				380A218B14F2B56E00262B13 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
