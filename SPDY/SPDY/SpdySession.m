@@ -48,6 +48,7 @@ static const int priority = 1;
 
 - (void)connectTo:(NSURL*) url;
 - (void)invalidateSocket;
+- (void)removeStream:(SpdyStream *)stream;
 - (void)setup_ssl_ctx;
 - (BOOL)sslConnect;
 - (BOOL)sslHandshake;  // Returns true if the handshake completed.
@@ -161,7 +162,6 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
                                 &sessionCallBack, &ctx);
         CFSocketConnectToAddress(socket, address, -1);
         CFRelease(address);
-        //break;
     }
     self.connectState = CONNECTING;
     freeaddrinfo(res);
@@ -225,9 +225,9 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 }
 
 - (void)setUpSSL {
-    // Create SSL Stream
+    // Create SSL context.
     int sock = CFSocketGetNative(socket);
-    make_non_block(sock);
+    make_non_block(sock);  // Ensure the SSL methods will not block.
     ssl_ctx = SSL_CTX_new(SSLv23_client_method());
     if (ssl_ctx == NULL) {
         [self sslError];
@@ -293,15 +293,9 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     CFRelease(loop_ref);
 }
 
-- (int) recv_data:(uint8_t *)data len:(size_t)len flags:(int)flags {
+- (int)recv_data:(uint8_t *)data len:(size_t)len flags:(int)flags {
     int r;
-    //want_write_ = false;
     r = SSL_read(ssl, data, (int)len);
-    if (r < 0) {
-        if (SSL_get_error(ssl, r) == SSL_ERROR_WANT_WRITE) {
-            //want_write_ = true;
-        }
-    }
     if (r == 0) {
       NSLog(@"Closing connection from read = 0");
       [self invalidateSocket];
@@ -314,9 +308,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     return e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE;
 }
 
-static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len, int flags, void *user_data) {
-    SpdySession *ss = (SpdySession*)user_data;
-    int r = [ss recv_data:data len:len flags:flags];
+static ssize_t fixUpCallbackValue(SpdySession *ss, int r) {
     if (r < 0) {
         if ([ss wouldBlock:r]) {
             r = SPDYLAY_ERR_WOULDBLOCK;
@@ -329,6 +321,12 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
     return r;
 }
 
+static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len, int flags, void *user_data) {
+    SpdySession *ss = (SpdySession*)user_data;
+    int r = [ss recv_data:data len:len flags:flags];
+    return fixUpCallbackValue(ss, r);
+}
+
 - (int) send_data:(const uint8_t*) data len:(size_t) len flags:(int) flags {
     int r = SSL_write(ssl, data, (int)len);
     return r;
@@ -337,18 +335,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data) {
     SpdySession *ss = (SpdySession*)user_data;
     int r = [ss send_data:data len:len flags:flags];
-    if (r < 0) {
-        if ([ss wouldBlock:r]) {
-            r = SPDYLAY_ERR_WOULDBLOCK;
-        } else {
-            r = SPDYLAY_ERR_CALLBACK_FAILURE;
-        }
-    }
-    return r;
-}
-
-// This is kind of weird, but on_data_recv_callback is called after the whole data frame is read.  on_data_chunk_recv_callback may be called as data is read from the stream.
-static void on_data_recv_callback(spdylay_session *session, uint8_t flags, int32_t stream_id, int32_t length, void *user_data) {
+    return fixUpCallbackValue(ss, r);
 }
 
 static void on_data_chunk_recv_callback(spdylay_session *session, uint8_t flags, int32_t stream_id,
@@ -384,11 +371,9 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     callbacks->recv_callback = recv_callback;
     callbacks->on_stream_close_callback = on_stream_close_callback;
     callbacks->on_ctrl_recv_callback = on_ctrl_recv_callback;
-    callbacks->on_data_recv_callback = on_data_recv_callback;
     callbacks->on_data_chunk_recv_callback = on_data_chunk_recv_callback;
-    
-    //callbacks->on_ctrl_send_callback = on_ctrl_send_callback3;        
     spdylay_session_client_new(&session, callbacks, self);
+
     self.spdy_negotiated = NO;
     self.connectState = NOT_CONNECTED;
     

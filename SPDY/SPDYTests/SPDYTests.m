@@ -7,26 +7,27 @@
 //
 
 #import "SPDYTests.h"
+#import "SPDY.h"
+
+@interface CountError : RequestCallback;
+    @property BOOL onErrorCalled;
+@end
+
+@implementation CountError
+@synthesize onErrorCalled;
+
+-(void)onError {
+    self.onErrorCalled = YES;
+}
+@end
 
 @implementation SPDYTests
 
-- (void)setUp
-{
-    [super setUp];
-    
-    // Set-up code here.
-}
-
-- (void)tearDown
-{
-    // Tear-down code here.
-    
-    [super tearDown];
-}
-
-- (void)testExample
-{
-    //STFail(@"Unit tests are not implemented yet in SPDYTests");
+- (void)testFetchNoHost {
+    CountError* count = [[[CountError alloc]init]autorelease];
+    SPDY* spdy = [[[SPDY alloc]init] autorelease];
+    [spdy fetch:@"go" delegate:count];
+    STAssertTrue(count.onErrorCalled, @"onError was called.");
 }
 
 @end

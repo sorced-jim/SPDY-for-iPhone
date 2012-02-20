@@ -49,6 +49,4 @@ enum ConnectState {
 - (void)fetchFromMessage:(CFHTTPMessageRef) request delegate:(RequestCallback *)delegate;
 - (void)addToLoop;
 
-- (void)removeStream:(SpdyStream*)stream;
-
 @end
