@@ -91,8 +91,21 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     unsigned long length = strlen(utf8) + 1;
     NSInteger arenaLength = [stringArena length];
     [stringArena appendBytes:utf8 length:length];
-    CFRelease(str);
     return (const char*)[stringArena mutableBytes] + arenaLength;
+}
+
+- (const char*)getStringFromCFHTTPMessage:(CFHTTPMessageRef)msg func:(CFStringRef(*)(CFHTTPMessageRef))func {
+    CFStringRef str = func(msg);
+    const char* utf8 = [self copyCFString:str];
+    CFRelease(str);
+    return utf8;
+}
+
+- (const char*)getStringFromCFURL:(CFURLRef)u func:(CFStringRef(*)(CFURLRef))func {
+    CFStringRef str = func(u);
+    const char* utf8 = [self copyCFString:str];
+    CFRelease(str);
+    return utf8;
 }
 
 - (void)serializeHeaders:(CFHTTPMessageRef) msg {
@@ -106,21 +119,20 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     const char** nv = nameValues;
     CFDictionaryGetKeysAndValues(d, (const void **)keys, (const void **)values);
     nv[0] = "method";
-    nv[1] = [self copyCFString:CFHTTPMessageCopyRequestMethod(msg)];
+    nv[1] = [self getStringFromCFHTTPMessage:msg func:CFHTTPMessageCopyRequestMethod];
     nv[2] = "user-agent";
     nv[3] = "SPDY objc-0.0.1";
     nv[4] = "version";
-    nv[5] = [self copyCFString:CFHTTPMessageCopyVersion(msg)];
+    nv[5] = [self getStringFromCFHTTPMessage:msg func:CFHTTPMessageCopyVersion];
     CFURLRef u = CFHTTPMessageCopyRequestURL(msg);
     nv[6] = "scheme";
-    nv[7] = [self copyCFString:CFURLCopyScheme(u)];
-    const char* host = [self copyCFString:CFURLCopyHostName(u)];
+    nv[7] = [self getStringFromCFURL:u func:CFURLCopyScheme];
     nv[8] = "host";
-    nv[9] = host;
+    nv[9] = [self getStringFromCFURL:u func:CFURLCopyHostName];
     nv[10] = "url";
-    const char* path = [self copyCFString:CFURLCopyPath(u)];
+    const char* path = [self getStringFromCFURL:u func:CFURLCopyPath];
     [stringArena setLength:[stringArena length] - 1];  // Remove the \0 from path.
-    [self copyCFString:CFURLCopyResourceSpecifier(u)];
+    [self getStringFromCFURL:u func:CFURLCopyResourceSpecifier];
     nv[11] = path;
     for (index = 0; index < count; ++index) {
         nv[index*2 + 12] = [self copyCFString:keys[index]];
