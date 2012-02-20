@@ -51,7 +51,7 @@
 
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
     NSURL* u = [NSURL URLWithString:url];
-    if (u == nil) {
+    if (u == nil || u.host == nil) {
         [delegate onError];
         return;
     }
