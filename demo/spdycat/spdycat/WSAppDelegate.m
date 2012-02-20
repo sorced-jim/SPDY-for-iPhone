@@ -50,7 +50,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     spdy = [[SPDY alloc]init];
-    [spdy fetch:@"https://images.google.com" delegate:[[[ShowBody alloc] init] autorelease]];
+    [spdy fetch:@"https://images.google.com/" delegate:[[[ShowBody alloc] init] autorelease]];
     [spdy fetch:@"https://images.google.com/imghp" delegate:[[[ShowBody alloc] init] autorelease]];
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     // Override point for customization after application launch.
