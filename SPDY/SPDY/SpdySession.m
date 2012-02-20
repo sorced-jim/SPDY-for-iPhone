@@ -123,7 +123,7 @@ static int make_non_block(int fd) {
     return 0;
 }
 
-static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, size_t length, int *eof, spdylay_data_source *source, void *user_data) {
+static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_id, uint8_t *buf, size_t length, int *eof, spdylay_data_source *source, void *user_data) {
     NSInputStream* stream = (NSInputStream*)source->ptr;
     NSUInteger bytesRead = [stream read:buf maxLength:length];
     if (![stream hasBytesAvailable]) {
@@ -337,6 +337,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 }
 
 - (int) send_data:(const uint8_t*) data len:(size_t) len flags:(int) flags {
+    NSLog(@"Trying SSL_write!");
     int r = SSL_write(ssl, data, (int)len);
     NSLog(@"SSL_write returned %d", r);
     return r;
@@ -344,6 +345,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 
 static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data) {
     SpdySession *ss = (SpdySession*)user_data;
+    NSLog(@"Got to send callback!");
     int r = [ss send_data:data len:len flags:flags];
     if (r < 0) {
         if ([ss wouldBlock:r]) {
@@ -387,6 +389,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
 - (SpdySession*) init {
     self = [super init];
     callbacks = malloc(sizeof(*callbacks));
+    memset(callbacks, 0, sizeof(*callbacks));
     callbacks->send_callback = send_callback;
     callbacks->recv_callback = recv_callback;
     callbacks->on_stream_close_callback = on_stream_close_callback;
@@ -453,6 +456,7 @@ static void sessionCallBack(CFSocketRef s,
             return;
         }
         callbackType |= kCFSocketWriteCallBack;
+        NSLog(@"Updated callbackType to %lu", callbackType);
     }
     
     if (callbackType & kCFSocketWriteCallBack) {
