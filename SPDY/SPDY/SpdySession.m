@@ -207,7 +207,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
         if (!self.spdy_negotiated) {
             [self notSpdyError];
             [self invalidateSocket];
-            return;
+            return NO;
         }
         NSEnumerator *enumerator = [streams objectEnumerator];
         id stream;
@@ -282,13 +282,13 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
 }
     
 - (void)fetch:(NSURL *)u delegate:(RequestCallback *)delegate {
-    SpdyStream* stream = [[SpdyStream createFromNSURL:u delegate:delegate] autorelease];
+    SpdyStream* stream = [[SpdyStream newFromNSURL:u delegate:delegate] autorelease];
     [self addStream:stream];
 }
 
 
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate {
-    SpdyStream* stream = [[SpdyStream createFromCFHTTPMessage:request delegate:delegate] autorelease];
+    SpdyStream* stream = [[SpdyStream newFromCFHTTPMessage:request delegate:delegate] autorelease];
     [self addStream:stream];
 }
 

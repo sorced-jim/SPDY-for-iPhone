@@ -52,7 +52,7 @@ static int countItems(const char** nv) {
 }
 
 - (void)testNameValuePairs {
-    stream = [SpdyStream createFromNSURL:url delegate:delegate];
+    stream = [SpdyStream newFromNSURL:url delegate:delegate];
     const char** nv = [stream nameValues];
     int items = countItems(nv);
     STAssertEquals(12, items, @"There should only be 6 pairs");
@@ -73,7 +73,7 @@ static int countItems(const char** nv) {
 }
 
 - (void)testCloseStream {
-    stream = [SpdyStream createFromNSURL:url delegate:delegate];
+    stream = [SpdyStream newFromNSURL:url delegate:delegate];
     [stream closeStream];
     STAssertTrue(delegate.closeCalled, @"Delegate not called on stream closed.");
 }
@@ -81,7 +81,7 @@ static int countItems(const char** nv) {
 - (void)testSerializeHeaders {
     CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("OPTIONS"), (CFURLRef)url, CFSTR("HTTP/1.0"));
     CFHTTPMessageSetHeaderFieldValue(msg, CFSTR("Boy"), CFSTR("Bad"));
-    stream = [SpdyStream createFromCFHTTPMessage:msg delegate:delegate];
+    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
     const char **nv = [stream nameValues];
     STAssertTrue(nv != NULL, @"nameValues should be allocated");
     if (nv == NULL) {
@@ -117,7 +117,7 @@ static int countItems(const char** nv) {
     NSData* data = [NSData dataWithBytesNoCopy:"hi=bye" length:6 freeWhenDone:NO];
     CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("POST"), (CFURLRef)url, CFSTR("HTTP/1.2"));
     CFHTTPMessageSetBody(msg, (CFDataRef)data);
-    stream = [SpdyStream createFromCFHTTPMessage:msg delegate:delegate];
+    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
     STAssertNotNil(stream.body, @"Stream has a body.");
     [data release];
     CFRelease(msg);

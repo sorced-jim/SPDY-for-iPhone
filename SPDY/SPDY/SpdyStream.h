@@ -41,8 +41,8 @@
 - (void)notSpdyError;
 - (void)connectionError;
 
-+ (SpdyStream*)createFromCFHTTPMessage:(CFHTTPMessageRef) msg delegate:(RequestCallback*) delegate;
-+ (SpdyStream*)createFromNSURL:(NSURL*) url delegate:(RequestCallback*) delegate;
++ (SpdyStream*)newFromCFHTTPMessage:(CFHTTPMessageRef) msg delegate:(RequestCallback*) delegate;
++ (SpdyStream*)newFromNSURL:(NSURL*) url delegate:(RequestCallback*) delegate;
 
 @property const char** nameValues;
 @property (retain) NSURL* url;

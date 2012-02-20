@@ -134,10 +134,11 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
 
 #pragma mark Creation methods.
 
-+ (SpdyStream*)createFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback*) delegate {
++ (SpdyStream*)newFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback*) delegate {
     SpdyStream *stream = [[SpdyStream alloc]init];
     stream.nameValues = malloc(sizeof(const char*)* (6*2 + 1));
-    stream.url = (NSURL*)CFHTTPMessageCopyRequestURL(msg);
+    CFURLRef u = CFHTTPMessageCopyRequestURL(msg);
+    stream.url = (NSURL*)u;
     CFDataRef body = CFHTTPMessageCopyBody(msg);
     if (body != nil) {
         stream.body = (NSData*)body;
@@ -146,10 +147,11 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     stream.delegate = delegate;
     [stream setStringArena:[NSMutableData dataWithCapacity:100]];
     [stream serializeHeaders:msg];
+    CFRelease(u);
     return stream;
 }
 
-+ (SpdyStream*)createFromNSURL:(NSURL *)url delegate:(RequestCallback *)delegate {
++ (SpdyStream*)newFromNSURL:(NSURL *)url delegate:(RequestCallback *)delegate {
     SpdyStream *stream = [[SpdyStream alloc]init];
     stream.nameValues = malloc(sizeof(const char*)* (6*2 + 1));
     stream.url = url;
