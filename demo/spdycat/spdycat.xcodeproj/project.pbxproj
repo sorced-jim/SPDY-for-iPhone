@@ -23,6 +23,7 @@
 		380A219D14F2CDFB00262B13 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219014F2B5E600262B13 /* libz.a */; };
 		380A21A214F2D67200262B13 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218F14F2B5E600262B13 /* libssl.a */; };
 		380A21A314F2D67E00262B13 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218C14F2B5E600262B13 /* libcrypto.a */; };
+		380A21A414F2E07400262B13 /* libspdylay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218E14F2B5E600262B13 /* libspdylay.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				380A219214F2B5E600262B13 /* libSPDY.a in Frameworks */,
+				380A21A414F2E07400262B13 /* libspdylay.a in Frameworks */,
 				380A21A214F2D67200262B13 /* libssl.a in Frameworks */,
 				380A21A314F2D67E00262B13 /* libcrypto.a in Frameworks */,
 				380A219D14F2CDFB00262B13 /* libz.a in Frameworks */,
@@ -92,7 +94,6 @@
 		380A214E14F2B56E00262B13 = {
 			isa = PBXGroup;
 			children = (
-				380A219614F2BAA200262B13 /* CFNetwork.framework */,
 				380A218C14F2B5E600262B13 /* libcrypto.a */,
 				380A218D14F2B5E600262B13 /* libSPDY.a */,
 				380A218E14F2B5E600262B13 /* libspdylay.a */,
@@ -117,6 +118,7 @@
 		380A215C14F2B56E00262B13 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				380A219614F2BAA200262B13 /* CFNetwork.framework */,
 				380A215D14F2B56E00262B13 /* UIKit.framework */,
 				380A215F14F2B56E00262B13 /* Foundation.framework */,
 				380A216114F2B56E00262B13 /* CoreGraphics.framework */,
@@ -334,6 +336,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				LINK_WITH_STANDARD_LIBRARIES = YES;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -351,7 +355,9 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				LINK_WITH_STANDARD_LIBRARIES = YES;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -360,6 +366,7 @@
 		380A218714F2B56E00262B13 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spdycat/spdycat-Prefix.pch";
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../build/include";
@@ -369,6 +376,7 @@
 					"\"$(SRCROOT)/../../build/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				"PROVISIONING_PROFILE[sdk=iphonesimulator*]" = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
