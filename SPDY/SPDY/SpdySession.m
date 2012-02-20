@@ -428,7 +428,6 @@ static void sessionCallBack(CFSocketRef s,
         return;
     }
     if (session.connectState == CONNECTING) {
-        NSLog(@"Data is %p", data);
         if (data != NULL) {
             session.connectState = ERROR;
             [session invalidateSocket];
