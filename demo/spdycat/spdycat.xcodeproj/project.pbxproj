@@ -1,0 +1,459 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		380A215E14F2B56E00262B13 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A215D14F2B56E00262B13 /* UIKit.framework */; };
+		380A216014F2B56E00262B13 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A215F14F2B56E00262B13 /* Foundation.framework */; };
+		380A216214F2B56E00262B13 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A216114F2B56E00262B13 /* CoreGraphics.framework */; };
+		380A216814F2B56E00262B13 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 380A216614F2B56E00262B13 /* InfoPlist.strings */; };
+		380A216A14F2B56E00262B13 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 380A216914F2B56E00262B13 /* main.m */; };
+		380A216E14F2B56E00262B13 /* WSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 380A216D14F2B56E00262B13 /* WSAppDelegate.m */; };
+		380A217614F2B56E00262B13 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A217514F2B56E00262B13 /* SenTestingKit.framework */; };
+		380A217714F2B56E00262B13 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A215D14F2B56E00262B13 /* UIKit.framework */; };
+		380A217814F2B56E00262B13 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A215F14F2B56E00262B13 /* Foundation.framework */; };
+		380A218014F2B56E00262B13 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 380A217E14F2B56E00262B13 /* InfoPlist.strings */; };
+		380A218314F2B56E00262B13 /* spdycatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 380A218214F2B56E00262B13 /* spdycatTests.m */; };
+		380A219114F2B5E600262B13 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218C14F2B5E600262B13 /* libcrypto.a */; };
+		380A219214F2B5E600262B13 /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218D14F2B5E600262B13 /* libSPDY.a */; };
+		380A219314F2B5E600262B13 /* libspdylay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218E14F2B5E600262B13 /* libspdylay.a */; };
+		380A219414F2B5E600262B13 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218F14F2B5E600262B13 /* libssl.a */; };
+		380A219514F2B5E600262B13 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219014F2B5E600262B13 /* libz.a */; };
+		380A219714F2BAA200262B13 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219614F2BAA200262B13 /* CFNetwork.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		380A217914F2B56E00262B13 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 380A215014F2B56E00262B13 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 380A215814F2B56E00262B13;
+			remoteInfo = spdycat;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		380A215914F2B56E00262B13 /* spdycat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = spdycat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		380A215D14F2B56E00262B13 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		380A215F14F2B56E00262B13 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		380A216114F2B56E00262B13 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		380A216514F2B56E00262B13 /* spdycat-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "spdycat-Info.plist"; sourceTree = "<group>"; };
+		380A216714F2B56E00262B13 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		380A216914F2B56E00262B13 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		380A216B14F2B56E00262B13 /* spdycat-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "spdycat-Prefix.pch"; sourceTree = "<group>"; };
+		380A216C14F2B56E00262B13 /* WSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WSAppDelegate.h; sourceTree = "<group>"; };
+		380A216D14F2B56E00262B13 /* WSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WSAppDelegate.m; sourceTree = "<group>"; };
+		380A217414F2B56E00262B13 /* spdycatTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = spdycatTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		380A217514F2B56E00262B13 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		380A217D14F2B56E00262B13 /* spdycatTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "spdycatTests-Info.plist"; sourceTree = "<group>"; };
+		380A217F14F2B56E00262B13 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		380A218114F2B56E00262B13 /* spdycatTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spdycatTests.h; sourceTree = "<group>"; };
+		380A218214F2B56E00262B13 /* spdycatTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = spdycatTests.m; sourceTree = "<group>"; };
+		380A218C14F2B5E600262B13 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = ../../build/lib/libcrypto.a; sourceTree = "<group>"; };
+		380A218D14F2B5E600262B13 /* libSPDY.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSPDY.a; path = ../../build/lib/libSPDY.a; sourceTree = "<group>"; };
+		380A218E14F2B5E600262B13 /* libspdylay.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspdylay.a; path = ../../build/lib/libspdylay.a; sourceTree = "<group>"; };
+		380A218F14F2B5E600262B13 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = ../../build/lib/libssl.a; sourceTree = "<group>"; };
+		380A219014F2B5E600262B13 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../build/lib/libz.a; sourceTree = "<group>"; };
+		380A219614F2BAA200262B13 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		380A215614F2B56E00262B13 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				380A219114F2B5E600262B13 /* libcrypto.a in Frameworks */,
+				380A219214F2B5E600262B13 /* libSPDY.a in Frameworks */,
+				380A219314F2B5E600262B13 /* libspdylay.a in Frameworks */,
+				380A219414F2B5E600262B13 /* libssl.a in Frameworks */,
+				380A219514F2B5E600262B13 /* libz.a in Frameworks */,
+				380A219714F2BAA200262B13 /* CFNetwork.framework in Frameworks */,
+				380A215E14F2B56E00262B13 /* UIKit.framework in Frameworks */,
+				380A216014F2B56E00262B13 /* Foundation.framework in Frameworks */,
+				380A216214F2B56E00262B13 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		380A217014F2B56E00262B13 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				380A217614F2B56E00262B13 /* SenTestingKit.framework in Frameworks */,
+				380A217714F2B56E00262B13 /* UIKit.framework in Frameworks */,
+				380A217814F2B56E00262B13 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		380A214E14F2B56E00262B13 = {
+			isa = PBXGroup;
+			children = (
+				380A219614F2BAA200262B13 /* CFNetwork.framework */,
+				380A218C14F2B5E600262B13 /* libcrypto.a */,
+				380A218D14F2B5E600262B13 /* libSPDY.a */,
+				380A218E14F2B5E600262B13 /* libspdylay.a */,
+				380A218F14F2B5E600262B13 /* libssl.a */,
+				380A219014F2B5E600262B13 /* libz.a */,
+				380A216314F2B56E00262B13 /* spdycat */,
+				380A217B14F2B56E00262B13 /* spdycatTests */,
+				380A215C14F2B56E00262B13 /* Frameworks */,
+				380A215A14F2B56E00262B13 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		380A215A14F2B56E00262B13 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				380A215914F2B56E00262B13 /* spdycat.app */,
+				380A217414F2B56E00262B13 /* spdycatTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		380A215C14F2B56E00262B13 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				380A215D14F2B56E00262B13 /* UIKit.framework */,
+				380A215F14F2B56E00262B13 /* Foundation.framework */,
+				380A216114F2B56E00262B13 /* CoreGraphics.framework */,
+				380A217514F2B56E00262B13 /* SenTestingKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		380A216314F2B56E00262B13 /* spdycat */ = {
+			isa = PBXGroup;
+			children = (
+				380A216C14F2B56E00262B13 /* WSAppDelegate.h */,
+				380A216D14F2B56E00262B13 /* WSAppDelegate.m */,
+				380A216414F2B56E00262B13 /* Supporting Files */,
+			);
+			path = spdycat;
+			sourceTree = "<group>";
+		};
+		380A216414F2B56E00262B13 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				380A216514F2B56E00262B13 /* spdycat-Info.plist */,
+				380A216614F2B56E00262B13 /* InfoPlist.strings */,
+				380A216914F2B56E00262B13 /* main.m */,
+				380A216B14F2B56E00262B13 /* spdycat-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		380A217B14F2B56E00262B13 /* spdycatTests */ = {
+			isa = PBXGroup;
+			children = (
+				380A218114F2B56E00262B13 /* spdycatTests.h */,
+				380A218214F2B56E00262B13 /* spdycatTests.m */,
+				380A217C14F2B56E00262B13 /* Supporting Files */,
+			);
+			path = spdycatTests;
+			sourceTree = "<group>";
+		};
+		380A217C14F2B56E00262B13 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				380A217D14F2B56E00262B13 /* spdycatTests-Info.plist */,
+				380A217E14F2B56E00262B13 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		380A215814F2B56E00262B13 /* spdycat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 380A218614F2B56E00262B13 /* Build configuration list for PBXNativeTarget "spdycat" */;
+			buildPhases = (
+				380A215514F2B56E00262B13 /* Sources */,
+				380A215614F2B56E00262B13 /* Frameworks */,
+				380A215714F2B56E00262B13 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = spdycat;
+			productName = spdycat;
+			productReference = 380A215914F2B56E00262B13 /* spdycat.app */;
+			productType = "com.apple.product-type.application";
+		};
+		380A217314F2B56E00262B13 /* spdycatTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 380A218914F2B56E00262B13 /* Build configuration list for PBXNativeTarget "spdycatTests" */;
+			buildPhases = (
+				380A216F14F2B56E00262B13 /* Sources */,
+				380A217014F2B56E00262B13 /* Frameworks */,
+				380A217114F2B56E00262B13 /* Resources */,
+				380A217214F2B56E00262B13 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				380A217A14F2B56E00262B13 /* PBXTargetDependency */,
+			);
+			name = spdycatTests;
+			productName = spdycatTests;
+			productReference = 380A217414F2B56E00262B13 /* spdycatTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		380A215014F2B56E00262B13 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+				ORGANIZATIONNAME = "Twist Inc";
+			};
+			buildConfigurationList = 380A215314F2B56E00262B13 /* Build configuration list for PBXProject "spdycat" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 380A214E14F2B56E00262B13;
+			productRefGroup = 380A215A14F2B56E00262B13 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				380A215814F2B56E00262B13 /* spdycat */,
+				380A217314F2B56E00262B13 /* spdycatTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		380A215714F2B56E00262B13 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				380A216814F2B56E00262B13 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		380A217114F2B56E00262B13 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				380A218014F2B56E00262B13 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		380A217214F2B56E00262B13 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		380A215514F2B56E00262B13 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				380A216A14F2B56E00262B13 /* main.m in Sources */,
+				380A216E14F2B56E00262B13 /* WSAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		380A216F14F2B56E00262B13 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				380A218314F2B56E00262B13 /* spdycatTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		380A217A14F2B56E00262B13 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 380A215814F2B56E00262B13 /* spdycat */;
+			targetProxy = 380A217914F2B56E00262B13 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		380A216614F2B56E00262B13 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				380A216714F2B56E00262B13 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		380A217E14F2B56E00262B13 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				380A217F14F2B56E00262B13 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		380A218414F2B56E00262B13 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		380A218514F2B56E00262B13 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		380A218714F2B56E00262B13 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "spdycat/spdycat-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../build/include";
+				INFOPLIST_FILE = "spdycat/spdycat-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../build/lib\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		380A218814F2B56E00262B13 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "spdycat/spdycat-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../build/include";
+				INFOPLIST_FILE = "spdycat/spdycat-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../build/lib\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		380A218A14F2B56E00262B13 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/spdycat.app/spdycat";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "spdycat/spdycat-Prefix.pch";
+				INFOPLIST_FILE = "spdycatTests/spdycatTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		380A218B14F2B56E00262B13 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/spdycat.app/spdycat";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "spdycat/spdycat-Prefix.pch";
+				INFOPLIST_FILE = "spdycatTests/spdycatTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		380A215314F2B56E00262B13 /* Build configuration list for PBXProject "spdycat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				380A218414F2B56E00262B13 /* Debug */,
+				380A218514F2B56E00262B13 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		380A218614F2B56E00262B13 /* Build configuration list for PBXNativeTarget "spdycat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				380A218714F2B56E00262B13 /* Debug */,
+				380A218814F2B56E00262B13 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		380A218914F2B56E00262B13 /* Build configuration list for PBXNativeTarget "spdycatTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				380A218A14F2B56E00262B13 /* Debug */,
+				380A218B14F2B56E00262B13 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 380A215014F2B56E00262B13 /* Project object */;
+}
