@@ -54,4 +54,10 @@ SPDY: build/lib/libSPDY.a
 clean:
 	-rm -r build
 	cd spdylay && make clean
-.PHONY: all spdylay zlib openssl SPDY clean
+
+update-spdylay:
+	cd spdylay && git pull
+	-rm build/lib/libspdylay.* build/{armv7,i386}/lib/libspdylay.*
+
+
+.PHONY: all spdylay zlib openssl SPDY clean update-spdylay
