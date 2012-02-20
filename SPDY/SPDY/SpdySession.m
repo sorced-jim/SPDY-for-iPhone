@@ -182,6 +182,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
 - (BOOL)submitRequest:(SpdyStream*)stream {
     if (!self.spdy_negotiated) {
         [stream notSpdyError];
+        return NO;
     }
 
     spdylay_data_provider data_prd = {-1, NULL};
@@ -189,11 +190,12 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
         data_prd.source.ptr = [NSInputStream inputStreamWithData:stream.body];
         data_prd.read_callback = read_from_data_callback;        
     }
-    [stream.delegate onConnect:stream.url];
     if (spdylay_submit_request(session, priority, [stream nameValues], &data_prd, stream) < 0) {
+        NSLog(@"Failed to submit request.");
         [stream connectionError];
         return NO;
     }
+    [stream.delegate onConnect:stream.url];
     return YES;
 }
 
@@ -215,7 +217,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
         
         while ((stream = [enumerator nextObject])) {
             if (![self submitRequest:stream]) {
-                [streams removeObject:stream];
+                //[streams removeObject:stream];
             }
         }
     }
@@ -300,10 +302,15 @@ static ssize_t read_from_data_callback(spdylay_session *session, uint8_t *buf, s
     int r;
     //want_write_ = false;
     r = SSL_read(ssl, data, (int)len);
+    NSLog(@"SSL_read returned %d", r);
     if (r < 0) {
         if (SSL_get_error(ssl, r) == SSL_ERROR_WANT_WRITE) {
             //want_write_ = true;
         }
+    }
+    if (r == 0) {
+      NSLog(@"Closing connection from read = 0");
+      [self invalidateSocket];
     }
     return r;
 }

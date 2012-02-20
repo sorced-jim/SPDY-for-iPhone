@@ -50,7 +50,7 @@
 }
 
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
-    NSURL* u = [[NSURL URLWithString:url] autorelease];
+    NSURL* u = [NSURL URLWithString:url];
     if (u == nil) {
         [delegate onError];
         return;
