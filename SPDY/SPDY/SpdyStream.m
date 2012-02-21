@@ -73,16 +73,16 @@
     [delegate onError];
 }
 
-static const char* copyString(NSMutableData* arena, NSString* str) {
-    const char* utf8 = [str UTF8String];
+static const char *copyString(NSMutableData *arena, NSString *str) {
+    const char *utf8 = [str UTF8String];
     unsigned long length = strlen(utf8) + 1;
     NSInteger arenaLength = [arena length];
     [arena appendBytes:utf8 length:length];
     return (const char*)[arena mutableBytes] + arenaLength;
 }
 
-- (const char*) copyCFString:(CFStringRef) str {
-    const char* utf8 = CFStringGetCStringPtr(str, CFStringGetFastestEncoding(str));
+- (const char *)copyCFString:(CFStringRef)str {
+    const char *utf8 = CFStringGetCStringPtr(str, CFStringGetFastestEncoding(str));
     if (utf8 == NULL) {
         NSLog(@"Can't get raw version of %@: %@", str, CFStringGetFastestEncoding(str));
         return "";
@@ -91,32 +91,32 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     unsigned long length = strlen(utf8) + 1;
     NSInteger arenaLength = [stringArena length];
     [stringArena appendBytes:utf8 length:length];
-    return (const char*)[stringArena mutableBytes] + arenaLength;
+    return (const char *)[stringArena mutableBytes] + arenaLength;
 }
 
-- (const char*)getStringFromCFHTTPMessage:(CFHTTPMessageRef)msg func:(CFStringRef(*)(CFHTTPMessageRef))func {
+- (const char *)getStringFromCFHTTPMessage:(CFHTTPMessageRef)msg func:(CFStringRef(*)(CFHTTPMessageRef))func {
     CFStringRef str = func(msg);
-    const char* utf8 = [self copyCFString:str];
+    const char *utf8 = [self copyCFString:str];
     CFRelease(str);
     return utf8;
 }
 
-- (const char*)getStringFromCFURL:(CFURLRef)u func:(CFStringRef(*)(CFURLRef))func {
+- (const char *)getStringFromCFURL:(CFURLRef)u func:(CFStringRef(*)(CFURLRef))func {
     CFStringRef str = func(u);
-    const char* utf8 = [self copyCFString:str];
+    const char *utf8 = [self copyCFString:str];
     CFRelease(str);
     return utf8;
 }
 
-- (void)serializeHeaders:(CFHTTPMessageRef) msg {
+- (void)serializeHeaders:(CFHTTPMessageRef)msg {
     CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
     CFIndex count = CFDictionaryGetCount(d);
     
     CFStringRef *keys = CFAllocatorAllocate(NULL, sizeof(CFStringRef)*count*2, 0);
     CFTypeRef *values = (CFTypeRef *)(keys + count);
     CFIndex index;
-    nameValues = malloc((count * 2 + 6*2 + 1) * sizeof(const char*));
-    const char** nv = nameValues;
+    nameValues = malloc((count * 2 + 6*2 + 1) * sizeof(const char *));
+    const char **nv = nameValues;
     CFDictionaryGetKeysAndValues(d, (const void **)keys, (const void **)values);
     nv[0] = "method";
     nv[1] = [self getStringFromCFHTTPMessage:msg func:CFHTTPMessageCopyRequestMethod];
@@ -130,7 +130,7 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     nv[8] = "host";
     nv[9] = [self getStringFromCFURL:u func:CFURLCopyHostName];
     nv[10] = "url";
-    const char* path = [self getStringFromCFURL:u func:CFURLCopyPath];
+    const char *path = [self getStringFromCFURL:u func:CFURLCopyPath];
     [stringArena setLength:[stringArena length] - 1];  // Remove the \0 from path.
     [self getStringFromCFURL:u func:CFURLCopyResourceSpecifier];
     nv[11] = path;
@@ -146,14 +146,14 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
 
 #pragma mark Creation methods.
 
-+ (SpdyStream*)newFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback*) delegate {
++ (SpdyStream *)newFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback *) delegate {
     SpdyStream *stream = [[SpdyStream alloc]init];
     stream.nameValues = malloc(sizeof(const char*)* (6*2 + 1));
     CFURLRef u = CFHTTPMessageCopyRequestURL(msg);
-    stream.url = (NSURL*)u;
+    stream.url = (NSURL *)u;
     CFDataRef body = CFHTTPMessageCopyBody(msg);
     if (body != nil) {
-        stream.body = (NSData*)body;
+        stream.body = (NSData *)body;
         CFRelease(body);
     }
     stream.delegate = delegate;
@@ -163,9 +163,9 @@ static const char* copyString(NSMutableData* arena, NSString* str) {
     return stream;
 }
 
-+ (SpdyStream*)newFromNSURL:(NSURL *)url delegate:(RequestCallback *)delegate {
++ (SpdyStream *)newFromNSURL:(NSURL *)url delegate:(RequestCallback *)delegate {
     SpdyStream *stream = [[SpdyStream alloc]init];
-    stream.nameValues = malloc(sizeof(const char*)* (6*2 + 1));
+    stream.nameValues = malloc(sizeof(const char *)* (6*2 + 1));
     stream.url = url;
     stream.delegate = delegate;
     [stream setStringArena:[NSMutableData dataWithCapacity:100]];

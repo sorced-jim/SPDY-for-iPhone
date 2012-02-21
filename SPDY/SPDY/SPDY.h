@@ -25,8 +25,8 @@
 }
 
 // A reference to delegate is kept until the stream is closed.  The caller will get an onError or onResponseBody before the stream is closed.
-- (void)fetch:(NSString*) path delegate:(RequestCallback*)delegate;
-- (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback*)delegate;
+- (void)fetch:(NSString *)path delegate:(RequestCallback *)delegate;
+- (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate;
 
 @end
 
@@ -34,9 +34,9 @@
 }
 
 // Methods that implementors should override.
-- (void)onConnect:(NSURL*)url;
+- (void)onConnect:(NSURL *)url;
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers;
-- (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length;
+- (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length;
 - (void)onStreamClose;
 - (void)onNotSpdyError;
 - (void)onError;
@@ -50,6 +50,6 @@
 - (void)onResponse:(CFHTTPMessageRef)response;
 - (void)onError;
 
-@property (retain) NSURL* url;
+@property (retain) NSURL *url;
 
 @end

@@ -32,11 +32,11 @@
 
 
 @implementation SPDY {
-    NSMutableDictionary* sessions;
+    NSMutableDictionary *sessions;
 }
 
-- (SpdySession*)getSession:(NSURL*) url {
-    SpdySession* session = [sessions objectForKey:[url host]];
+- (SpdySession *)getSession:(NSURL *)url {
+    SpdySession *session = [sessions objectForKey:[url host]];
     if (session == nil) {
         session = [[[SpdySession alloc]init] autorelease];
         if (![session connect:url]) {
@@ -50,7 +50,7 @@
 }
 
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
-    NSURL* u = [NSURL URLWithString:url];
+    NSURL *u = [NSURL URLWithString:url];
     if (u == nil || u.host == nil) {
         [delegate onError];
         return;
@@ -65,7 +65,7 @@
 
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate {
     CFURLRef url = CFHTTPMessageCopyRequestURL(request);
-    SpdySession* session = [self getSession:(NSURL*)url];
+    SpdySession *session = [self getSession:(NSURL *)url];
     if (session == nil) {
         [delegate onNotSpdyError];
     } else {
@@ -88,7 +88,7 @@
 
 @implementation RequestCallback
 
-- (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length {
+- (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
     return length;
 }
 
@@ -107,7 +107,7 @@
     
 }
 
-- (void)onConnect:(NSURL*)url {
+- (void)onConnect:(NSURL *)url {
     
 }
 @end
@@ -115,7 +115,7 @@
 @implementation BufferedCallback {
     CFMutableDataRef body;
     CFHTTPMessageRef headers;
-    NSURL* _url;
+    NSURL *_url;
 }
 
 @synthesize url = _url;
@@ -133,7 +133,7 @@
     CFRelease(headers);
 }
 
-- (void)onConnect:(NSURL*)u {
+- (void)onConnect:(NSURL *)u {
     self.url = u;
 }
 
@@ -142,7 +142,7 @@
     CFRetain(headers);
 }
 
-- (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length {
+- (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
     CFDataAppendBytes(body, bytes, length);
     return length;
 }

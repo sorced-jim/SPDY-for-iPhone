@@ -46,13 +46,15 @@ static const int priority = 1;
 
 @interface SpdySession ()
 
-- (void)connectTo:(NSURL*) url;
+- (void)connectTo:(NSURL *)url;
 - (void)invalidateSocket;
 - (void)removeStream:(SpdyStream *)stream;
+- (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags;
 - (void)setup_ssl_ctx;
 - (BOOL)sslConnect;
 - (BOOL)sslHandshake;  // Returns true if the handshake completed.
 - (void)sslError;
+- (BOOL)wouldBlock:(int)r;
 @end
 
 
@@ -60,13 +62,13 @@ static const int priority = 1;
     NSMutableSet *streams;
     
     CFSocketRef socket;
-    SSL* ssl;
-    SSL_CTX* ssl_ctx;
+    SSL *ssl;
+    SSL_CTX *ssl_ctx;
     spdylay_session_callbacks *callbacks;
 }
 
+@synthesize spdyNegotiated;
 @synthesize session;
-@synthesize spdy_negotiated;
 @synthesize host;
 @synthesize connectState;
 
@@ -76,21 +78,20 @@ static void sessionCallBack(CFSocketRef s,
                             const void *data,
                             void *info);
 
-static int select_next_proto_cb(SSL* ssl,
+static int select_next_proto_cb(SSL *ssl,
                                 unsigned char **out, unsigned char *outlen,
                                 const unsigned char *in, unsigned int inlen,
                                 void *arg) {
-    SpdySession* sc = (SpdySession*)arg;
-    if (spdylay_select_next_protocol(out, outlen, in, inlen) > 0) {
-        sc.spdy_negotiated = YES;
-    }
+    SpdySession *sc = (SpdySession *)arg;
+    if (spdylay_select_next_protocol(out, outlen, in, inlen) > 0)
+        sc.spdyNegotiated = YES;
+    
     return SSL_TLSEXT_ERR_OK;
 }
 
 - (void)invalidateSocket {
-  if (socket == nil) {
+  if (socket == nil)
     return;
-  }
 
   CFSocketInvalidate(socket);
   CFRelease(socket);
@@ -113,13 +114,11 @@ static int select_next_proto_cb(SSL* ssl,
 static int make_non_block(int fd) {
     int flags, r;
     while ((flags = fcntl(fd, F_GETFL, 0)) == -1 && errno == EINTR);
-    if (flags == -1) {
+    if (flags == -1)
         return -1;
-    }
     while ((r = fcntl(fd, F_SETFL, flags | O_NONBLOCK)) == -1 && errno == EINTR);
-    if (r == -1) {
+    if (r == -1)
         return -1;
-    }
     return 0;
 }
 
@@ -133,16 +132,15 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     return bytesRead;
 }
 
-- (void)connectTo:(NSURL*) url {
+- (void)connectTo:(NSURL *)url {
     struct addrinfo hints;
     
     char service[10];
-    NSNumber* port = [url port];
-    if (port != nil) {
+    NSNumber *port = [url port];
+    if (port != nil)
         snprintf(service, sizeof(service), "%u", [port intValue]);
-    } else {
+    else
         snprintf(service, sizeof(service), "443");
-    }
     
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;
@@ -150,9 +148,8 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     
     struct addrinfo *res;
     int err = getaddrinfo([[url host] UTF8String], service, &hints, &res);
-    if (err != 0) {
+    if (err != 0)
         return;
-    }
     
     struct addrinfo* rp = res;
     if (rp != NULL) {
@@ -178,7 +175,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 }
 
 - (BOOL)submitRequest:(SpdyStream*)stream {
-    if (!self.spdy_negotiated) {
+    if (!self.spdyNegotiated) {
         [stream notSpdyError];
         return NO;
     }
@@ -201,7 +198,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     int r = SSL_connect(ssl);
     if (r == 1) {
         self.connectState = CONNECTED;
-        if (!self.spdy_negotiated) {
+        if (!self.spdyNegotiated) {
             [self notSpdyError];
             [self invalidateSocket];
             return NO;
@@ -210,9 +207,8 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         id stream;
         
         while ((stream = [enumerator nextObject])) {
-            if (![self submitRequest:stream]) {
+            if (![self submitRequest:stream])
                 [streams removeObject:stream];
-            }
         }
         return YES;
     }
@@ -251,7 +247,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 }
 
 
-- (CFSocketRef) newSocket:(NSURL*) url {
+- (CFSocketRef) newSocket:(NSURL *)url {
     [self connectTo:url];
     return socket;
 }
@@ -266,7 +262,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     return YES;
 }
 
-- (void)addStream:(SpdyStream*)stream {
+- (void)addStream:(SpdyStream *)stream {
     if (self.connectState == CONNECTED) {
         if (![self submitRequest:stream]) {
             return;
@@ -277,13 +273,13 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 }
     
 - (void)fetch:(NSURL *)u delegate:(RequestCallback *)delegate {
-    SpdyStream* stream = [[SpdyStream newFromNSURL:u delegate:delegate] autorelease];
+    SpdyStream *stream = [[SpdyStream newFromNSURL:u delegate:delegate] autorelease];
     [self addStream:stream];
 }
 
 
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate {
-    SpdyStream* stream = [[SpdyStream newFromCFHTTPMessage:request delegate:delegate] autorelease];
+    SpdyStream *stream = [[SpdyStream newFromCFHTTPMessage:request delegate:delegate] autorelease];
     [self addStream:stream];
 }
 
@@ -303,7 +299,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     return r;
 }
 
-- (BOOL) wouldBlock:(int) r {
+- (BOOL)wouldBlock:(int)r {
     int e = SSL_get_error(ssl, r);
     return e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE;
 }
@@ -322,12 +318,12 @@ static ssize_t fixUpCallbackValue(SpdySession *ss, int r) {
 }
 
 static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len, int flags, void *user_data) {
-    SpdySession *ss = (SpdySession*)user_data;
+    SpdySession *ss = (SpdySession *)user_data;
     int r = [ss recv_data:data len:len flags:flags];
     return fixUpCallbackValue(ss, r);
 }
 
-- (int) send_data:(const uint8_t*) data len:(size_t) len flags:(int) flags {
+- (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags {
     int r = SSL_write(ssl, data, (int)len);
     return r;
 }
@@ -351,11 +347,11 @@ static void on_stream_close_callback(spdylay_session *session, int32_t stream_id
     [ss removeStream:stream];
 }
 
-static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type type, spdylay_frame *frame, void* user_data) {
+static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type type, spdylay_frame *frame, void *user_data) {
     if (type == SPDYLAY_SYN_REPLY) {
-        spdylay_syn_reply* reply = &frame->syn_reply;
+        spdylay_syn_reply *reply = &frame->syn_reply;
         SpdyStream *stream = spdylay_session_get_stream_user_data(session, reply->stream_id);
-        [stream parseHeaders:(const char**)reply->nv];
+        [stream parseHeaders:(const char **)reply->nv];
     }
 }
 
@@ -363,7 +359,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     [streams removeObject:stream];
 }
 
-- (SpdySession*) init {
+- (SpdySession *)init {
     self = [super init];
     callbacks = malloc(sizeof(*callbacks));
     memset(callbacks, 0, sizeof(*callbacks));
@@ -374,7 +370,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     callbacks->on_data_chunk_recv_callback = on_data_chunk_recv_callback;
     spdylay_session_client_new(&session, callbacks, self);
 
-    self.spdy_negotiated = NO;
+    self.spdyNegotiated = NO;
     self.connectState = NOT_CONNECTED;
     
     streams = [[NSMutableSet alloc] init];
@@ -407,7 +403,7 @@ static void sessionCallBack(CFSocketRef s,
     if (info == NULL) {
         return;
     }
-    SpdySession *session = (SpdySession*)info;
+    SpdySession *session = (SpdySession *)info;
     spdylay_session* laySession = [session session];
     if (laySession == NULL) {
         return;

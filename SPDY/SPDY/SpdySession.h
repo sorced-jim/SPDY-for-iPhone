@@ -35,18 +35,18 @@ enum ConnectState {
     NSURL* host;
     struct spdylay_session *session;
     
-    BOOL spdy_negotiated;
+    BOOL spdyNegotiated;
     enum ConnectState connectState;
 }
 
-@property BOOL spdy_negotiated;
+@property BOOL spdyNegotiated;
 @property struct spdylay_session *session;
-@property (retain) NSURL* host;
+@property (retain) NSURL *host;
 @property enum ConnectState connectState;
 
-- (BOOL)connect:(NSURL*) host;
-- (void)fetch:(NSURL*) path delegate:(RequestCallback*)delegate;
-- (void)fetchFromMessage:(CFHTTPMessageRef) request delegate:(RequestCallback *)delegate;
+- (BOOL)connect:(NSURL *) host;
+- (void)fetch:(NSURL *) path delegate:(RequestCallback *)delegate;
+- (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate;
 - (void)addToLoop;
 
 @end

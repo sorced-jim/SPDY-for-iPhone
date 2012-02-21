@@ -23,7 +23,7 @@
 @class RequestCallback;
 
 @interface SpdyStream : NSObject {
-    const char** nameValues;
+    const char **nameValues;
     NSURL *url;
     NSData *body;   
     BOOL streamClosed;
@@ -33,20 +33,20 @@
 }
 
 // To be used by the SPDY session.
-- (void) parseHeaders:(const char**) nameValuePairs;
-- (size_t) writeBytes:(const uint8_t*) data len:(size_t) length;
+- (void) parseHeaders:(const char **)nameValuePairs;
+- (size_t) writeBytes:(const uint8_t *)data len:(size_t) length;
 - (void) closeStream;
 
 // Error case handlers used by the SPDY session.
 - (void)notSpdyError;
 - (void)connectionError;
 
-+ (SpdyStream*)newFromCFHTTPMessage:(CFHTTPMessageRef) msg delegate:(RequestCallback*) delegate;
-+ (SpdyStream*)newFromNSURL:(NSURL*) url delegate:(RequestCallback*) delegate;
++ (SpdyStream*)newFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback*)delegate;
++ (SpdyStream*)newFromNSURL:(NSURL *)url delegate:(RequestCallback*)delegate;
 
-@property const char** nameValues;
-@property (retain) NSURL* url;
-@property (retain) RequestCallback* delegate;
+@property const char **nameValues;
+@property (retain) NSURL *url;
+@property (retain) RequestCallback *delegate;
 @property (retain) NSMutableData *stringArena;
 @property (retain) NSData *body;
 

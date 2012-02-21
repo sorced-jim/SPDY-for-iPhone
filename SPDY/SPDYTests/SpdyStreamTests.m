@@ -27,7 +27,7 @@
 
 @end
 
-static int countItems(const char** nv) {
+static int countItems(const char **nv) {
     int count;
     for (count = 0; nv[count]; ++count) {
     }
@@ -35,9 +35,9 @@ static int countItems(const char** nv) {
 }
 
 @implementation SpdyStreamTests {
-    Callback* delegate;
-    NSURL* url;
-    SpdyStream* stream;
+    Callback *delegate;
+    NSURL *url;
+    SpdyStream *stream;
 }
 
 - (void)setUp {
@@ -53,7 +53,7 @@ static int countItems(const char** nv) {
 
 - (void)testNameValuePairs {
     stream = [SpdyStream newFromNSURL:url delegate:delegate];
-    const char** nv = [stream nameValues];
+    const char **nv = [stream nameValues];
     int items = countItems(nv);
     STAssertEquals(12, items, @"There should only be 6 pairs");
     STAssertEquals(0, items % 2, @"There must be an even number of pairs.");
@@ -114,7 +114,7 @@ static int countItems(const char** nv) {
 }
 
 - (void)testSetBody {
-    NSData* data = [NSData dataWithBytesNoCopy:"hi=bye" length:6 freeWhenDone:NO];
+    NSData *data = [NSData dataWithBytesNoCopy:"hi=bye" length:6 freeWhenDone:NO];
     CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("POST"), (CFURLRef)url, CFSTR("HTTP/1.2"));
     CFHTTPMessageSetBody(msg, (CFDataRef)data);
     stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
