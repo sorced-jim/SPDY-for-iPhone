@@ -9,7 +9,7 @@ all:
 	cp build/UninstalledProducts/libSPDY.a build/lib/armv7/libSPDY.a
 	lipo -create build/lib/armv7/libSPDY.a build/lib/i386/libSPDY.a -output ../build/lib/libSPDY.a
 	mkdir -p ../build/include/SPDY
-	cp build/include/SPDY/SPDY.h ../build/include/SPDY/
+	cp build/include/SPDY/*.h ../build/include/SPDY/
 
 check:
 	xcodebuild clean

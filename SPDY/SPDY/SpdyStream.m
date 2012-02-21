@@ -121,7 +121,7 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     nv[0] = "method";
     nv[1] = [self getStringFromCFHTTPMessage:msg func:CFHTTPMessageCopyRequestMethod];
     nv[2] = "user-agent";
-    nv[3] = "SPDY objc-0.0.1";
+    nv[3] = "SPDY objc-0.0.3";
     nv[4] = "version";
     nv[5] = [self getStringFromCFHTTPMessage:msg func:CFHTTPMessageCopyVersion];
     CFURLRef u = CFHTTPMessageCopyRequestURL(msg);
