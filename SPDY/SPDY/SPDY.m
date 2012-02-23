@@ -191,27 +191,94 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 
 // Create a delegate derived class of RequestCallback.  Create a context struct.
 // Convert this to an objective-C object that derives from RequestCallback.
-struct _SpdyContext {
-    BufferedCallback *delegate;
+@interface _SpdyCFStream : RequestCallback {
     CFAllocatorRef alloc;
     CFReadStreamRef readStreamPair;
     CFWriteStreamRef writeStreamPair;  // read() will write into writeStreamPair.
     SpdyStream *stream;
     SpdySession *session;
+    CFHTTPMessageRef _responseHeaders;
 };
 
-static void deallocContext(struct _SpdyContext *ctx) {
-    CFRelease(ctx->alloc);
-    CFRelease(ctx->readStreamPair);
-    CFRelease(ctx->writeStreamPair);
-    [ctx->delegate release];
+@property (assign) BOOL opened;
+@property (assign) BOOL eof;
+@property (assign) int error;
+@property (assign) CFHTTPMessageRef responseHeaders;
+@property (assign) CFReadStreamRef readStreamPair;
+@end
+
+@implementation _SpdyCFStream
+
+@synthesize opened;
+@synthesize eof;
+@synthesize error;
+@synthesize readStreamPair;
+
+- (_SpdyCFStream *)init:(CFAllocatorRef)a {
+    self = [super init];
+    alloc = CFRetain(a);
+    CFStreamCreateBoundPair(alloc, &readStreamPair, &writeStreamPair, 16 * 1024);
+    self.error = 0;
+    self.opened = NO;
+    self.eof = NO;
+    return self;
 }
 
+- (void)dealloc {
+    CFRelease(alloc);
+    CFRelease(readStreamPair);
+    CFRelease(writeStreamPair);
+}
+
+- (void)setResponseHeaders:(CFHTTPMessageRef)h {
+    _responseHeaders = h;
+    CFRetain(h);
+}
+
+- (CFHTTPMessageRef)responseHeaders {
+    return _responseHeaders;
+}
+
+// Methods that implementors should override.
+- (void)onConnect:(NSURL *)url {
+    self.opened = YES;
+}
+
+- (void)onResponseHeaders:(CFHTTPMessageRef)headers {
+    self.responseHeaders = headers;
+}
+
+- (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
+    return CFWriteStreamWrite(writeStreamPair, bytes, length);
+}
+
+- (void)onStreamClose {
+    self.eof = YES;
+}
+- (void)onNotSpdyError {
+    self.error = 2;
+}
+- (void)onError {
+    self.error = 1;
+    self.opened = NO;
+}
+
+- (BOOL)assignCFStreamError:(CFStreamError*)e {
+    if (self.error != 0) {
+        e->domain = kCFStreamErrorDomainCustom;
+        e->error = self.error;
+        return NO;
+    }
+    return YES;
+}
+
+@end
+
 static CFTypeRef copyProperty(CFReadStreamRef readStream, CFStringRef property, void *data) {
-    struct _SpdyContext *ctx = (struct _SpdyContext *)data;
+    _SpdyCFStream *ctx = (_SpdyCFStream *)data;
     if (CFEqual(property, kCFStreamPropertyHTTPResponseHeader)) {
-        if (ctx->delegate.headers != NULL) {
-            return CFRetain(ctx->delegate.headers);
+        if (ctx.responseHeaders != NULL) {
+            return CFRetain(ctx.responseHeaders);
         }
     }
     if (CFEqual(property, kCFStreamPropertyHTTPRequestBytesWrittenCount)) {
@@ -221,60 +288,53 @@ static CFTypeRef copyProperty(CFReadStreamRef readStream, CFStringRef property, 
 }
 
 static Boolean openStream(CFReadStreamRef readStream, CFStreamError *error, Boolean *openCompleted, void *data) {
-    struct _SpdyContext *ctx = (struct _SpdyContext *)data;
-    // submit the request.
-    return NO;
+    _SpdyCFStream *ctx = (_SpdyCFStream *)data;
+    *openCompleted = ctx.opened;
+    // TODO(jim): The request should be submitted now instead of at create time.
+    return [ctx assignCFStreamError:error];
 }
 
 static Boolean openStreamCompleted(CFReadStreamRef readStream, CFStreamError *error, void *data) {
-    struct _SpdyContext *ctx = (struct _SpdyContext *)data;
-    // Check if stream has been submitted.
-    return NO;    
+    _SpdyCFStream *ctx = (_SpdyCFStream *)data;
+    [ctx assignCFStreamError:error];
+    return ctx.opened;
 }
 
 static CFIndex readFromStream(CFReadStreamRef stream, UInt8 *buffer, CFIndex bufferLength, CFStreamError *error, Boolean *atEOF, void *data) {
-    struct _SpdyContext *ctx = (struct _SpdyContext *)data;
-    // Get stream body and read from that.
-    return -1;
+    _SpdyCFStream *ctx = (_SpdyCFStream *)data;
+    *atEOF = ctx.eof;
+    [ctx assignCFStreamError:error];
+    return CFReadStreamRead(ctx.readStreamPair, buffer, bufferLength);
 }
 
 static Boolean canRead(CFReadStreamRef stream, void *data) {
-    struct _SpdyContext *ctx = (struct _SpdyContext *)data;
-    // Check that the ctx->stream body exists.
-    return NO;
+    _SpdyCFStream *ctx = (_SpdyCFStream *)data;
+    return ctx.opened;
 }
 
 static void scheduleStream(CFReadStreamRef stream, CFRunLoopRef runLoop, CFStringRef runLoopMode, void *data) {
-    struct _SpdyContext *ctx = (struct _SpdyContext *)data;
+    _SpdyCFStream *ctx = (_SpdyCFStream *)data;
 
     // The streams are handled by SpdySession.  Flow control may require scheduling and unscheduling.
     // Schedule the readStream pair here.
-    CFReadStreamScheduleWithRunLoop(ctx->readStreamPair, runLoop, runLoopMode);
+    CFReadStreamScheduleWithRunLoop(ctx.readStreamPair, runLoop, runLoopMode);
 }
 
 static void UnscheduleStream(CFReadStreamRef stream, CFRunLoopRef runLoop, CFStringRef runLoopMode, void *data) {
-    struct _SpdyContext *ctx = (struct _SpdyContext *)data;
+    _SpdyCFStream *ctx = (_SpdyCFStream *)data;
 
     // Unschedule the readStream pair here.
-    CFReadStreamUnscheduleFromRunLoop(ctx->readStreamPair, runLoop, runLoopMode);
+    CFReadStreamUnscheduleFromRunLoop(ctx.readStreamPair, runLoop, runLoopMode);
 }
 
 static void closeStream(CFReadStreamRef stream, void *data) {
-    
+    // TODO(jim): I need to be able to call into the stream.
 }
 
 CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody) {
-    struct _SpdyContext *ctx = (struct _SpdyContext *)CFAllocatorAllocate(alloc, sizeof(*ctx), 0);
+    _SpdyCFStream *ctx = [[_SpdyCFStream alloc]init:alloc];
     if (ctx) {
-        memset(ctx, 0, sizeof(*ctx));
-        ctx->alloc = CFRetain(alloc);
-        ctx->delegate = [[BufferedCallback alloc]init];
-        _CFReadStreamCallBacksV0Copy callbacks;
-        
-        CFReadStreamRef readStreamPair;
-        CFWriteStreamRef writeStreamPair;
-        
-        CFStreamCreateBoundPair(alloc, &readStreamPair, &writeStreamPair, 16 * 1024);
+        _CFReadStreamCallBacksV0Copy callbacks;        
         memset(&callbacks, 0, sizeof(callbacks));
 
         // version = 1 supports setProperty, v0 does not.
@@ -290,7 +350,6 @@ CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef 
                          
         CFReadStreamRef result = CFReadStreamCreate(alloc, &callbacks, ctx);
         return result;
-                         
      }
      return NULL;
 }
