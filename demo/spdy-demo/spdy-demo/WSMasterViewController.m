@@ -12,10 +12,9 @@
 #import "SPDY/SPDY.h"
 #import "WSDetailViewController.h"
 
-static SPDY* spdy = NULL;
-
 @implementation WSMasterViewController {
     NSMutableArray *_urlsFetched;
+    SPDY *spdy;
 }
 @synthesize urlTable;
 @synthesize urlInput;
@@ -41,9 +40,7 @@ static SPDY* spdy = NULL;
 	// Do any additional setup after loading the view, typically from a nib.
 
     self.urlsFetched = [NSMutableArray arrayWithCapacity:4];
-    if (spdy == NULL) {
-        spdy = [[SPDY alloc]init];        
-    }
+    spdy = [SPDY sharedSPDY];
     self.urlTable.dataSource = self;
     self.urlTable.delegate = self;
 }

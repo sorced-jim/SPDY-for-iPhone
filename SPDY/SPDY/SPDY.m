@@ -31,6 +31,10 @@
 #include "openssl/ssl.h"
 #import "SpdySession.h"
 
+// The shared spdy instance.
+static SPDY *spdy = NULL;
+
+
 typedef struct {
     CFIndex version; /* == 0 */
     Boolean (*open)(CFReadStreamRef stream, CFStreamError *error, Boolean *openComplete, void *info);
@@ -89,8 +93,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     CFRelease(url);
 }
 
-- (SPDY*) init {
-    SSL_library_init();
+- (SPDY *)init {
     self = [super init];
     sessions = [[NSMutableDictionary alloc]init];
     return self;
@@ -98,6 +101,14 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 
 - (void)dealloc {
     [sessions release];
+}
+
++ (SPDY *)sharedSPDY {
+    if (spdy == NULL) {
+        SSL_library_init();
+        spdy = [[SPDY alloc]init];
+    }
+    return spdy;
 }
 @end
 
@@ -201,7 +212,6 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 };
 
 @property (assign) BOOL opened;
-@property (assign) BOOL eof;
 @property (assign) int error;
 @property (assign) CFHTTPMessageRef responseHeaders;
 @property (assign) CFReadStreamRef readStreamPair;
@@ -210,7 +220,6 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 @implementation _SpdyCFStream
 
 @synthesize opened;
-@synthesize eof;
 @synthesize error;
 @synthesize readStreamPair;
 
@@ -220,12 +229,17 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     CFStreamCreateBoundPair(alloc, &readStreamPair, &writeStreamPair, 16 * 1024);
     self.error = 0;
     self.opened = NO;
-    self.eof = NO;
     return self;
 }
 
 - (void)dealloc {
     CFRelease(alloc);
+    if (CFReadStreamGetStatus(readStreamPair) != kCFStreamStatusClosed) {
+        CFReadStreamClose(readStreamPair);
+    }
+    if (CFWriteStreamGetStatus(writeStreamPair) != kCFStreamStatusClosed) {
+        CFWriteStreamClose(writeStreamPair);
+    }
     CFRelease(readStreamPair);
     CFRelease(writeStreamPair);
 }
@@ -249,15 +263,18 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 }
 
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
+    // TODO(jim): Ensure that any errors from write() get transfered to the SpdyStream.
     return CFWriteStreamWrite(writeStreamPair, bytes, length);
 }
 
 - (void)onStreamClose {
-    self.eof = YES;
+    CFWriteStreamClose(writeStreamPair);
 }
+
 - (void)onNotSpdyError {
     self.error = 2;
 }
+
 - (void)onError {
     self.error = 1;
     self.opened = NO;
@@ -302,9 +319,10 @@ static Boolean openStreamCompleted(CFReadStreamRef readStream, CFStreamError *er
 
 static CFIndex readFromStream(CFReadStreamRef stream, UInt8 *buffer, CFIndex bufferLength, CFStreamError *error, Boolean *atEOF, void *data) {
     _SpdyCFStream *ctx = (_SpdyCFStream *)data;
-    *atEOF = ctx.eof;
     [ctx assignCFStreamError:error];
-    return CFReadStreamRead(ctx.readStreamPair, buffer, bufferLength);
+    CFIndex r = CFReadStreamRead(ctx.readStreamPair, buffer, bufferLength);
+    *atEOF = (r == 0);
+    return r;
 }
 
 static Boolean canRead(CFReadStreamRef stream, void *data) {
@@ -328,7 +346,8 @@ static void UnscheduleStream(CFReadStreamRef stream, CFRunLoopRef runLoop, CFStr
 }
 
 static void closeStream(CFReadStreamRef stream, void *data) {
-    // TODO(jim): I need to be able to call into the stream.
+    _SpdyCFStream *ctx = (_SpdyCFStream *)data;
+    CFReadStreamClose(ctx.readStreamPair);
 }
 
 CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody) {
@@ -349,6 +368,7 @@ CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef 
         callbacks.unschedule = UnscheduleStream;
                          
         CFReadStreamRef result = CFReadStreamCreate(alloc, &callbacks, ctx);
+
         return result;
      }
      return NULL;

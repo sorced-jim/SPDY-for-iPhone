@@ -5,7 +5,6 @@
    but it works.
 - Pass in a timeout to SPDY:fetch.
 - Write tests for SpdySession
-- Convert spdycat demo to use libSPDY.a
 
 The following are some of the next steps to be able to create a library
 and use it in ASI HTTP.

@@ -42,14 +42,13 @@
 
 - (void)dealloc
 {
-    [spdy release];
     [_window release];
     [super dealloc];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    spdy = [[SPDY alloc]init];
+    spdy = [SPDY sharedSPDY];
     [spdy fetch:@"https://images.google.com/" delegate:[[[ShowBody alloc] init] autorelease]];
     [spdy fetch:@"https://images.google.com/imghp" delegate:[[[ShowBody alloc] init] autorelease]];
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
