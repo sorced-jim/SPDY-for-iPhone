@@ -25,7 +25,9 @@
 @interface SpdyStream : NSObject {
     const char **nameValues;
     NSURL *url;
-    NSData *body;   
+    NSData *body;
+    NSInteger requestBodyBytesSent;
+
     BOOL streamClosed;
     RequestCallback *delegate;
     
@@ -49,6 +51,7 @@
 @property (retain) RequestCallback *delegate;
 @property (retain) NSMutableData *stringArena;
 @property (retain) NSData *body;
+@property (assign) NSInteger requestBodyBytesSent;
 
 @end
 

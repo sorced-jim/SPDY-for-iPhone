@@ -28,6 +28,7 @@
 @synthesize url;
 @synthesize body;
 @synthesize delegate;
+@synthesize requestBodyBytesSent;
 @synthesize stringArena;
 
 - (id)init {

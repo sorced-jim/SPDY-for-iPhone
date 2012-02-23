@@ -21,6 +21,13 @@
 
 @class RequestCallback;
 
+// Returns a CFReadStream.  If requestBody is non-NULL the request method in requestHeaders must
+// support a message body and the requestBody will override the body that may already be in requestHeaders.  If
+// the request method in requestHeaders expects a body and requestBody is NULL then the body from requestHeaders
+// will be used.
+CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody);
+
+
 @interface SPDY : NSObject {
 }
 
