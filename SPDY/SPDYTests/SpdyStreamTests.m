@@ -41,7 +41,7 @@ static int countItems(const char **nv) {
 }
 
 - (void)setUp {
-    url = [NSURL URLWithString:@"http://example.com/bar;foo?q=123&q=bar&j=3"];
+    url = [[NSURL URLWithString:@"http://example.com/bar;foo?q=123&q=bar&j=3"] retain];
     delegate = [[Callback alloc]init];
 }
 
@@ -110,6 +110,24 @@ static int countItems(const char **nv) {
     STAssertEquals(0, strcmp(nv[12], "Boy"), @"Boy is a header.");
     STAssertEquals(0, strcmp(nv[13], "Bad"), @"The boy was bad.");
     STAssertNil(stream.body, @"No Body.");
+    CFRelease(msg);
+}
+
+- (void)testSerializeHeadersNoResourceSpecifier {
+    CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("OPTIONS"), CFURLCreateWithString(kCFAllocatorDefault, CFSTR("http://bar/"), NULL), kCFHTTPVersion1_0);
+    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
+    const char **nv = [stream nameValues];
+    STAssertTrue(nv != NULL, @"nameValues should be allocated");
+    if (nv == NULL) {
+        return;
+    }
+    int items = countItems(nv);
+    STAssertEquals(12, items, @"At least 6 pairs.");
+    if (items < 12) {
+        return;
+    }
+    STAssertEquals(0, strcmp(nv[5], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[5]);
+    STAssertEquals(0, strcmp(nv[11], "/"), @"The path and query parameters must be in the url: '%s'", nv[11]);
     CFRelease(msg);
 }
 

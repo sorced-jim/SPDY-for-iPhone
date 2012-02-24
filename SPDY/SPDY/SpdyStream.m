@@ -132,8 +132,12 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     nv[9] = [self getStringFromCFURL:u func:CFURLCopyHostName];
     nv[10] = "url";
     const char *path = [self getStringFromCFURL:u func:CFURLCopyPath];
-    [stringArena setLength:[stringArena length] - 1];  // Remove the \0 from path.
-    [self getStringFromCFURL:u func:CFURLCopyResourceSpecifier];
+    CFStringRef resourceSpecifier = CFURLCopyResourceSpecifier(u);
+    if (resourceSpecifier != NULL) {
+        [stringArena setLength:[stringArena length] - 1];  // Remove the \0 from path.
+        [self copyCFString:resourceSpecifier];
+        CFRelease(resourceSpecifier);
+    }
     nv[11] = path;
     for (index = 0; index < count; ++index) {
         nv[index*2 + 12] = [self copyCFString:keys[index]];
