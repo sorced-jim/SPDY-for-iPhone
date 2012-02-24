@@ -203,7 +203,6 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 // Create a delegate derived class of RequestCallback.  Create a context struct.
 // Convert this to an objective-C object that derives from RequestCallback.
 @interface _SpdyCFStream : RequestCallback {
-    CFAllocatorRef alloc;
     CFReadStreamRef readStreamPair;
     CFWriteStreamRef writeStreamPair;  // read() will write into writeStreamPair.
     SpdyStream *stream;
@@ -225,15 +224,13 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 
 - (_SpdyCFStream *)init:(CFAllocatorRef)a {
     self = [super init];
-    alloc = CFRetain(a);
-    CFStreamCreateBoundPair(alloc, &readStreamPair, &writeStreamPair, 16 * 1024);
+    CFStreamCreateBoundPair(a, &readStreamPair, &writeStreamPair, 16 * 1024);
     self.error = 0;
     self.opened = NO;
     return self;
 }
 
 - (void)dealloc {
-    CFRelease(alloc);
     if (CFReadStreamGetStatus(readStreamPair) != kCFStreamStatusClosed) {
         CFReadStreamClose(readStreamPair);
     }
