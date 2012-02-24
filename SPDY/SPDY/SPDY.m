@@ -216,6 +216,11 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 @property (assign) CFReadStreamRef readStreamPair;
 @end
 
+static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventType type, void *info) {
+    _SpdyCFStream *ctx = (_SpdyCFStream *)info;
+    // Trigger the actual client callback.  How?  Damn?
+}
+
 @implementation _SpdyCFStream
 
 @synthesize opened;
@@ -225,6 +230,10 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 - (_SpdyCFStream *)init:(CFAllocatorRef)a {
     self = [super init];
     CFStreamCreateBoundPair(a, &readStreamPair, &writeStreamPair, 16 * 1024);
+    
+    CFStreamClientContext ctxt = {0, self, NULL, NULL, NULL};
+    CFReadStreamSetClient(readStreamPair, kCFStreamEventHasBytesAvailable, ReadStreamClientCallBack, &ctxt);
+
     self.error = 0;
     self.opened = NO;
     return self;
