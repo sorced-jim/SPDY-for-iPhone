@@ -368,7 +368,8 @@ CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef 
         callbacks.unschedule = UnscheduleStream;
                          
         CFReadStreamRef result = CFReadStreamCreate(alloc, &callbacks, ctx);
-
+        SPDY *spdy = [SPDY sharedSPDY];
+        [spdy fetchFromMessage:requestHeaders delegate:ctx];
         return result;
      }
      return NULL;
