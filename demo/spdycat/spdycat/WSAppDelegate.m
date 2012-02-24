@@ -9,6 +9,13 @@
 #import "WSAppDelegate.h"
 #import "SPDY/SPDY.h"
 
+// Create CFHTTPMessage.
+static CFHTTPMessageRef createHttpMessage() {
+    CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("GET"), CFURLCreateWithString(kCFAllocatorDefault, CFSTR("https://www.google.com/"), NULL), kCFHTTPVersion1_0);
+    CFHTTPMessageSetHeaderFieldValue(msg, CFSTR("X-Try-Spdy"), CFSTR("Jim was phython, are you looking at the logs"));
+    return msg;
+}
+
 @interface ShowBody : BufferedCallback {
 }
 
@@ -39,6 +46,12 @@
 
 @synthesize window = _window;
 
+static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventType type, void *info) {
+    UInt8* bytes = malloc(16*1024);
+    CFIndex bytesRead = CFReadStreamRead(readStream, bytes, 16*1024);
+    printf("%.*s", (int)bytesRead, bytes);
+    free(bytes);
+}
 
 - (void)dealloc
 {
@@ -51,6 +64,12 @@
     spdy = [SPDY sharedSPDY];
     [spdy fetch:@"https://images.google.com/" delegate:[[[ShowBody alloc] init] autorelease]];
     [spdy fetch:@"https://images.google.com/imghp" delegate:[[[ShowBody alloc] init] autorelease]];
+    [spdy fetchFromMessage:createHttpMessage() delegate:[[[ShowBody alloc] init] autorelease]];
+    
+    //CFReadStreamRef readStream = SpdyCreateSpdyReadStream(kCFAllocatorDefault, createHttpMessage(), NULL);
+    //CFStreamClientContext ctxt = {0, self, NULL, NULL, NULL};
+    //CFReadStreamSetClient(readStream, kCFStreamEventHasBytesAvailable, ReadStreamClientCallBack, &ctxt);
+    
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
