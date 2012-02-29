@@ -11,8 +11,10 @@
 
 // Create CFHTTPMessage.
 static CFHTTPMessageRef createHttpMessage() {
-    CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("GET"), CFURLCreateWithString(kCFAllocatorDefault, CFSTR("https://www.google.com/"), NULL), kCFHTTPVersion1_0);
-    CFHTTPMessageSetHeaderFieldValue(msg, CFSTR("X-Try-Spdy"), CFSTR("Jim was phython, are you looking at the logs"));
+    CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("GET"),
+                                                      CFURLCreateWithString(kCFAllocatorDefault, CFSTR("https://www.google.com/"), NULL),
+                                                      kCFHTTPVersion1_0);
+    CFHTTPMessageSetHeaderFieldValue(msg, CFSTR("X-Try-Spdy"), CFSTR("Jim was phython, are you looking at the logs?"));
     return msg;
 }
 
@@ -61,14 +63,16 @@ static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventTy
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    spdy = [SPDY sharedSPDY];
-    [spdy fetch:@"https://images.google.com/" delegate:[[[ShowBody alloc] init] autorelease]];
-    [spdy fetch:@"https://images.google.com/imghp" delegate:[[[ShowBody alloc] init] autorelease]];
-    [spdy fetchFromMessage:createHttpMessage() delegate:[[[ShowBody alloc] init] autorelease]];
+    //spdy = [SPDY sharedSPDY];
+    //[spdy fetch:@"https://images.google.com/" delegate:[[[ShowBody alloc] init] autorelease]];
+    //[spdy fetch:@"https://images.google.com/imghp" delegate:[[[ShowBody alloc] init] autorelease]];
+    //[spdy fetchFromMessage:createHttpMessage() delegate:[[[ShowBody alloc] init] autorelease]];
     
-    //CFReadStreamRef readStream = SpdyCreateSpdyReadStream(kCFAllocatorDefault, createHttpMessage(), NULL);
-    //CFStreamClientContext ctxt = {0, self, NULL, NULL, NULL};
-    //CFReadStreamSetClient(readStream, kCFStreamEventHasBytesAvailable, ReadStreamClientCallBack, &ctxt);
+    CFReadStreamRef readStream = SpdyCreateSpdyReadStream(kCFAllocatorDefault, createHttpMessage(), NULL);
+    CFStreamClientContext ctxt = {0, self, NULL, NULL, NULL};
+    CFReadStreamSetClient(readStream, kCFStreamEventHasBytesAvailable, ReadStreamClientCallBack, &ctxt);
+    CFReadStreamOpen(readStream);
+    CFReadStreamScheduleWithRunLoop(readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
     
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     // Override point for customization after application launch.
