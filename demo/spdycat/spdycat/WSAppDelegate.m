@@ -49,6 +49,16 @@ static CFHTTPMessageRef createHttpMessage() {
 @synthesize window = _window;
 
 static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventType type, void *info) {
+    CFHTTPMessageRef msg = (CFHTTPMessageRef)CFReadStreamCopyProperty(readStream, kCFStreamPropertyHTTPResponseHeader);
+    if (msg == NULL) {
+        NSLog(@"No response header.");
+        return;
+    }
+    if (!CFHTTPMessageIsHeaderComplete(msg)) {
+        NSLog(@"Incomplete headers.");
+        return;
+    }
+    CFRelease(msg);
     UInt8* bytes = malloc(16*1024);
     CFIndex bytesRead = CFReadStreamRead(readStream, bytes, 16*1024);
     printf("%.*s", (int)bytesRead, bytes);
@@ -69,10 +79,11 @@ static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventTy
     //[spdy fetchFromMessage:createHttpMessage() delegate:[[[ShowBody alloc] init] autorelease]];
     
     CFReadStreamRef readStream = SpdyCreateSpdyReadStream(kCFAllocatorDefault, createHttpMessage(), NULL);
+    CFReadStreamScheduleWithRunLoop(readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+
     CFStreamClientContext ctxt = {0, self, NULL, NULL, NULL};
     CFReadStreamSetClient(readStream, kCFStreamEventHasBytesAvailable, ReadStreamClientCallBack, &ctxt);
     CFReadStreamOpen(readStream);
-    CFReadStreamScheduleWithRunLoop(readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
     
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     // Override point for customization after application launch.

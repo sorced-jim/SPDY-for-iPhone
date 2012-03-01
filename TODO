@@ -8,10 +8,5 @@
 
 The following are some of the next steps to be able to create a library
 and use it in ASI HTTP.
-- Return a ReadStream (Actually NSInputStream)for a given NSURL
- - Creating a CFStream doesn't work for two reasons:
-  1) CFStreamCreate is private so actual streams can't be created.
-  2) CFStreamCreateBoundPair doesn't allow arbitrary properties to
-     be set, so http response headers can't be returned.
- - Try creating an NSINputStream and cast it to a CFReadStream.
 - Return an HTTP ReadStream when NPN fails to negotiate spdy.
+ - Or allow ASI HTTP to keep track of which domains support SPDY.
