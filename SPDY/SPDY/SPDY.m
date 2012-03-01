@@ -30,6 +30,7 @@
 
 #include "openssl/ssl.h"
 #import "SpdySession.h"
+#import "SpdyInputStream.h"
 
 // The shared spdy instance.
 static SPDY *spdy = NULL;
@@ -222,7 +223,9 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 - (_SpdyCFStream *)init:(CFAllocatorRef)a {
     self = [super init];
     
-    CFStreamCreateBoundPair(a, &readStreamPair, &writeStreamPair, 16 * 1024);
+    CFReadStreamRef baseReadStream;
+    CFStreamCreateBoundPair(a, &baseReadStream, &writeStreamPair, 16 * 1024);
+    readStreamPair = (CFReadStreamRef)[[SpdyInputStream alloc]init:(NSInputStream *)baseReadStream];
     self.error = 0;
     self.opened = NO;
     return self;

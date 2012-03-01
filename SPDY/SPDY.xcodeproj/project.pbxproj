@@ -31,6 +31,8 @@
 		3870AF6A14E47F8E009D8118 /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF5214E47F8E009D8118 /* libSPDY.a */; };
 		3870AF7014E47F8E009D8118 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3870AF6E14E47F8E009D8118 /* InfoPlist.strings */; };
 		3870AF7314E47F8E009D8118 /* SPDYTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3870AF7214E47F8E009D8118 /* SPDYTests.m */; };
+		3889D68F14FEE41200DDED3F /* SpdyInputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 3889D68D14FEE41200DDED3F /* SpdyInputStream.h */; };
+		3889D69014FEE41200DDED3F /* SpdyInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 3889D68E14FEE41200DDED3F /* SpdyInputStream.m */; };
 		38FFF69414E9A303001A974E /* SPDY.h in Headers */ = {isa = PBXBuildFile; fileRef = 3870AF5A14E47F8E009D8118 /* SPDY.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -75,6 +77,8 @@
 		3870AF6F14E47F8E009D8118 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3870AF7114E47F8E009D8118 /* SPDYTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPDYTests.h; sourceTree = "<group>"; };
 		3870AF7214E47F8E009D8118 /* SPDYTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPDYTests.m; sourceTree = "<group>"; };
+		3889D68D14FEE41200DDED3F /* SpdyInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyInputStream.h; sourceTree = "<group>"; };
+		3889D68E14FEE41200DDED3F /* SpdyInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyInputStream.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +156,8 @@
 			children = (
 				3870AF5A14E47F8E009D8118 /* SPDY.h */,
 				3870AF5B14E47F8E009D8118 /* SPDY.m */,
+				3889D68D14FEE41200DDED3F /* SpdyInputStream.h */,
+				3889D68E14FEE41200DDED3F /* SpdyInputStream.m */,
 				3800CADE14E48CAE00B85319 /* SpdySession.h */,
 				3800CADF14E48CAE00B85319 /* SpdySession.m */,
 				3800CAE014E48CAE00B85319 /* SpdyStream.h */,
@@ -204,6 +210,7 @@
 				3800CAE414E48CAE00B85319 /* SpdyStream.h in Headers */,
 				380A212814EC30F200262B13 /* SpdyStreamTests.h in Headers */,
 				380A21A714F2FCBC00262B13 /* SpdySessionTests.h in Headers */,
+				3889D68F14FEE41200DDED3F /* SpdyInputStream.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,6 +314,7 @@
 				3870AF5C14E47F8E009D8118 /* SPDY.m in Sources */,
 				3800CAE314E48CAE00B85319 /* SpdySession.m in Sources */,
 				3800CAE514E48CAE00B85319 /* SpdyStream.m in Sources */,
+				3889D69014FEE41200DDED3F /* SpdyInputStream.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

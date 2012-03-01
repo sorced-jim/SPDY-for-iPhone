@@ -15,15 +15,26 @@
     BOOL closeCalled;
 }
 @property BOOL closeCalled;
+@property (assign) CFHTTPMessageRef responseHeaders;
 @end
 
 
 @implementation Callback
 
+- (void)dealloc {
+    CFRelease(self.responseHeaders);
+}
+
 - (void)onStreamClose {
     self.closeCalled = YES;
 }
+
+- (void)onResponseHeaders:(CFHTTPMessageRef)headers {
+    self.responseHeaders = (CFHTTPMessageRef)CFRetain(headers);
+}
+
 @synthesize closeCalled;
+@synthesize responseHeaders;
 
 @end
 
@@ -139,5 +150,16 @@ static int countItems(const char **nv) {
     STAssertNotNil(stream.body, @"Stream has a body.");
     [data release];
     CFRelease(msg);
+}
+
+- (void)testParseHeaders {
+    stream = [SpdyStream newFromNSURL:url delegate:delegate];
+    static const char* nameValues[] = {
+        "Content-Type", "text/plain",
+        NULL,
+    };
+    [stream parseHeaders:nameValues];
+    STAssertTrue(delegate.responseHeaders != NULL, @"Have headers");
+    STAssertTrue(CFHTTPMessageIsHeaderComplete(delegate.responseHeaders), @"Full headers.");
 }
 @end

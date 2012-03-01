@@ -54,6 +54,7 @@
         CFRelease(key);
         CFRelease(value);
     }
+    assert(CFHTTPMessageAppendBytes(response, "\r\n", 2));
     [delegate onResponseHeaders:response];
 }
 
@@ -109,6 +110,8 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     return utf8;
 }
 
+// There is a bug here.  If stringArena grows we have to reassign
+// all the previously set headers.
 - (void)serializeHeaders:(CFHTTPMessageRef)msg {
     CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
     CFIndex count = CFDictionaryGetCount(d);
@@ -116,8 +119,8 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     CFStringRef *keys = CFAllocatorAllocate(NULL, sizeof(CFStringRef)*count*2, 0);
     CFTypeRef *values = (CFTypeRef *)(keys + count);
     CFIndex index;
-    nameValues = malloc((count * 2 + 6*2 + 1) * sizeof(const char *));
-    const char **nv = nameValues;
+    self.nameValues = malloc((count * 2 + 6*2 + 1) * sizeof(const char *));
+    const char **nv = self.nameValues;
     CFDictionaryGetKeysAndValues(d, (const void **)keys, (const void **)values);
     nv[0] = "method";
     nv[1] = [self getStringFromCFHTTPMessage:msg func:CFHTTPMessageCopyRequestMethod];
@@ -151,9 +154,8 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
 
 #pragma mark Creation methods.
 
-+ (SpdyStream *)newFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback *) delegate {
++ (SpdyStream *)newFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback *)delegate {
     SpdyStream *stream = [[SpdyStream alloc]init];
-    stream.nameValues = malloc(sizeof(const char*)* (6*2 + 1));
     CFURLRef u = CFHTTPMessageCopyRequestURL(msg);
     stream.url = (NSURL *)u;
     CFDataRef body = CFHTTPMessageCopyBody(msg);
@@ -162,7 +164,7 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
         CFRelease(body);
     }
     stream.delegate = delegate;
-    [stream setStringArena:[NSMutableData dataWithCapacity:100]];
+    [stream setStringArena:[NSMutableData dataWithCapacity:4096]];
     [stream serializeHeaders:msg];
     CFRelease(u);
     return stream;
