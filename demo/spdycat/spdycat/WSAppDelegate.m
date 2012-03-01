@@ -56,6 +56,7 @@ static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventTy
     }
     if (!CFHTTPMessageIsHeaderComplete(msg)) {
         NSLog(@"Incomplete headers.");
+        CFRelease(msg);
         return;
     }
     CFRelease(msg);
