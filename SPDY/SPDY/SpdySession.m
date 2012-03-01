@@ -46,6 +46,9 @@ static const int priority = 1;
 
 @interface SpdySession ()
 
+@property (assign) uint16_t spdyVersion;
+
+
 - (void)connectTo:(NSURL *)url;
 - (void)invalidateSocket;
 - (void)removeStream:(SpdyStream *)stream;
@@ -68,6 +71,7 @@ static const int priority = 1;
 }
 
 @synthesize spdyNegotiated;
+@synthesize spdyVersion;
 @synthesize session;
 @synthesize host;
 @synthesize connectState;
@@ -83,8 +87,10 @@ static int select_next_proto_cb(SSL *ssl,
                                 const unsigned char *in, unsigned int inlen,
                                 void *arg) {
     SpdySession *sc = (SpdySession *)arg;
-    if (spdylay_select_next_protocol(out, outlen, in, inlen) > 0)
+    if (spdylay_select_next_protocol(out, outlen, in, inlen) > 0) {
+        sc.spdyVersion = spdylay_npn_get_version(*out, *outlen);
         sc.spdyNegotiated = YES;
+    }
     
     return SSL_TLSEXT_ERR_OK;
 }
@@ -370,7 +376,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     callbacks->on_stream_close_callback = on_stream_close_callback;
     callbacks->on_ctrl_recv_callback = on_ctrl_recv_callback;
     callbacks->on_data_chunk_recv_callback = on_data_chunk_recv_callback;
-    spdylay_session_client_new(&session, callbacks, self);
+    spdylay_session_client_new(&session, self.spdyVersion, callbacks, self);
 
     self.spdyNegotiated = NO;
     self.connectState = NOT_CONNECTED;
@@ -382,7 +388,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
 
 - (void)dealloc {
     if (session != NULL) {
-        spdylay_submit_goaway(session);
+        spdylay_submit_goaway(session, 0);
         spdylay_session_del(session);
         session = NULL;
     }
