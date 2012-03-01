@@ -175,7 +175,7 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     stream.nameValues = malloc(sizeof(const char *)* (6*2 + 1));
     stream.url = url;
     stream.delegate = delegate;
-    [stream setStringArena:[NSMutableData dataWithCapacity:100]];
+    [stream setStringArena:[NSMutableData dataWithCapacity:1024]];
     const char** nv = [stream nameValues];
     nv[0] = "method";
     nv[1] = "GET";
