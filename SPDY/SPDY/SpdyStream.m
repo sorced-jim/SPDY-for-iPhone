@@ -54,7 +54,7 @@
         CFRelease(key);
         CFRelease(value);
     }
-    assert(CFHTTPMessageAppendBytes(response, "\r\n", 2));
+    assert(CFHTTPMessageAppendBytes(response, (const UInt8 *)"\r\n", 2));
     [delegate onResponseHeaders:response];
 }
 
