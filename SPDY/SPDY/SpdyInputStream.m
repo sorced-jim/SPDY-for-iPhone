@@ -45,14 +45,14 @@
 }
 
 - (id <NSStreamDelegate>)delegate {
-    return delegate;
+    return [parentStream delegate];
 }
 
 - (void)setDelegate:(id<NSStreamDelegate>)aDelegate {
     if (aDelegate == nil) {
-        delegate = self;
+        [parentStream setDelegate:self];
     } else {
-        delegate = aDelegate;
+        [parentStream setDelegate:aDelegate];
     }
 }
 
