@@ -22,6 +22,7 @@
 
 - (SpdyInputStream *)init:(NSInputStream *)parent {
     self = [super init];
+    [self setDelegate:self];
     if (self) {
         parentStream = [parent retain];
         [parentStream setDelegate:self];
@@ -45,14 +46,14 @@
 }
 
 - (id <NSStreamDelegate>)delegate {
-    return [parentStream delegate];
+    return delegate;
 }
 
 - (void)setDelegate:(id<NSStreamDelegate>)aDelegate {
     if (aDelegate == nil) {
-        [parentStream setDelegate:self];
+        delegate = self;
     } else {
-        [parentStream setDelegate:aDelegate];
+        delegate = aDelegate;
     }
 }
 
