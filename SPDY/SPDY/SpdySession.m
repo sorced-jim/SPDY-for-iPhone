@@ -88,8 +88,9 @@ static int select_next_proto_cb(SSL *ssl,
                                 const unsigned char *in, unsigned int inlen,
                                 void *arg) {
     SpdySession *sc = (SpdySession *)arg;
-    if (spdylay_select_next_protocol(out, outlen, in, inlen) > 0) {
-        sc.spdyVersion = spdylay_npn_get_version(*out, *outlen);
+    int spdyVersion = spdylay_select_next_protocol(out, outlen, in, inlen);
+    if (spdyVersion > 0) {
+        sc.spdyVersion = spdyVersion;
         sc.spdyNegotiated = YES;
     }
     
