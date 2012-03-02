@@ -19,9 +19,11 @@ def _run_server(builddir, testdata, port):
                     '%s/cacert.pem' % testdata])
   return subprocess.Popen(base_args)
 
-def _check_server_up(port):
+def _check_server_up(builddir, port):
   # Check this check for now.
-  time.sleep(1)
+  base_args = ['%s/spdycat' % builddir, 'http://localhost:%d/' % port]
+  while subprocess.call(base_args) != 0:
+    time.sleep(1)
 
 def _kill_server(server):
   tries = 0
@@ -40,7 +42,7 @@ def main(basedir, test_driver):
   datadir = basedir + '/../spdylay/tests/testdata'
   result = -2
   server = _run_server(builddir, datadir, _PORT)
-  _check_server_up(_PORT)
+  _check_server_up(builddir, _PORT)
   try:
     result = subprocess.call([test_driver])
   except:
