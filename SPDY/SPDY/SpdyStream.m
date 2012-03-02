@@ -72,7 +72,9 @@
 }
 
 - (void)connectionError {
-    [delegate onError];
+    CFErrorRef error = CFErrorCreate(kCFAllocatorDefault, CFSTR("SpdyErrorDomain"), 1, NULL);
+    [delegate onError:error];
+    CFRelease(error);
 }
 
 static const char *copyString(NSMutableData *arena, NSString *str) {

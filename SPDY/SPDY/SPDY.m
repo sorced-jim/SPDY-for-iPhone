@@ -72,7 +72,9 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
     NSURL *u = [NSURL URLWithString:url];
     if (u == nil || u.host == nil) {
-        [delegate onError];
+        CFErrorRef error = CFErrorCreate(kCFAllocatorDefault, kCFErrorDomainCFNetwork, kCFHostErrorHostNotFound, NULL);
+        [delegate onError:error];
+        CFRelease(error);
         return;
     }
     SpdySession *session = [self getSession:u];
@@ -122,7 +124,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
 }
 
-- (void)onError {
+- (void)onError:(CFErrorRef)error {
     
 }
 
@@ -196,7 +198,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     
 }
 
-- (void)onError {
+- (void)onError:(CFErrorRef)error {
     
 }
 @end
@@ -268,8 +270,8 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     self.error = 2;
 }
 
-- (void)onError {
-    self.error = 1;
+- (void)onError:(CFErrorRef)error_code {
+    self.error = CFErrorGetCode(error_code);
     self.opened = NO;
 }
 

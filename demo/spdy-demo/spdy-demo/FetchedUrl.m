@@ -31,7 +31,7 @@
     [fetchedUrl.parent reloadData];
 }
 
-- (void)onError {
+- (void)onError:(CFErrorRef)error {
     fetchedUrl.state = @"Error";
     [fetchedUrl.parent reloadData];
 }

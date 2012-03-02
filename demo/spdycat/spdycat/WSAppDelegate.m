@@ -25,7 +25,7 @@ static CFHTTPMessageRef createHttpMessage() {
 
 @implementation ShowBody
 
-- (void)onError {
+- (void)onError:(CFErrorRef)error {
     NSLog(@"Got an error!");
 }
 

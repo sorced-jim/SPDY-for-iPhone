@@ -50,6 +50,7 @@ static const int priority = 1;
 
 
 - (void)connectTo:(NSURL *)url;
+- (void)connectionFailed:(int)error;
 - (void)invalidateSocket;
 - (void)removeStream:(SpdyStream *)stream;
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags;
@@ -182,6 +183,16 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     }
 }
 
+- (void)connectionFailed:(int)error {
+    self.connectState = ERROR;
+    [self invalidateSocket];
+    CFErrorRef cfError = CFErrorCreate(kCFAllocatorDefault, kCFErrorDomainPOSIX, error, NULL);
+    for (id value in streams) {
+        [[value delegate]onError:cfError];
+    }
+    CFRelease(cfError);
+}
+
 - (BOOL)submitRequest:(SpdyStream*)stream {
     if (!self.spdyNegotiated) {
         [stream notSpdyError];
@@ -211,6 +222,9 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
             [self invalidateSocket];
             return NO;
         }
+
+        spdylay_session_client_new(&session, self.spdyVersion, callbacks, self);
+
         NSEnumerator *enumerator = [streams objectEnumerator];
         id stream;
         
@@ -369,6 +383,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
 
 - (SpdySession *)init {
     self = [super init];
+
     callbacks = malloc(sizeof(*callbacks));
     memset(callbacks, 0, sizeof(*callbacks));
     callbacks->send_callback = send_callback;
@@ -376,8 +391,8 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     callbacks->on_stream_close_callback = on_stream_close_callback;
     callbacks->on_ctrl_recv_callback = on_ctrl_recv_callback;
     callbacks->on_data_chunk_recv_callback = on_data_chunk_recv_callback;
-    spdylay_session_client_new(&session, self.spdyVersion, callbacks, self);
 
+    session = NULL;
     self.spdyNegotiated = NO;
     self.connectState = NOT_CONNECTED;
     
@@ -412,14 +427,10 @@ static void sessionCallBack(CFSocketRef s,
         return;
     }
     SpdySession *session = (SpdySession *)info;
-    spdylay_session* laySession = [session session];
-    if (laySession == NULL) {
-        return;
-    }
     if (session.connectState == CONNECTING) {
         if (data != NULL) {
-            session.connectState = ERROR;
-            [session invalidateSocket];
+            int e = *(int *)data;
+            [session connectionFailed:e];
             return;
         }
         session.connectState = SSL_HANDSHAKE;
@@ -434,7 +445,8 @@ static void sessionCallBack(CFSocketRef s,
         }
         callbackType |= kCFSocketWriteCallBack;
     }
-    
+
+    spdylay_session *laySession = [session session];
     if (callbackType & kCFSocketWriteCallBack) {
         spdylay_session_send(laySession);
     }

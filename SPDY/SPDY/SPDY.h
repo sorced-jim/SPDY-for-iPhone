@@ -48,7 +48,7 @@ CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef 
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length;
 - (void)onStreamClose;
 - (void)onNotSpdyError;
-- (void)onError;
+- (void)onError:(CFErrorRef)error;
 
 @end
 
@@ -57,7 +57,7 @@ CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef 
 
 // Derived classses should override these methods since BufferedCallback overrides the rest of the callbacks from RequestCallback.
 - (void)onResponse:(CFHTTPMessageRef)response;
-- (void)onError;
+- (void)onError:(CFErrorRef)error;
 
 @property (retain) NSURL *url;
 

@@ -33,6 +33,8 @@
 		3870AF7314E47F8E009D8118 /* SPDYTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3870AF7214E47F8E009D8118 /* SPDYTests.m */; };
 		3889D68F14FEE41200DDED3F /* SpdyInputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 3889D68D14FEE41200DDED3F /* SpdyInputStream.h */; };
 		3889D69014FEE41200DDED3F /* SpdyInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 3889D68E14FEE41200DDED3F /* SpdyInputStream.m */; };
+		3889D69D15001BD400DDED3F /* EndToEndTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3889D69C15001BD400DDED3F /* EndToEndTests.m */; };
+		3889D6A1150022DC00DDED3F /* SpdyInputStreamTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3889D6A0150022DC00DDED3F /* SpdyInputStreamTests.m */; };
 		38FFF69414E9A303001A974E /* SPDY.h in Headers */ = {isa = PBXBuildFile; fileRef = 3870AF5A14E47F8E009D8118 /* SPDY.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -79,6 +81,10 @@
 		3870AF7214E47F8E009D8118 /* SPDYTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPDYTests.m; sourceTree = "<group>"; };
 		3889D68D14FEE41200DDED3F /* SpdyInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyInputStream.h; sourceTree = "<group>"; };
 		3889D68E14FEE41200DDED3F /* SpdyInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyInputStream.m; sourceTree = "<group>"; };
+		3889D69B15001BD400DDED3F /* EndToEndTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EndToEndTests.h; sourceTree = "<group>"; };
+		3889D69C15001BD400DDED3F /* EndToEndTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EndToEndTests.m; sourceTree = "<group>"; };
+		3889D69F150022DC00DDED3F /* SpdyInputStreamTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyInputStreamTests.h; sourceTree = "<group>"; };
+		3889D6A0150022DC00DDED3F /* SpdyInputStreamTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyInputStreamTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +190,10 @@
 				380A212714EC30F200262B13 /* SpdyStreamTests.m */,
 				380A21A514F2FCBC00262B13 /* SpdySessionTests.h */,
 				380A21A614F2FCBC00262B13 /* SpdySessionTests.m */,
+				3889D69F150022DC00DDED3F /* SpdyInputStreamTests.h */,
+				3889D6A0150022DC00DDED3F /* SpdyInputStreamTests.m */,
+				3889D69B15001BD400DDED3F /* EndToEndTests.h */,
+				3889D69C15001BD400DDED3F /* EndToEndTests.m */,
 				3870AF6C14E47F8E009D8118 /* Supporting Files */,
 			);
 			path = SPDYTests;
@@ -302,7 +312,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SRCROOT}/runTests.py\" \"${SRCROOT}\" \"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -325,6 +335,8 @@
 				3870AF7314E47F8E009D8118 /* SPDYTests.m in Sources */,
 				380A21A914F2FCE100262B13 /* SpdySessionTests.m in Sources */,
 				380A212A14EC312300262B13 /* SpdyStreamTests.m in Sources */,
+				3889D69D15001BD400DDED3F /* EndToEndTests.m in Sources */,
+				3889D6A1150022DC00DDED3F /* SpdyInputStreamTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
