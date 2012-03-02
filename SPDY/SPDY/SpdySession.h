@@ -49,4 +49,7 @@ enum ConnectState {
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate;
 - (void)addToLoop;
 
+// Indicates if the session has entered an invalid state.
+- (BOOL)isInvalid;
+
 @end

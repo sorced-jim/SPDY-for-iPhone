@@ -57,6 +57,10 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 
 - (SpdySession *)getSession:(NSURL *)url {
     SpdySession *session = [sessions objectForKey:[url host]];
+    if (session != nil && [session isInvalid]) {
+        [sessions removeObjectForKey:[url host]];
+        session = nil;
+    }
     if (session == nil) {
         session = [[[SpdySession alloc]init] autorelease];
         if (![session connect:url]) {

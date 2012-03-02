@@ -12,5 +12,5 @@ all:
 	cp build/include/SPDY/*.h ../build/include/SPDY/
 
 check:
-	xcodebuild clean
-	xcodebuild -sdk iphonesimulator4.3 -target SPDYTests
+	xcodebuild -configuration Debug -sdk iphonesimulator4.3 clean
+	xcodebuild -configuration Debug -sdk iphonesimulator4.3 -target SPDYTests

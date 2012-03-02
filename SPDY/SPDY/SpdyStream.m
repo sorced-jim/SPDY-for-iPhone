@@ -38,10 +38,14 @@
     }
     response = CFHTTPMessageCreateEmpty(NULL, NO);
     streamClosed = NO;
+    self.body = NULL;
     return self;
 }
 
 - (void)dealloc {
+    if (self.body != NULL) {
+        CFRelease(self.body);
+    }
     free(nameValues);
 }
 
@@ -161,9 +165,8 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     CFURLRef u = CFHTTPMessageCopyRequestURL(msg);
     stream.url = (NSURL *)u;
     CFDataRef body = CFHTTPMessageCopyBody(msg);
-    if (body != nil) {
+    if (body != NULL) {
         stream.body = (NSData *)body;
-        CFRelease(body);
     }
     stream.delegate = delegate;
     [stream setStringArena:[NSMutableData dataWithCapacity:4096]];

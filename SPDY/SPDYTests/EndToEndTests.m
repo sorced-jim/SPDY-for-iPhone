@@ -60,18 +60,48 @@ static const int port = 9783;
 @end
 
 
-@implementation EndToEndTests
+@implementation EndToEndTests {
+    E2ECallback *delegate;
+}
 
+- (void)setUp {
+    delegate = [[E2ECallback alloc]init];    
+}
+
+- (void)tearDown {
+    [delegate release];
+}
 
 // All code under test must be linked into the Unit Test bundle
 - (void)testSimpleFetch {
-    E2ECallback *delegate = [[[E2ECallback alloc]init] autorelease];
     [[SPDY sharedSPDY]fetch:@"http://localhost:9793/" delegate:delegate];
     CFRunLoopRun();
     if (delegate.skipTests) {
+        NSLog(@"Skipping tests since the server isn't up.");
         return;
     }
     STAssertTrue(delegate.closeCalled, @"Run loop finished as expected.");
+}
+
+static const unsigned char smallBody[] =
+    "Hello, my name is simon.  And I like to do drawings.  I like to draw, all day long, so come do drawings with me."
+    "Hello, my name is simon.  And I like to do drawings.  I like to draw, all day long, so come do drawings with me."
+    "I'm not good at new content :) 12345";
+
+- (void)testSimpleMessageBody {
+    CFDataRef body = CFDataCreate(kCFAllocatorDefault, smallBody, sizeof(smallBody));
+    CFURLRef url = CFURLCreateWithString(kCFAllocatorDefault, CFSTR("https://localhost:9793/"), NULL);
+    CFHTTPMessageRef request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("POST"), url, kCFHTTPVersion1_1);
+    CFHTTPMessageSetBody(request, body);
+    [[SPDY sharedSPDY]fetchFromMessage:request delegate:delegate];
+    CFRunLoopRun();
+    CFRelease(request);
+    CFRelease(url);
+    CFRelease(body);
+    if (delegate.skipTests) {
+        return;
+    }
+    STAssertTrue(delegate.closeCalled, @"Run loop finished as expected.");    
 }
 
 @end

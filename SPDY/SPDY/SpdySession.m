@@ -48,7 +48,6 @@ static const int priority = 1;
 
 @property (assign) uint16_t spdyVersion;
 
-
 - (void)connectTo:(NSURL *)url;
 - (void)connectionFailed:(int)error;
 - (void)invalidateSocket;
@@ -132,13 +131,16 @@ static int make_non_block(int fd) {
 
 static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_id, uint8_t *buf, size_t length, int *eof, spdylay_data_source *source, void *user_data) {
     NSInputStream* stream = (NSInputStream*)source->ptr;
-    NSUInteger bytesRead = [stream read:buf maxLength:length];
+    NSInteger bytesRead = [stream read:buf maxLength:length];
     if (![stream hasBytesAvailable]) {
         *eof = 1;
+        [stream close];
         [stream release];
     }
     SpdyStream *spdyStream = spdylay_session_get_stream_user_data(session, stream_id);
-    spdyStream.requestBodyBytesSent += bytesRead;
+    if (bytesRead > 0) {
+        spdyStream.requestBodyBytesSent += bytesRead;
+    }
     return bytesRead;
 }
 
@@ -194,6 +196,10 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     CFRelease(cfError);
 }
 
+- (BOOL)isInvalid {
+    return socket == nil;
+}
+
 - (BOOL)submitRequest:(SpdyStream*)stream {
     if (!self.spdyNegotiated) {
         [stream notSpdyError];
@@ -201,9 +207,11 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     }
 
     spdylay_data_provider data_prd = {-1, NULL};
-    if (stream.body != nil) {
-        data_prd.source.ptr = [NSInputStream inputStreamWithData:stream.body];
-        data_prd.read_callback = read_from_data_callback;        
+    if (stream.body != NULL) {
+        NSInputStream *bodyStream = [NSInputStream inputStreamWithData:stream.body];
+        [bodyStream open];
+        data_prd.source.ptr = bodyStream;
+        data_prd.read_callback = read_from_data_callback;
     }
     if (spdylay_submit_request(session, priority, [stream nameValues], &data_prd, stream) < 0) {
         NSLog(@"Failed to submit request.");
@@ -395,6 +403,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
 
     session = NULL;
     self.spdyNegotiated = NO;
+    self.spdyVersion = -1;
     self.connectState = NOT_CONNECTED;
     
     streams = [[NSMutableSet alloc] init];
