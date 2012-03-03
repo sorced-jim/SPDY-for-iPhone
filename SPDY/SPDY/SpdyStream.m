@@ -54,9 +54,15 @@
         CFStringRef key = CFStringCreateWithCString(NULL, nameValuePairs[0], kCFStringEncodingUTF8);
         CFStringRef value = CFStringCreateWithCString(NULL, nameValuePairs[1], kCFStringEncodingUTF8);
         nameValuePairs += 2;
-        CFHTTPMessageSetHeaderFieldValue(response, key, value);
-        CFRelease(key);
-        CFRelease(value);
+        if (key != NULL) {
+            if (value != NULL) {
+                CFHTTPMessageSetHeaderFieldValue(response, key, value);
+                CFRelease(value);
+            }
+            CFRelease(key);
+        } else if (value != NULL) {
+            CFRelease(value);            
+        }
     }
     assert(CFHTTPMessageAppendBytes(response, (const UInt8 *)"\r\n", 2));
     [delegate onResponseHeaders:response];

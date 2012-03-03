@@ -172,6 +172,39 @@ static int countItems(const char **nv) {
     STAssertTrue(CFHTTPMessageIsHeaderComplete(delegate.responseHeaders), @"Full headers.");
 }
 
+- (void)testParseHeadersBadValues {
+    stream = [SpdyStream newFromNSURL:url delegate:delegate];
+    static const char* nameValues[] = {
+        "Content-Type", "text/plain",
+        "bad\xc3\x28key", "good value",
+        "dropped-key", "bad\xc3\x28value",
+        "bad\xc3\x28key", "bad\xc3\x28value",
+        "Used-Key", "good value",
+        NULL,
+    };
+    [stream parseHeaders:nameValues];
+    STAssertTrue(delegate.responseHeaders != NULL, @"Have headers");
+    STAssertTrue(CFHTTPMessageIsHeaderComplete(delegate.responseHeaders), @"Full headers.");
+    NSDictionary *headers = [(NSDictionary *)CFHTTPMessageCopyAllHeaderFields(delegate.responseHeaders) autorelease];
+    STAssertEquals([headers count], 2U, @"Two headers kept %@", headers);
+}
+
+- (void)testParseHeadersOddHeaders {
+    stream = [SpdyStream newFromNSURL:url delegate:delegate];
+    static const char* nameValues[] = {
+        "Content-Type", "text/plain",
+        "Used-Key", "good value",
+        "Unmatched.",
+        NULL,
+    };
+    [stream parseHeaders:nameValues];
+    STAssertTrue(delegate.responseHeaders != NULL, @"Have headers");
+    STAssertTrue(CFHTTPMessageIsHeaderComplete(delegate.responseHeaders), @"Full headers.");
+    NSDictionary *headers = [(NSDictionary *)CFHTTPMessageCopyAllHeaderFields(delegate.responseHeaders) autorelease];
+    STAssertEquals([headers count], 2U, @"Two headers kept %@", headers);
+}
+
+
 - (void)testCancelStream {
     stream = [SpdyStream newFromNSURL:url delegate:delegate];
     [stream cancelStream];
