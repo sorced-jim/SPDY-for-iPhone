@@ -20,8 +20,21 @@
 #import "SpdyStream.h"
 #import "SPDY.h"
 
+@interface SpdyStream ()
+- (void)fixArena:(NSInteger)length;
+- (const char *)copyString:(NSString *)str;
+- (const char *)getStringFromCFHTTPMessage:(CFHTTPMessageRef)msg func:(CFStringRef(*)(CFHTTPMessageRef))func;
+- (const char *)copyCFString:(CFStringRef)str;
+- (NSMutableData *)createArena:(NSInteger)capacity;
+
+@property (retain) NSMutableData *stringArena;
+
+@end
+
 @implementation SpdyStream {
     CFHTTPMessageRef response;
+    NSMutableArray *arenas;
+    NSInteger arenaCapacity;
 }
 
 @synthesize nameValues;
@@ -41,11 +54,18 @@
     streamClosed = NO;
     self.body = nil;
     self.streamId = -1;
+    arenas = nil;
+    arenaCapacity = -1;
+    self.stringArena = nil;
     return self;
 }
 
 - (void)dealloc {
     self.body = nil;
+    self.stringArena = nil;
+    if (arenas != nil) {
+        [arenas release];
+    }
     free(nameValues);
 }
 
@@ -94,12 +114,31 @@
     CFRelease(error);
 }
 
-static const char *copyString(NSMutableData *arena, NSString *str) {
+- (NSMutableData *)createArena:(NSInteger)capacity {
+    arenaCapacity = capacity;
+    return [NSMutableData dataWithCapacity:capacity];
+}
+
+- (void)fixArena:(NSInteger)length {
+    if ([self.stringArena length] + length > arenaCapacity) {
+        NSLog(@"Adding an arena. %d > %d", [self.stringArena length] + length, arenaCapacity);
+        if (arenas == nil) {
+            arenas = [[NSMutableArray alloc]initWithCapacity:2];
+        }
+        [arenas addObject:self.stringArena];
+
+        NSInteger newCapacity = length > arenaCapacity ? length : arenaCapacity;
+        self.stringArena = [self createArena:newCapacity];
+    }
+}
+
+- (const char *)copyString:(NSString *)str {
     const char *utf8 = [str UTF8String];
     unsigned long length = strlen(utf8) + 1;
-    NSInteger arenaLength = [arena length];
-    [arena appendBytes:utf8 length:length];
-    return (const char*)[arena mutableBytes] + arenaLength;
+    [self fixArena:length];
+    NSInteger arenaLength = [self.stringArena length];
+    [self.stringArena appendBytes:utf8 length:length];
+    return (const char*)[self.stringArena mutableBytes] + arenaLength;
 }
 
 - (const char *)copyCFString:(CFStringRef)str {
@@ -110,9 +149,10 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     }
     
     unsigned long length = strlen(utf8) + 1;
-    NSInteger arenaLength = [stringArena length];
-    [stringArena appendBytes:utf8 length:length];
-    return (const char *)[stringArena mutableBytes] + arenaLength;
+    [self fixArena:length];
+    NSInteger arenaLength = [self.stringArena length];
+    [self.stringArena appendBytes:utf8 length:length];
+    return (const char *)[self.stringArena mutableBytes] + arenaLength;
 }
 
 - (const char *)getStringFromCFHTTPMessage:(CFHTTPMessageRef)msg func:(CFStringRef(*)(CFHTTPMessageRef))func {
@@ -129,8 +169,6 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     return utf8;
 }
 
-// There is a bug here.  If stringArena grows we have to reassign
-// all the previously set headers.
 - (void)serializeHeaders:(CFHTTPMessageRef)msg {
     CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
     CFIndex count = CFDictionaryGetCount(d);
@@ -156,7 +194,8 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     const char *path = [self getStringFromCFURL:u func:CFURLCopyPath];
     CFStringRef resourceSpecifier = CFURLCopyResourceSpecifier(u);
     if (resourceSpecifier != NULL) {
-        [stringArena setLength:[stringArena length] - 1];  // Remove the \0 from path.
+        // TODO(jim): Ensure the arena doesn't change with the new string.
+        [self.stringArena setLength:[self.stringArena length] - 1];  // Remove the \0 from path.
         [self copyCFString:resourceSpecifier];
         CFRelease(resourceSpecifier);
     }
@@ -183,7 +222,7 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
         CFRelease(body);
     }
     stream.delegate = delegate;
-    [stream setStringArena:[NSMutableData dataWithCapacity:4096]];
+    stream.stringArena = [stream createArena:1024];
     [stream serializeHeaders:msg];
     CFRelease(u);
     return stream;
@@ -194,15 +233,15 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     stream.nameValues = malloc(sizeof(const char *)* (6*2 + 1));
     stream.url = url;
     stream.delegate = delegate;
-    [stream setStringArena:[NSMutableData dataWithCapacity:1024]];
+    stream.stringArena = [stream createArena:512];
     const char** nv = [stream nameValues];
     nv[0] = "method";
     nv[1] = "GET";
     nv[2] = "scheme";
-    nv[3] = copyString([stream stringArena], [url scheme]);
+    nv[3] = [stream copyString:[url scheme]];
     nv[4] = "url";
-    const char* pathPlus = copyString([stream stringArena], [url resourceSpecifier]);
-    const char* host = copyString([stream stringArena], [url host]);
+    const char* pathPlus = [stream copyString:[url resourceSpecifier]];
+    const char* host = [stream copyString:[url host]];
     nv[5] = pathPlus + strlen(host) + 2;
     nv[6] = "host";
     nv[7] = host;

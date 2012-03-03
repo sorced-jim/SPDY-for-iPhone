@@ -30,8 +30,6 @@
 
     BOOL streamClosed;
     RequestCallback *delegate;
-    
-    NSMutableData *stringArena;
 }
 
 // To be used by the SPDY session.
@@ -50,7 +48,6 @@
 @property const char **nameValues;
 @property (retain) NSURL *url;
 @property (retain) RequestCallback *delegate;
-@property (retain) NSMutableData *stringArena;
 @property (retain) NSData *body;
 @property (assign) NSInteger requestBodyBytesSent;
 @property (assign) NSInteger streamId;
