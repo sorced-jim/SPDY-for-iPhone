@@ -29,6 +29,7 @@
 @synthesize body;
 @synthesize delegate;
 @synthesize requestBodyBytesSent;
+@synthesize streamId;
 @synthesize stringArena;
 
 - (id)init {
@@ -38,19 +39,18 @@
     }
     response = CFHTTPMessageCreateEmpty(NULL, NO);
     streamClosed = NO;
-    self.body = NULL;
+    self.body = nil;
+    self.streamId = -1;
     return self;
 }
 
 - (void)dealloc {
-    if (self.body != NULL) {
-        CFRelease(self.body);
-    }
+    self.body = nil;
     free(nameValues);
 }
 
 - (void)parseHeaders:(const char **)nameValuePairs {
-    while (*nameValuePairs != NULL) {
+    while (*nameValuePairs != NULL && *(nameValuePairs+1) != NULL) {
         CFStringRef key = CFStringCreateWithCString(NULL, nameValuePairs[0], kCFStringEncodingUTF8);
         CFStringRef value = CFStringCreateWithCString(NULL, nameValuePairs[1], kCFStringEncodingUTF8);
         nameValuePairs += 2;
@@ -66,9 +66,16 @@
     return [delegate onResponseData:bytes length:length];
 }
 
-- (void) closeStream {
+- (void)closeStream {
     streamClosed = YES;
     [delegate onStreamClose];
+}
+
+- (void)cancelStream {
+    streamClosed = YES;
+    CFErrorRef error = CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyRequestCancelled, NULL);
+    [delegate onError:error];
+    CFRelease(error);
 }
 
 - (void)notSpdyError {
@@ -76,7 +83,7 @@
 }
 
 - (void)connectionError {
-    CFErrorRef error = CFErrorCreate(kCFAllocatorDefault, CFSTR("SpdyErrorDomain"), 1, NULL);
+    CFErrorRef error = CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyConnectionFailed, NULL);
     [delegate onError:error];
     CFRelease(error);
 }
@@ -167,6 +174,7 @@ static const char *copyString(NSMutableData *arena, NSString *str) {
     CFDataRef body = CFHTTPMessageCopyBody(msg);
     if (body != NULL) {
         stream.body = (NSData *)body;
+        CFRelease(body);
     }
     stream.delegate = delegate;
     [stream setStringArena:[NSMutableData dataWithCapacity:4096]];

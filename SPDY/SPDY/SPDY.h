@@ -27,6 +27,13 @@
 // will be used.
 CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody);
 
+extern CFStringRef kSpdyErrorDomain;
+
+enum SpdyErrors {
+    kSpdyConnectionOk = 0,
+    kSpdyConnectionFailed = 1,
+    kSpdyRequestCancelled = 2,
+};
 
 @interface SPDY : NSObject {
 }
@@ -36,6 +43,9 @@ CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef 
 // A reference to delegate is kept until the stream is closed.  The caller will get an onError or onResponseBody before the stream is closed.
 - (void)fetch:(NSString *)path delegate:(RequestCallback *)delegate;
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate;
+
+// Cancels all active requests and closes all connections.  Returns the number of requests that were cancelled.  Ideally this should be called when all requests have already been canceled.
+- (NSInteger)closeAllSessions;
 
 @end
 

@@ -34,7 +34,7 @@
 
 // The shared spdy instance.
 static SPDY *spdy = NULL;
-
+CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
 
 typedef struct {
     CFIndex version; /* == 0 */
@@ -98,6 +98,18 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
         [session fetchFromMessage:request delegate:delegate];
     }
     CFRelease(url);
+}
+
+- (NSInteger)closeAllSessions {
+    NSInteger cancelledRequests = 0;
+    NSEnumerator *enumerator = [sessions objectEnumerator];
+    SpdySession *session;
+    
+    while ((session = (SpdySession *)[enumerator nextObject])) {
+        cancelledRequests += [session resetStreamsAndGoAway];
+    }
+    [sessions removeAllObjects];
+    return cancelledRequests;
 }
 
 - (SPDY *)init {

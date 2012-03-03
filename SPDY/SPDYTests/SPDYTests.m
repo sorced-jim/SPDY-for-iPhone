@@ -9,9 +9,11 @@
 #import "SPDYTests.h"
 #import "SPDY.h"
 
-@interface CountError : RequestCallback;
-    @property BOOL onErrorCalled;
-    @property (assign) CFErrorRef error;
+@interface CountError : RequestCallback {
+    CFErrorRef error;
+}
+@property BOOL onErrorCalled;
+@property (assign) CFErrorRef error;
 @end
 
 @implementation CountError
@@ -19,14 +21,13 @@
 @synthesize error;
 
 -(void)onError:(CFErrorRef)e {
-    self.error = e;
-    CFRetain(self.error);
+    error = e;
+    CFRetain(error);
     self.onErrorCalled = YES;
 }
 
 - (void)dealloc {
-    CFRelease(self.error);
-    self.error = NULL;
+    CFRelease(error);
 }
 @end
 

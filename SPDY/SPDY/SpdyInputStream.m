@@ -34,6 +34,7 @@
 
 - (void)dealloc {
     [parentStream release];
+    [properties removeAllObjects];
     [properties release];
 }
 
@@ -70,7 +71,7 @@
     if (value != nil) {
         return value;
     }
-    return [[properties objectForKey:key] retain];
+    return [properties objectForKey:key];
 }
 
 - (BOOL)setProperty:(id)property forKey:(NSString *)key {

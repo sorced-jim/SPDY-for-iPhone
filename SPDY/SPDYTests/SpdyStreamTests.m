@@ -11,18 +11,23 @@
 #import "SpdyStream.h"
 #import "SPDY.h"
 
-@interface Callback : RequestCallback {
+@interface SpdyStreamCallback : RequestCallback {
     BOOL closeCalled;
+    CFHTTPMessageRef responseHeaders;
 }
 @property BOOL closeCalled;
+@property (retain) NSError *error;
 @property (assign) CFHTTPMessageRef responseHeaders;
 @end
 
 
-@implementation Callback
+@implementation SpdyStreamCallback
 
 - (void)dealloc {
-    CFRelease(self.responseHeaders);
+    if (responseHeaders != NULL) {
+        CFRelease(responseHeaders);
+    }
+    self.error = nil;
 }
 
 - (void)onStreamClose {
@@ -33,7 +38,12 @@
     self.responseHeaders = (CFHTTPMessageRef)CFRetain(headers);
 }
 
+- (void)onError:(CFErrorRef)error {
+    self.error = (NSError *)error;
+}
+
 @synthesize closeCalled;
+@synthesize error;
 @synthesize responseHeaders;
 
 @end
@@ -46,14 +56,14 @@ static int countItems(const char **nv) {
 }
 
 @implementation SpdyStreamTests {
-    Callback *delegate;
+    SpdyStreamCallback *delegate;
     NSURL *url;
     SpdyStream *stream;
 }
 
 - (void)setUp {
     url = [[NSURL URLWithString:@"http://example.com/bar;foo?q=123&q=bar&j=3"] retain];
-    delegate = [[Callback alloc]init];
+    delegate = [[SpdyStreamCallback alloc]init];
 }
 
 - (void)tearDown {
@@ -143,12 +153,11 @@ static int countItems(const char **nv) {
 }
 
 - (void)testSetBody {
-    NSData *data = [NSData dataWithBytesNoCopy:"hi=bye" length:6 freeWhenDone:NO];
-    CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("POST"), (CFURLRef)url, CFSTR("HTTP/1.2"));
+    NSData *data = [NSData dataWithBytes:"hi=bye" length:6]; // autoreleased.
+    CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("POST"), (CFURLRef)url, CFSTR("HTTP/1.2"));
     CFHTTPMessageSetBody(msg, (CFDataRef)data);
     stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
     STAssertNotNil(stream.body, @"Stream has a body.");
-    [data release];
     CFRelease(msg);
 }
 
@@ -161,5 +170,12 @@ static int countItems(const char **nv) {
     [stream parseHeaders:nameValues];
     STAssertTrue(delegate.responseHeaders != NULL, @"Have headers");
     STAssertTrue(CFHTTPMessageIsHeaderComplete(delegate.responseHeaders), @"Full headers.");
+}
+
+- (void)testCancelStream {
+    stream = [SpdyStream newFromNSURL:url delegate:delegate];
+    [stream cancelStream];
+    STAssertEquals([delegate.error domain], (NSString *)kSpdyErrorDomain, @"Spdy domain.");
+    STAssertEquals([delegate.error code], kSpdyRequestCancelled, @"Cancelled request.");
 }
 @end

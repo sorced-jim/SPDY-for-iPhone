@@ -35,9 +35,10 @@
 }
 
 // To be used by the SPDY session.
-- (void) parseHeaders:(const char **)nameValuePairs;
-- (size_t) writeBytes:(const uint8_t *)data len:(size_t) length;
-- (void) closeStream;
+- (void)parseHeaders:(const char **)nameValuePairs;
+- (size_t)writeBytes:(const uint8_t *)data len:(size_t) length;
+- (void)closeStream;
+- (void)cancelStream;
 
 // Error case handlers used by the SPDY session.
 - (void)notSpdyError;
@@ -52,6 +53,7 @@
 @property (retain) NSMutableData *stringArena;
 @property (retain) NSData *body;
 @property (assign) NSInteger requestBodyBytesSent;
+@property (assign) NSInteger streamId;
 
 @end
 

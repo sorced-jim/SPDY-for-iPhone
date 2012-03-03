@@ -138,6 +138,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         [stream release];
     }
     SpdyStream *spdyStream = spdylay_session_get_stream_user_data(session, stream_id);
+    [spdyStream setStreamId:stream_id];
     if (bytesRead > 0) {
         spdyStream.requestBodyBytesSent += bytesRead;
     }
@@ -194,6 +195,20 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         [[value delegate]onError:cfError];
     }
     CFRelease(cfError);
+}
+
+- (NSInteger)resetStreamsAndGoAway {
+    NSInteger cancelledStreams = [streams count];
+    for (SpdyStream *stream in streams) {
+        [stream cancelStream];
+        if (stream.streamId > 0) {
+            spdylay_submit_rst_stream([self session], stream.streamId, SPDYLAY_CANCEL);
+        }
+    }
+    [streams removeAllObjects];
+    spdylay_submit_goaway(session, SPDYLAY_GOAWAY_OK);
+    spdylay_session_send(self.session);
+    return cancelledStreams;
 }
 
 - (BOOL)isInvalid {
@@ -382,6 +397,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     if (type == SPDYLAY_SYN_REPLY) {
         spdylay_syn_reply *reply = &frame->syn_reply;
         SpdyStream *stream = spdylay_session_get_stream_user_data(session, reply->stream_id);
+        [stream setStreamId:reply->stream_id];
         [stream parseHeaders:(const char **)reply->nv];
     }
 }
@@ -413,7 +429,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
 
 - (void)dealloc {
     if (session != NULL) {
-        spdylay_submit_goaway(session, 0);
+        spdylay_submit_goaway(session, SPDYLAY_GOAWAY_OK);
         spdylay_session_del(session);
         session = NULL;
     }
