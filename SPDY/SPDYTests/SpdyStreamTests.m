@@ -124,7 +124,7 @@ static int countItems(const char **nv) {
     STAssertEquals(0, strcmp(nv[6], "scheme"), @"The scheme exists: '%s'", nv[4]);
     STAssertEquals(0, strcmp(nv[7], "http"), @"It's pulled from the url.");
     STAssertEquals(0, strcmp(nv[8], "host"), @"The host is separate.");
-    STAssertEquals(0, strcmp(nv[9], "example.com"), @"No www here.");
+    STAssertEquals(0, strcmp(nv[9], "example.com"), @"No www here: %s", nv[9]);
 
     STAssertEquals(0, strcmp(nv[10], "url"), @"");
     STAssertEquals(0, strcmp(nv[11], "/bar;foo?q=123&q=bar&j=3"), @"The path and query parameters must be in the url: '%s'", nv[11]);
@@ -150,6 +150,32 @@ static int countItems(const char **nv) {
     STAssertEquals(0, strcmp(nv[5], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[5]);
     STAssertEquals(0, strcmp(nv[11], "/"), @"The path and query parameters must be in the url: '%s'", nv[11]);
     CFRelease(msg);
+}
+
+- (void)testHugeQueryPath {
+    CFMutableStringRef longUrl = CFStringCreateMutable(kCFAllocatorDefault, 1200);
+    CFStringAppend(longUrl, CFSTR("http://bar/path?"));
+    CFStringPad(longUrl, CFSTR("q=1234&"), 1100, 0);
+    CFURLRef urlRef = CFURLCreateWithString(kCFAllocatorDefault, longUrl, NULL);
+
+    CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("OPTIONS"), urlRef, kCFHTTPVersion1_0);
+    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
+    const char **nv = [stream nameValues];
+    STAssertTrue(nv != NULL, @"nameValues should be allocated");
+    if (nv == NULL) {
+        return;
+    }
+    int items = countItems(nv);
+    STAssertEquals(12, items, @"At least 6 pairs.");
+    if (items < 12) {
+        return;
+    }
+    STAssertEquals(0, strcmp(nv[5], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[5]);
+    STAssertEquals(0, strncmp(nv[11], "/path?q=1234&q=1234&", 20), @"The path and query parameters must be in the url: '%.*s'", 30, nv[11]);
+    
+    CFRelease(msg);
+    CFRelease(urlRef);
+    CFRelease(longUrl);
 }
 
 - (void)testSetBody {

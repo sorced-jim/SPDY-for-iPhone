@@ -191,15 +191,17 @@
     nv[8] = "host";
     nv[9] = [self getStringFromCFURL:u func:CFURLCopyHostName];
     nv[10] = "url";
-    const char *path = [self getStringFromCFURL:u func:CFURLCopyPath];
     CFStringRef resourceSpecifier = CFURLCopyResourceSpecifier(u);
+    CFStringRef path = CFURLCopyPath(u);
     if (resourceSpecifier != NULL) {
-        // TODO(jim): Ensure the arena doesn't change with the new string.
-        [self.stringArena setLength:[self.stringArena length] - 1];  // Remove the \0 from path.
-        [self copyCFString:resourceSpecifier];
+        NSMutableString *nsPath = [[[NSMutableString alloc]init] autorelease];
+        [nsPath appendFormat:@"%@%@", (NSString *)path, (NSString *)resourceSpecifier];
+        nv[11] = [self copyString:nsPath];
         CFRelease(resourceSpecifier);
+    } else {
+        nv[11] = [self copyCFString:path];
     }
-    nv[11] = path;
+    CFRelease(path);
     for (index = 0; index < count; ++index) {
         nv[index*2 + 12] = [self copyCFString:keys[index]];
         nv[index*2 + 13] = [self copyCFString:values[index]];
