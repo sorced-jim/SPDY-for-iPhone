@@ -305,7 +305,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 }
 
 - (void)onNotSpdyError {
-    self.readStreamPair.error = [NSMakeCollectable(CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyConnectionFailed, NULL)) autorelease];
+    self.readStreamPair.error = [NSMakeCollectable(CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyConnectionNotSpdy, NULL)) autorelease];
 }
 
 - (void)onError:(CFErrorRef)error_code {
