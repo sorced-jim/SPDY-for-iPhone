@@ -51,6 +51,10 @@ typedef struct {
 
 CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCallBacksV0Copy *callbacks, void *info);
 
+@interface SPDY ()
+- (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body;
+@end
+
 @implementation SPDY {
     NSMutableDictionary *sessions;
 }
@@ -90,14 +94,18 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 }
 
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate {
+    [self fetchFromMessage:request delegate:delegate body:nil];
+}
+
+- (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body {
     CFURLRef url = CFHTTPMessageCopyRequestURL(request);
     SpdySession *session = [self getSession:(NSURL *)url];
     if (session == nil) {
         [delegate onNotSpdyError];
     } else {
-        [session fetchFromMessage:request delegate:delegate];
+        [session fetchFromMessage:request delegate:delegate body:body];
     }
-    CFRelease(url);
+    CFRelease(url);    
 }
 
 - (NSInteger)closeAllSessions {
@@ -311,7 +319,7 @@ CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef 
     _SpdyCFStream *ctx = [[[_SpdyCFStream alloc]init:alloc] autorelease];
     if (ctx) {
         SPDY *spdy = [SPDY sharedSPDY];
-        [spdy fetchFromMessage:requestHeaders delegate:ctx];
+        [spdy fetchFromMessage:requestHeaders delegate:ctx body:(NSInputStream *)requestBody];
         return (CFReadStreamRef)[[ctx readStreamPair] retain];
      }
      return NULL;

@@ -208,7 +208,6 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     if (error != NULL) {
         CFRelease(error);
     }
-    CFReadStreamClose(readStream);
     CFRelease(readStream);
 }
 
@@ -234,6 +233,58 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     STAssertTrue(errors == NULL, @"No errors.");
     unsigned long long bytesSent = [[NSMakeCollectable(CFReadStreamCopyProperty((CFReadStreamRef)readStream, kCFStreamPropertyHTTPRequestBytesWrittenCount)) autorelease] unsignedLongLongValue];
     STAssertEquals((unsigned long long)sizeof(smallBody), bytesSent, @"The whole body was sent.");
+    
+    CFReadStreamClose(readStream);
+    CFRelease(readStream);
+}
+
+- (void)testCFStreamUploadFromStream {
+    NSInputStream *body = [NSInputStream inputStreamWithData:[NSData dataWithBytes:smallBody length:sizeof(smallBody) - 20]];
+    CFURLRef url = CFURLCreateWithString(kCFAllocatorDefault, CFSTR("https://localhost:9793/"), NULL);
+    CFHTTPMessageRef request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("POST"), url, kCFHTTPVersion1_1);
+    
+    CFReadStreamRef readStream = SpdyCreateSpdyReadStream(kCFAllocatorDefault, request, (CFReadStreamRef)body);
+    CFReadStreamScheduleWithRunLoop(readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+    
+    CFStreamClientContext ctxt = {0, NULL, NULL, NULL, NULL};
+    CFReadStreamSetClient(readStream, kCFStreamEventHasBytesAvailable | kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered, ReadStreamClientCallBack, &ctxt);
+    CFReadStreamOpen(readStream);
+    CFRunLoopRun();
+    CFRelease(request);
+    CFRelease(url);
+    
+    CFErrorRef errors = CFReadStreamCopyError(readStream);
+    STAssertTrue(errors == NULL, @"No errors.");
+    unsigned long long bytesSent = [[NSMakeCollectable(CFReadStreamCopyProperty((CFReadStreamRef)readStream, kCFStreamPropertyHTTPRequestBytesWrittenCount)) autorelease] unsignedLongLongValue];
+    STAssertEquals((unsigned long long)sizeof(smallBody) - 20, bytesSent, @"The whole body was sent.");
+    
+    CFReadStreamClose(readStream);
+    CFRelease(readStream);
+}
+
+- (void)testCFStreamUploadFromStreamInsteadOfBody {
+    NSInputStream *body = [NSInputStream inputStreamWithData:[NSData dataWithBytes:smallBody length:sizeof(smallBody) - 19]];
+    CFURLRef url = CFURLCreateWithString(kCFAllocatorDefault, CFSTR("https://localhost:9793/"), NULL);
+    CFHTTPMessageRef request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("POST"), url, kCFHTTPVersion1_1);
+
+    CFDataRef requestBody = CFDataCreate(kCFAllocatorDefault, smallBody, sizeof(smallBody));
+    CFHTTPMessageSetBody(request, requestBody);
+    
+    CFReadStreamRef readStream = SpdyCreateSpdyReadStream(kCFAllocatorDefault, request, (CFReadStreamRef)body);
+    CFReadStreamScheduleWithRunLoop(readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+    
+    CFStreamClientContext ctxt = {0, NULL, NULL, NULL, NULL};
+    CFReadStreamSetClient(readStream, kCFStreamEventHasBytesAvailable | kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered, ReadStreamClientCallBack, &ctxt);
+    CFReadStreamOpen(readStream);
+    CFRunLoopRun();
+    CFRelease(request);
+    CFRelease(url);
+    CFRelease(requestBody);
+    
+    CFErrorRef errors = CFReadStreamCopyError(readStream);
+    STAssertTrue(errors == NULL, @"No errors.");
+    unsigned long long bytesSent = [[NSMakeCollectable(CFReadStreamCopyProperty((CFReadStreamRef)readStream, kCFStreamPropertyHTTPRequestBytesWrittenCount)) autorelease] unsignedLongLongValue];
+    STAssertEquals((unsigned long long)sizeof(smallBody) - 19, bytesSent, @"The whole body was sent.");
     
     CFReadStreamClose(readStream);
     CFRelease(readStream);

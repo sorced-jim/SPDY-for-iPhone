@@ -220,14 +220,18 @@
 
 #pragma mark Creation methods.
 
-+ (SpdyStream *)newFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback *)delegate {
++ (SpdyStream *)newFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback *)delegate body:(NSInputStream *)body {
     SpdyStream *stream = [[SpdyStream alloc]init];
     CFURLRef u = CFHTTPMessageCopyRequestURL(msg);
     stream.url = (NSURL *)u;
-    CFDataRef body = CFHTTPMessageCopyBody(msg);
-    if (body != NULL) {
-        stream.body = (NSData *)body;
-        CFRelease(body);
+    if (body != nil) {
+        stream.body = body;
+    } else {
+        CFDataRef bodyData = CFHTTPMessageCopyBody(msg);
+        if (bodyData != NULL) {
+            stream.body = [NSInputStream inputStreamWithData:(NSData *)bodyData];
+            CFRelease(bodyData);
+        }
     }
     stream.delegate = delegate;
     stream.stringArena = [stream createArena:1024];

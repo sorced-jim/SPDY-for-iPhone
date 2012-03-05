@@ -102,7 +102,7 @@ static int countItems(const char **nv) {
 - (void)testSerializeHeaders {
     CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("OPTIONS"), (CFURLRef)url, CFSTR("HTTP/1.0"));
     CFHTTPMessageSetHeaderFieldValue(msg, CFSTR("Boy"), CFSTR("Bad"));
-    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
+    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate body:nil];
     const char **nv = [stream nameValues];
     STAssertTrue(nv != NULL, @"nameValues should be allocated");
     if (nv == NULL) {
@@ -136,7 +136,7 @@ static int countItems(const char **nv) {
 
 - (void)testSerializeHeadersNoResourceSpecifier {
     CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("OPTIONS"), CFURLCreateWithString(kCFAllocatorDefault, CFSTR("http://bar/"), NULL), kCFHTTPVersion1_0);
-    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
+    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate body:nil];
     const char **nv = [stream nameValues];
     STAssertTrue(nv != NULL, @"nameValues should be allocated");
     if (nv == NULL) {
@@ -159,7 +159,7 @@ static int countItems(const char **nv) {
     CFURLRef urlRef = CFURLCreateWithString(kCFAllocatorDefault, longUrl, NULL);
 
     CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(NULL, CFSTR("OPTIONS"), urlRef, kCFHTTPVersion1_0);
-    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
+    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate body:nil];
     const char **nv = [stream nameValues];
     STAssertTrue(nv != NULL, @"nameValues should be allocated");
     if (nv == NULL) {
@@ -182,7 +182,7 @@ static int countItems(const char **nv) {
     NSData *data = [NSData dataWithBytes:"hi=bye" length:6]; // autoreleased.
     CFHTTPMessageRef msg = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("POST"), (CFURLRef)url, CFSTR("HTTP/1.2"));
     CFHTTPMessageSetBody(msg, (CFDataRef)data);
-    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate];
+    stream = [SpdyStream newFromCFHTTPMessage:msg delegate:delegate body:nil];
     STAssertNotNil(stream.body, @"Stream has a body.");
     CFRelease(msg);
 }
