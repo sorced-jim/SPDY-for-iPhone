@@ -137,7 +137,6 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         [stream close];
     }
     SpdyStream *spdyStream = spdylay_session_get_stream_user_data(session, stream_id);
-    [spdyStream setStreamId:stream_id];
     if (bytesRead > 0) {
         [[spdyStream delegate]onRequestBytesSent:bytesRead];
     }
@@ -396,8 +395,15 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     if (type == SPDYLAY_SYN_REPLY) {
         spdylay_syn_reply *reply = &frame->syn_reply;
         SpdyStream *stream = spdylay_session_get_stream_user_data(session, reply->stream_id);
-        [stream setStreamId:reply->stream_id];
         [stream parseHeaders:(const char **)reply->nv];
+    }
+}
+
+static void before_ctrl_send_callback(spdylay_session *session, spdylay_frame_type type, spdylay_frame *frame, void *user_data) {
+    if (type == SPDYLAY_SYN_STREAM) {
+        spdylay_syn_stream *syn = &frame->syn_stream;
+        SpdyStream *stream = spdylay_session_get_stream_user_data(session, syn->stream_id);
+        [stream setStreamId:syn->stream_id];        
     }
 }
 
@@ -414,6 +420,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     callbacks->recv_callback = recv_callback;
     callbacks->on_stream_close_callback = on_stream_close_callback;
     callbacks->on_ctrl_recv_callback = on_ctrl_recv_callback;
+    callbacks->before_ctrl_send_callback = before_ctrl_send_callback;
     callbacks->on_data_chunk_recv_callback = on_data_chunk_recv_callback;
 
     session = NULL;
