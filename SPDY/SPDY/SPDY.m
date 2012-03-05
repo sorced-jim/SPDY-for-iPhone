@@ -156,7 +156,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     
 }
 
-- (void)onConnect:(NSURL *)url {
+- (void)onConnect:(id<SpdyRequestIdentifier>)url {
     
 }
 @end
@@ -196,8 +196,8 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     return _headers;
 }
 
-- (void)onConnect:(NSURL *)u {
-    self.url = u;
+- (void)onConnect:(id<SpdyRequestIdentifier>)u {
+    self.url = u.url;
 }
 
 -(void)onResponseHeaders:(CFHTTPMessageRef)h {
@@ -269,7 +269,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 }
 
 // Methods that implementors should override.
-- (void)onConnect:(NSURL *)url {
+- (void)onConnect:(id<SpdyRequestIdentifier>)url {
     CFWriteStreamOpen(writeStreamPair);
     self.opened = YES;
 }

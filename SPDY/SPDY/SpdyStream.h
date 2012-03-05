@@ -19,10 +19,11 @@
 
 
 #import <Foundation/Foundation.h>
+#import "SPDY.h"
 
 @class RequestCallback;
 
-@interface SpdyStream : NSObject {
+@interface SpdyStream : NSObject<SpdyRequestIdentifier> {
     const char **nameValues;
     NSURL *url;
     NSData *body;

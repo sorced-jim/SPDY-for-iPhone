@@ -36,8 +36,8 @@ static const int port = 9783;
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
-- (void)onConnect:(NSURL *)url {
-    NSLog(@"Connected to %@", url);
+- (void)onConnect:(id<SpdyRequestIdentifier>)u {
+    NSLog(@"Connected to %@", u.url);
 }
 
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
@@ -73,7 +73,7 @@ static const int port = 9783;
 
 @synthesize closedStreams;
 
-- (void)onConnect:(NSURL *)url {
+- (void)onConnect:(id<SpdyRequestIdentifier>)stream {
     self.closedStreams = [[SPDY sharedSPDY] closeAllSessions];
 }
 

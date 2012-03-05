@@ -12,14 +12,14 @@
 @interface Callback : BufferedCallback {
     FetchedUrl *fetchedUrl;
 }
-- (id)init:(FetchedUrl*) fetchedUrl;
+- (id)init:(FetchedUrl *) fetchedUrl;
 @end
 
 @implementation Callback {
     
 }
 
-- (id)init:(FetchedUrl*) u {
+- (id)init:(FetchedUrl *) u {
     self = [super init];
     fetchedUrl = u;
 
@@ -36,15 +36,15 @@
     [fetchedUrl.parent reloadData];
 }
 
-- (void)onConnect:(NSURL*)u {
+- (void)onConnect:(id<SpdyRequestIdentifier>)u {
     [super onConnect:u];
     fetchedUrl.state = @"connected";
-    fetchedUrl.baseUrl = u;
+    fetchedUrl.baseUrl = u.url;
     [fetchedUrl.parent reloadData];
 
 }
 
-- (size_t)onResponseData:(const uint8_t*)bytes length:(size_t)length {
+- (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
     fetchedUrl.state = @"Loading";
     [fetchedUrl.parent reloadData];
     return [super onResponseData:bytes length:length];
@@ -52,7 +52,7 @@
 
 - (void)onResponse:(CFHTTPMessageRef)response {
     CFDataRef b = CFHTTPMessageCopyBody(response);
-    fetchedUrl.body = (NSData*)b;
+    fetchedUrl.body = (NSData *)b;
     CFRelease(b);
 
     fetchedUrl.state = @"loaded";
@@ -76,7 +76,7 @@
 @synthesize baseUrl = _baseUrl;
 @synthesize parent = _parent;
 
-- (id)init:(NSString*)u spdy:(SPDY*)spdy table:(UITableView*)table {
+- (id)init:(NSString *)u spdy:(SPDY *)spdy table:(UITableView *)table {
     self = [super init];
     delegate = [[Callback alloc]init:self];
     self.url = u;

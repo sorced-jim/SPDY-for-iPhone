@@ -231,7 +231,6 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         [stream connectionError];
         return NO;
     }
-    [stream.delegate onConnect:stream.url];
     return YES;
 }
 
@@ -403,7 +402,8 @@ static void before_ctrl_send_callback(spdylay_session *session, spdylay_frame_ty
     if (type == SPDYLAY_SYN_STREAM) {
         spdylay_syn_stream *syn = &frame->syn_stream;
         SpdyStream *stream = spdylay_session_get_stream_user_data(session, syn->stream_id);
-        [stream setStreamId:syn->stream_id];        
+        [stream setStreamId:syn->stream_id];
+        [stream.delegate onConnect:stream];
     }
 }
 

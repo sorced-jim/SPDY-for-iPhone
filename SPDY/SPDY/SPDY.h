@@ -35,6 +35,10 @@ enum SpdyErrors {
     kSpdyRequestCancelled = 2,
 };
 
+@protocol SpdyRequestIdentifier
+- (NSURL *)url;
+@end
+
 @interface SPDY : NSObject {
 }
 
@@ -53,7 +57,7 @@ enum SpdyErrors {
 }
 
 // Methods that implementors should override.
-- (void)onConnect:(NSURL *)url;
+- (void)onConnect:(id<SpdyRequestIdentifier>)url;
 - (void)onRequestBytesSent:(NSInteger)bytesSend;
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers;
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length;
