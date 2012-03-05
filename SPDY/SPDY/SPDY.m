@@ -133,6 +133,10 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 
 @implementation RequestCallback
 
+- (void)onRequestBytesSent:(NSInteger)bytesSend {
+    
+}
+
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
     return length;
 }
@@ -224,6 +228,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 @interface _SpdyCFStream : RequestCallback {
     CFReadStreamRef readStreamPair;
     CFWriteStreamRef writeStreamPair;  // read() will write into writeStreamPair.
+    unsigned long long requestBytesWritten;
 };
 
 @property (assign) BOOL opened;
@@ -267,6 +272,13 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 - (void)onConnect:(NSURL *)url {
     CFWriteStreamOpen(writeStreamPair);
     self.opened = YES;
+}
+
+- (void)onRequestBytesSent:(NSInteger)bytesSend {
+    requestBytesWritten += bytesSend;
+    CFNumberRef totalBytes = CFNumberCreate(kCFAllocatorDefault, kCFNumberLongLongType, &requestBytesWritten);
+    CFReadStreamSetProperty(readStreamPair, kCFStreamPropertyHTTPRequestBytesWrittenCount, totalBytes);
+    CFRelease(totalBytes);
 }
 
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {

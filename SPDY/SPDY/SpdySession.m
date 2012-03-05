@@ -135,12 +135,11 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     if (![stream hasBytesAvailable]) {
         *eof = 1;
         [stream close];
-        [stream release];
     }
     SpdyStream *spdyStream = spdylay_session_get_stream_user_data(session, stream_id);
     [spdyStream setStreamId:stream_id];
     if (bytesRead > 0) {
-        spdyStream.requestBodyBytesSent += bytesRead;
+        [[spdyStream delegate]onRequestBytesSent:bytesRead];
     }
     return bytesRead;
 }

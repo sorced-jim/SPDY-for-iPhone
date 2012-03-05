@@ -26,7 +26,6 @@
     const char **nameValues;
     NSURL *url;
     NSData *body;
-    NSInteger requestBodyBytesSent;
 
     BOOL streamClosed;
     RequestCallback *delegate;
@@ -49,7 +48,6 @@
 @property (retain) NSURL *url;
 @property (retain) RequestCallback *delegate;
 @property (retain) NSData *body;
-@property (assign) NSInteger requestBodyBytesSent;
 @property (assign) NSInteger streamId;
 
 @end

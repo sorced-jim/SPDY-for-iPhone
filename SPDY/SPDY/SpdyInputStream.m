@@ -141,7 +141,7 @@
 
 - (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode {
     assert(aStream == parentStream);
-    
+
     switch (eventCode) {
         case NSStreamEventOpenCompleted:
             if (requestedEvents & kCFStreamEventOpenCompleted) {
