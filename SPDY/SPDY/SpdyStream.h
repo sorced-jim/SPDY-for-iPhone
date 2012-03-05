@@ -22,6 +22,7 @@
 #import "SPDY.h"
 
 @class RequestCallback;
+@class SpdySession;
 
 @interface SpdyStream : NSObject<SpdyRequestIdentifier> {
     const char **nameValues;
@@ -38,6 +39,9 @@
 - (void)closeStream;
 - (void)cancelStream;
 
+// Close forwards back to the parent session.
+- (void)close;
+
 // Error case handlers used by the SPDY session.
 - (void)notSpdyError;
 - (void)connectionError;
@@ -50,6 +54,7 @@
 @property (retain) RequestCallback *delegate;
 @property (retain) NSData *body;
 @property (assign) NSInteger streamId;
+@property (retain) SpdySession *parentSession;
 
 @end
 

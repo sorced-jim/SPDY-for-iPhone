@@ -88,7 +88,7 @@ static const int port = 9783;
 @synthesize delegate;
 
 - (void)setUp {
-    self.delegate = [[E2ECallback alloc]init];
+    self.delegate = [[[E2ECallback alloc]init] autorelease];
 }
 
 - (void)tearDown {
@@ -121,9 +121,6 @@ static const unsigned char smallBody[] =
     CFRelease(request);
     CFRelease(url);
     CFRelease(body);
-    if (self.delegate.skipTests) {
-        return;
-    }
     STAssertTrue(self.delegate.closeCalled, @"Run loop finished as expected.");    
 }
 
@@ -131,9 +128,6 @@ static const unsigned char smallBody[] =
     self.delegate = [[CloseOnConnectCallback alloc]init];
     [[SPDY sharedSPDY]fetch:@"http://localhost:9793/index.html" delegate:self.delegate];
     CFRunLoopRun();
-    if (self.delegate.skipTests) {
-        return;
-    }
     STAssertEquals([(CloseOnConnectCallback *)self.delegate closedStreams], 1, @"One stream closed.");
     STAssertNotNil(self.delegate.error, @"An error was set.");
 }
@@ -167,17 +161,62 @@ static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventTy
     CFRelease(request);
     CFRelease(url);
 
-    CFErrorRef skipTests = CFReadStreamCopyError(readStream);
-    if (skipTests != NULL) {
-        CFRelease(skipTests);
-        NSLog(@"Skipping tests.");
+    CFErrorRef errors = CFReadStreamCopyError(readStream);
+    STAssertTrue(errors == NULL, @"No errors.");
+    if (errors != NULL) {
+        CFRelease(errors);
+    }
+    CFReadStreamClose(readStream);
+    CFRelease(readStream);
+}
+
+static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventType type, void *info) {
+    if (type & kCFStreamEventHasBytesAvailable) {
+        char *bytes = malloc(1024);
+        CFIndex bytesRead = 1;
+        while (CFReadStreamHasBytesAvailable(readStream) && bytesRead > 0) {
+            bytesRead = CFReadStreamRead(readStream, (UInt8 *)bytes, 1024);
+        }
+        free(bytes);
+        CFReadStreamClose(readStream);
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{CFRunLoopStop(CFRunLoopGetCurrent());});
+    }
+    if (type & (kCFStreamEventEndEncountered | kCFStreamEventErrorOccurred)) {
+        CFRunLoopStop(CFRunLoopGetCurrent());
     }
 }
+
+
+- (void)testCFStreamCancelStream {
+    CFURLRef url = CFURLCreateWithString(kCFAllocatorDefault, CFSTR("https://localhost:9793/"), NULL);
+    CFHTTPMessageRef request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("GET"), url, kCFHTTPVersion1_1);
+    
+    CFReadStreamRef readStream = SpdyCreateSpdyReadStream(kCFAllocatorDefault, request, NULL);
+    CFReadStreamScheduleWithRunLoop(readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+    
+    CFStreamClientContext ctxt = {0, NULL, NULL, NULL, NULL};
+    CFReadStreamSetClient(readStream, kCFStreamEventHasBytesAvailable | kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered, CloseReadStreamClientCallBack, &ctxt);
+    CFReadStreamOpen(readStream);
+
+    CFRunLoopRun();
+    
+    CFRelease(request);
+    CFRelease(url);
+    
+    CFErrorRef error = CFReadStreamCopyError(readStream);
+    STAssertTrue(error != NULL, @"Cancelled stream error.");
+    if (error != NULL) {
+        CFRelease(error);
+    }
+    CFReadStreamClose(readStream);
+    CFRelease(readStream);
+}
+
 
 - (void)testCFStreamUploadBytes {
     CFDataRef body = CFDataCreate(kCFAllocatorDefault, smallBody, sizeof(smallBody));
     CFURLRef url = CFURLCreateWithString(kCFAllocatorDefault, CFSTR("https://localhost:9793/"), NULL);
-    CFHTTPMessageRef request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("GET"), url, kCFHTTPVersion1_1);
+    CFHTTPMessageRef request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("POST"), url, kCFHTTPVersion1_1);
     CFHTTPMessageSetBody(request, body);
     
     CFReadStreamRef readStream = SpdyCreateSpdyReadStream(kCFAllocatorDefault, request, NULL);
@@ -191,13 +230,13 @@ static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventTy
     CFRelease(url);
     CFRelease(body);
     
-    CFErrorRef skipTests = CFReadStreamCopyError(readStream);
-    if (skipTests != NULL) {
-        CFRelease(skipTests);
-        NSLog(@"Skipping tests.");
-    }
+    CFErrorRef errors = CFReadStreamCopyError(readStream);
+    STAssertTrue(errors == NULL, @"No errors.");
     unsigned long long bytesSent = [[NSMakeCollectable(CFReadStreamCopyProperty((CFReadStreamRef)readStream, kCFStreamPropertyHTTPRequestBytesWrittenCount)) autorelease] unsignedLongLongValue];
     STAssertEquals((unsigned long long)sizeof(smallBody), bytesSent, @"The whole body was sent.");
+    
+    CFReadStreamClose(readStream);
+    CFRelease(readStream);
 }
 
 @end

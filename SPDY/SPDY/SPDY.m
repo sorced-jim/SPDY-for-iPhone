@@ -226,14 +226,13 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 // Create a delegate derived class of RequestCallback.  Create a context struct.
 // Convert this to an objective-C object that derives from RequestCallback.
 @interface _SpdyCFStream : RequestCallback {
-    CFReadStreamRef readStreamPair;
     CFWriteStreamRef writeStreamPair;  // read() will write into writeStreamPair.
     unsigned long long requestBytesWritten;
 };
 
 @property (assign) BOOL opened;
 @property (assign) int error;
-@property (assign) CFReadStreamRef readStreamPair;
+@property (retain) SpdyInputStream *readStreamPair;
 @end
 
 
@@ -248,28 +247,30 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     
     CFReadStreamRef baseReadStream;
     CFStreamCreateBoundPair(a, &baseReadStream, &writeStreamPair, 16 * 1024);
-    readStreamPair = (CFReadStreamRef)[[SpdyInputStream alloc]init:(NSInputStream *)baseReadStream];
-    self.error = 0;
+    self.readStreamPair = [[[SpdyInputStream alloc]init:(NSInputStream *)baseReadStream] autorelease];
     self.opened = NO;
+    requestBytesWritten = 0;
     return self;
 }
 
 - (void)dealloc {
-    if (CFReadStreamGetStatus(readStreamPair) != kCFStreamStatusClosed) {
-        CFReadStreamClose(readStreamPair);
+    self.readStreamPair.requestId = nil;
+    if ([self.readStreamPair streamStatus] != NSStreamStatusClosed) {
+        [self.readStreamPair close];
     }
     if (CFWriteStreamGetStatus(writeStreamPair) != kCFStreamStatusClosed) {
         CFWriteStreamClose(writeStreamPair);
     }
-    CFRelease(readStreamPair);
     CFRelease(writeStreamPair);
+    self.readStreamPair = nil;
 }
 
 - (void)setResponseHeaders:(CFHTTPMessageRef)h {
 }
 
 // Methods that implementors should override.
-- (void)onConnect:(id<SpdyRequestIdentifier>)url {
+- (void)onConnect:(id<SpdyRequestIdentifier>)requestId {
+    [self.readStreamPair setRequestId:requestId];
     CFWriteStreamOpen(writeStreamPair);
     self.opened = YES;
 }
@@ -277,12 +278,12 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 - (void)onRequestBytesSent:(NSInteger)bytesSend {
     requestBytesWritten += bytesSend;
     CFNumberRef totalBytes = CFNumberCreate(kCFAllocatorDefault, kCFNumberLongLongType, &requestBytesWritten);
-    CFReadStreamSetProperty(readStreamPair, kCFStreamPropertyHTTPRequestBytesWrittenCount, totalBytes);
+    CFReadStreamSetProperty((CFReadStreamRef)readStreamPair, kCFStreamPropertyHTTPRequestBytesWrittenCount, totalBytes);
     CFRelease(totalBytes);
 }
 
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
-    CFReadStreamSetProperty(readStreamPair, kCFStreamPropertyHTTPResponseHeader, headers);
+    CFReadStreamSetProperty((CFReadStreamRef)readStreamPair, kCFStreamPropertyHTTPResponseHeader, headers);
 }
 
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
@@ -291,26 +292,27 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 }
 
 - (void)onStreamClose {
+    self.opened = NO;
     CFWriteStreamClose(writeStreamPair);
 }
 
 - (void)onNotSpdyError {
-    self.error = 2;
+    self.readStreamPair.error = [NSMakeCollectable(CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyConnectionFailed, NULL)) autorelease];
 }
 
 - (void)onError:(CFErrorRef)error_code {
-    self.error = CFErrorGetCode(error_code);
+    self.readStreamPair.error = (NSError *)error_code;
     self.opened = NO;
 }
 
 @end
 
 CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody) {
-    _SpdyCFStream *ctx = [[_SpdyCFStream alloc]init:alloc];
+    _SpdyCFStream *ctx = [[[_SpdyCFStream alloc]init:alloc] autorelease];
     if (ctx) {
         SPDY *spdy = [SPDY sharedSPDY];
         [spdy fetchFromMessage:requestHeaders delegate:ctx];
-        return [ctx readStreamPair];
+        return (CFReadStreamRef)[[ctx readStreamPair] retain];
      }
      return NULL;
 }

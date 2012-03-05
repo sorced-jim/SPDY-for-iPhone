@@ -54,4 +54,7 @@ enum ConnectState {
 // Indicates if the session has entered an invalid state.
 - (BOOL)isInvalid;
 
+// Used by the SpdyStream
+- (void)cancelStream:(SpdyStream *)stream;
+
 @end

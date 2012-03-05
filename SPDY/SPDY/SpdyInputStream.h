@@ -9,7 +9,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SPDY.h"
 
 @interface SpdyInputStream : NSInputStream<NSStreamDelegate>
 - (SpdyInputStream *)init:(NSInputStream *)parent;
+
+@property (retain) NSError *error;
+@property (retain) id<SpdyRequestIdentifier> requestId;
+
 @end

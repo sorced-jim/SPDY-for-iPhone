@@ -18,7 +18,8 @@
 // limitations under the License.
 
 #import "SpdyStream.h"
-#import "SPDY.h"
+
+#import "SpdySession.h"
 
 @interface SpdyStream ()
 - (void)fixArena:(NSInteger)length;
@@ -41,6 +42,7 @@
 @synthesize url;
 @synthesize body;
 @synthesize delegate;
+@synthesize parentSession;
 @synthesize streamId;
 @synthesize stringArena;
 
@@ -62,6 +64,7 @@
 - (void)dealloc {
     self.body = nil;
     self.stringArena = nil;
+    self.parentSession = nil;
     if (arenas != nil) {
         [arenas release];
     }
@@ -101,6 +104,10 @@
     CFErrorRef error = CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyRequestCancelled, NULL);
     [delegate onError:error];
     CFRelease(error);
+}
+
+- (void)close {
+    [self.parentSession cancelStream:self];
 }
 
 - (void)notSpdyError {

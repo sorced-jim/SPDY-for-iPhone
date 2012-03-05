@@ -37,6 +37,7 @@ enum SpdyErrors {
 
 @protocol SpdyRequestIdentifier
 - (NSURL *)url;
+- (void)close;
 @end
 
 @interface SPDY : NSObject {

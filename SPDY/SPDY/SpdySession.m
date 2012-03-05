@@ -48,6 +48,7 @@ static const int priority = 1;
 
 @property (assign) uint16_t spdyVersion;
 
+- (void)_cancelStream:(SpdyStream *)stream;
 - (void)connectTo:(NSURL *)url;
 - (void)connectionFailed:(int)error;
 - (void)invalidateSocket;
@@ -195,13 +196,22 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     CFRelease(cfError);
 }
 
+- (void)_cancelStream:(SpdyStream *)stream {
+    [stream cancelStream];
+    if (stream.streamId > 0) {
+        spdylay_submit_rst_stream([self session], stream.streamId, SPDYLAY_CANCEL);
+    }    
+}
+
+- (void)cancelStream:(SpdyStream *)stream {
+    [self _cancelStream:stream];
+    [streams removeObject:stream];
+}
+
 - (NSInteger)resetStreamsAndGoAway {
     NSInteger cancelledStreams = [streams count];
     for (SpdyStream *stream in streams) {
-        [stream cancelStream];
-        if (stream.streamId > 0) {
-            spdylay_submit_rst_stream([self session], stream.streamId, SPDYLAY_CANCEL);
-        }
+        [self _cancelStream:stream];
     }
     [streams removeAllObjects];
     spdylay_submit_goaway(session, SPDYLAY_GOAWAY_OK);
@@ -312,6 +322,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         }
         spdylay_session_send(self.session);
     }
+    stream.parentSession = self;
     [streams addObject:stream];
 }
     

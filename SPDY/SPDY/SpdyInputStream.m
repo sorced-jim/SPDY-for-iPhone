@@ -20,10 +20,15 @@
     CFOptionFlags requestedEvents;
 }
 
+@synthesize error;
+@synthesize requestId;
+
 - (SpdyInputStream *)init:(NSInputStream *)parent {
     self = [super init];
     [self setDelegate:self];
     if (self) {
+        self.requestId = nil;
+        self.error = nil;
         parentStream = [parent retain];
         [parentStream setDelegate:self];
         properties = [[NSMutableDictionary alloc]initWithCapacity:4];
@@ -36,6 +41,8 @@
     [parentStream release];
     [properties removeAllObjects];
     [properties release];
+    self.requestId = nil;
+    self.error = nil;
 }
 
 - (void)open {
@@ -43,6 +50,9 @@
 }
 
 - (void)close {
+    if (self.requestId != nil) {
+        [self.requestId close];
+    }
     [parentStream close];
 }
 
@@ -86,6 +96,9 @@
 }
 
 - (NSError *)streamError {
+    if (self.error != nil) {
+        return self.error;
+    }
     return [parentStream streamError];
 }
 
