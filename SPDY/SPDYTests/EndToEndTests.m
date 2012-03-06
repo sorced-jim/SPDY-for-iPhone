@@ -32,6 +32,7 @@ static const int port = 9783;
 }
 
 - (void)onStreamClose {
+    NSLog(@"Closing stream.");
     self.closeCalled = YES;
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
@@ -41,6 +42,7 @@ static const int port = 9783;
 }
 
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
+    NSLog(@"Got response headers.");
     self.responseHeaders = (CFHTTPMessageRef)CFRetain(headers);
 }
 
@@ -51,8 +53,8 @@ static const int port = 9783;
 }
 
 - (void)onNotSpdyError {
-    CFRunLoopStop(CFRunLoopGetCurrent());
     NSLog(@"Not connecting to a spdy server.");
+    CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
 @synthesize error;
