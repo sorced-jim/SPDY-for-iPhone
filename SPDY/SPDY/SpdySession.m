@@ -178,11 +178,9 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 
 - (void)notSpdyError {
     self.connectState = ERROR;
-    NSEnumerator *enumerator = [streams objectEnumerator];
-    id value;
     
-    while ((value = [enumerator nextObject])) {
-        [value notSpdyError];
+    for (SpdyStream *stream in streams) {
+        [stream notSpdyError];
     }
 }
 

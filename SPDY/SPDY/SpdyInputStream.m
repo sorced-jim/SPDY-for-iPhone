@@ -18,9 +18,9 @@
     CFReadStreamClientCallBack copiedCallback;
     CFStreamClientContext copiedContext;
     CFOptionFlags requestedEvents;
+    NSError *_error;
 }
 
-@synthesize error;
 @synthesize requestId;
 
 - (SpdyInputStream *)init:(NSInputStream *)parent {
@@ -100,6 +100,22 @@
         return self.error;
     }
     return [parentStream streamError];
+}
+
+- (NSError *)error {
+    return _error;
+}
+
+- (void)setError:(NSError *)e {
+    if (_error != nil) {
+        [_error autorelease];
+    }
+    if (e != nil) {
+        _error = [e retain];
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{[self stream:parentStream handleEvent:NSStreamEventErrorOccurred];});
+    } else {
+        _error = nil;
+    }
 }
 
 #pragma mark NSInputStream subclass methods

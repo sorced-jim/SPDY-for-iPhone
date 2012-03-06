@@ -45,10 +45,7 @@ static const int port = 9783;
 }
 
 - (void)onError:(CFErrorRef)error {
-    if (CFEqual(CFErrorGetDomain(error), kCFErrorDomainPOSIX) && CFErrorGetCode(error) == ECONNREFUSED) {
-        // Running the tests through xcode doesn't actually use the run script, so ignore failures where the server can't be contacted.
-        self.skipTests = YES;
-    }
+    NSLog(@"Got error %@", (NSError *)error);
     self.error = (NSError *)error;
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
@@ -99,10 +96,6 @@ static const int port = 9783;
 - (void)testSimpleFetch {
     [[SPDY sharedSPDY]fetch:@"http://localhost:9793/" delegate:self.delegate];
     CFRunLoopRun();
-    if (self.delegate.skipTests) {
-        NSLog(@"Skipping tests since the server isn't up.");
-        return;
-    }
     STAssertTrue(self.delegate.closeCalled, @"Run loop finished as expected.");
 }
 
@@ -178,8 +171,7 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
             bytesRead = CFReadStreamRead(readStream, (UInt8 *)bytes, 1024);
         }
         free(bytes);
-        CFReadStreamClose(readStream);
-        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{CFRunLoopStop(CFRunLoopGetCurrent());});
+        CFRunLoopStop(CFRunLoopGetCurrent());
     }
     if (type & (kCFStreamEventEndEncountered | kCFStreamEventErrorOccurred)) {
         CFRunLoopStop(CFRunLoopGetCurrent());
@@ -198,6 +190,8 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     CFReadStreamSetClient(readStream, kCFStreamEventHasBytesAvailable | kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered, CloseReadStreamClientCallBack, &ctxt);
     CFReadStreamOpen(readStream);
 
+    CFRunLoopRun();
+    CFReadStreamClose(readStream);
     CFRunLoopRun();
     
     CFRelease(request);
