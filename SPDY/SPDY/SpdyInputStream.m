@@ -81,7 +81,7 @@
     if (value != nil) {
         return value;
     }
-    return [properties objectForKey:key];
+    return [[properties objectForKey:key] retain];
 }
 
 - (BOOL)setProperty:(id)property forKey:(NSString *)key {
