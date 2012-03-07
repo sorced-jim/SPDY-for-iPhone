@@ -376,6 +376,10 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags {
     int r = SSL_write(ssl, data, (int)len);
+    if (r == 0) {
+        NSLog(@"Closing connection from write = 0");
+        [self invalidateSocket];
+    }
     return r;
 }
 
