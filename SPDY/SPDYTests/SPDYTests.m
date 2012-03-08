@@ -28,6 +28,7 @@
 
 - (void)dealloc {
     CFRelease(error);
+    [super dealloc];
 }
 @end
 

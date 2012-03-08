@@ -58,6 +58,7 @@ static const int priority = 1;
 - (BOOL)sslConnect;
 - (BOOL)sslHandshake;  // Returns true if the handshake completed.
 - (void)sslError;
+- (BOOL)submitRequest:(SpdyStream *)stream;
 - (BOOL)wouldBlock:(int)r;
 @end
 
@@ -198,7 +199,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     [stream cancelStream];
     if (stream.streamId > 0) {
         spdylay_submit_rst_stream([self session], stream.streamId, SPDYLAY_CANCEL);
-    }    
+    }
 }
 
 - (void)cancelStream:(SpdyStream *)stream {
@@ -221,7 +222,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     return socket == nil;
 }
 
-- (BOOL)submitRequest:(SpdyStream*)stream {
+- (BOOL)submitRequest:(SpdyStream *)stream {
     if (!self.spdyNegotiated) {
         [stream notSpdyError];
         return NO;
@@ -257,8 +258,9 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         id stream;
         
         while ((stream = [enumerator nextObject])) {
-            if (![self submitRequest:stream])
+            if (![self submitRequest:stream]) {
                 [streams removeObject:stream];
+            }
         }
         return YES;
     }
@@ -313,14 +315,14 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 }
 
 - (void)addStream:(SpdyStream *)stream {
+    stream.parentSession = self;
+    [streams addObject:stream];
     if (self.connectState == CONNECTED) {
         if (![self submitRequest:stream]) {
             return;
         }
         spdylay_session_send(self.session);
     }
-    stream.parentSession = self;
-    [streams addObject:stream];
 }
     
 - (void)fetch:(NSURL *)u delegate:(RequestCallback *)delegate {
@@ -344,8 +346,9 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     int r;
     r = SSL_read(ssl, data, (int)len);
     if (r == 0) {
-      NSLog(@"Closing connection from read = 0");
-      [self invalidateSocket];
+        NSLog(@"Closing connection from read = 0");
+        //[self connectionFailed:ECONNRESET];
+        [self invalidateSocket];
     }
     return r;
 }
@@ -378,6 +381,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
     int r = SSL_write(ssl, data, (int)len);
     if (r == 0) {
         NSLog(@"Closing connection from write = 0");
+        //[self connectionFailed:ECONNRESET];
         [self invalidateSocket];
     }
     return r;
@@ -459,6 +463,7 @@ static void before_ctrl_send_callback(spdylay_session *session, spdylay_frame_ty
     }
     [self invalidateSocket];
     free(callbacks);
+    [super dealloc];
 }
 @end
 

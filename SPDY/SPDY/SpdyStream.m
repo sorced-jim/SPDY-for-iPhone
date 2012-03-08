@@ -69,6 +69,7 @@
         [arenas release];
     }
     free(nameValues);
+    [super dealloc];
 }
 
 - (void)parseHeaders:(const char **)nameValuePairs {
@@ -95,8 +96,10 @@
 }
 
 - (void)closeStream {
-    streamClosed = YES;
-    [delegate onStreamClose];
+    if (streamClosed != YES) {
+        streamClosed = YES;
+        [delegate onStreamClose];
+    }
 }
 
 - (void)cancelStream {

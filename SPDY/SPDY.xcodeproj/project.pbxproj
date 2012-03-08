@@ -269,7 +269,7 @@
 		3870AF4914E47F8E009D8118 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 3870AF4C14E47F8E009D8118 /* Build configuration list for PBXProject "SPDY" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -367,10 +367,7 @@
 			buildSettings = {
 				"ADDITIONAL_SDKS[arch=*]" = "";
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					i386,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DSTROOT = "$(SRCROOT)/../build/lib";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -398,10 +395,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					i386,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DSTROOT = "$(SRCROOT)/../build/lib";
 				GCC_C_LANGUAGE_STANDARD = gnu99;

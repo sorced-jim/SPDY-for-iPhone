@@ -29,6 +29,7 @@ static const int port = 9783;
     if (responseHeaders != NULL) {
         CFRelease(responseHeaders);
     }
+    [super dealloc];
 }
 
 - (void)onStreamClose {
@@ -46,15 +47,15 @@ static const int port = 9783;
     self.responseHeaders = (CFHTTPMessageRef)CFRetain(headers);
 }
 
-- (void)onError:(CFErrorRef)error {
-    NSLog(@"Got error %@", (NSError *)error);
-    self.error = (NSError *)error;
-    CFRunLoopStop(CFRunLoopGetCurrent());
+- (void)onError:(CFErrorRef)e {
+    NSLog(@"Got error %@, will exit loop.", (NSError *)e);
+    self.error = (NSError *)e;
+    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ CFRunLoopStop(CFRunLoopGetCurrent()); });
 }
 
 - (void)onNotSpdyError {
     NSLog(@"Not connecting to a spdy server.");
-    CFRunLoopStop(CFRunLoopGetCurrent());
+    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ CFRunLoopStop(CFRunLoopGetCurrent()); });
 }
 
 @synthesize error;
@@ -80,14 +81,22 @@ static const int port = 9783;
 
 @interface EndToEndTests ()
 @property (retain) E2ECallback *delegate;
+@property (assign) BOOL exitNeeded;
 @end
 
 @implementation EndToEndTests
 
 @synthesize delegate;
+@synthesize exitNeeded;
 
 - (void)setUp {
+    self.exitNeeded = YES;
     self.delegate = [[[E2ECallback alloc]init] autorelease];
+    
+    // Run the run loop and perform any pending loop exits.
+    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ if (self.exitNeeded) { CFRunLoopStop(CFRunLoopGetCurrent()); } });
+    CFRunLoopRun();
+    self.exitNeeded = NO;
 }
 
 - (void)tearDown {
@@ -119,7 +128,7 @@ static const unsigned char smallBody[] =
     STAssertTrue(self.delegate.closeCalled, @"Run loop finished as expected.");    
 }
 
-- (void)disable_testCancelOnConnect {
+- (void)testCancelOnConnect {
     self.delegate = [[CloseOnConnectCallback alloc]init];
     [[SPDY sharedSPDY]fetch:@"http://localhost:9793/index.html" delegate:self.delegate];
     CFRunLoopRun();

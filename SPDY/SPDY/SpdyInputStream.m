@@ -43,6 +43,7 @@
     [properties release];
     self.requestId = nil;
     self.error = nil;
+    [super dealloc];
 }
 
 - (void)open {
@@ -81,6 +82,8 @@
     if (value != nil) {
         return value;
     }
+    // propertyForKey is called from CFReadStreamCopyProperty, but CopyProperty doesn't call
+    // CFRetain, so we need to call retain here.
     return [[properties objectForKey:key] retain];
 }
 

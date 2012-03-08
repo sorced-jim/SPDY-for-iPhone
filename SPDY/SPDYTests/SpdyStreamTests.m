@@ -28,6 +28,7 @@
         CFRelease(responseHeaders);
     }
     self.error = nil;
+    [super dealloc];
 }
 
 - (void)onStreamClose {
@@ -38,8 +39,8 @@
     self.responseHeaders = (CFHTTPMessageRef)CFRetain(headers);
 }
 
-- (void)onError:(CFErrorRef)error {
-    self.error = (NSError *)error;
+- (void)onError:(CFErrorRef)e {
+    self.error = (NSError *)e;
 }
 
 @synthesize closeCalled;

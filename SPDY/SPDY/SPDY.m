@@ -128,6 +128,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 
 - (void)dealloc {
     [sessions release];
+    [super dealloc];
 }
 
 + (SPDY *)sharedSPDY {
@@ -193,6 +194,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     self.url = nil;
     CFRelease(body);
     CFRelease(_headers);
+    [super dealloc];
 }
 
 - (void)setHeaders:(CFHTTPMessageRef)h {
@@ -271,6 +273,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     }
     CFRelease(writeStreamPair);
     self.readStreamPair = nil;
+    [super dealloc];
 }
 
 - (void)setResponseHeaders:(CFHTTPMessageRef)h {
