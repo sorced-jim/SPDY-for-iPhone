@@ -347,7 +347,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     r = SSL_read(ssl, data, (int)len);
     if (r == 0) {
         NSLog(@"Closing connection from read = 0");
-        //[self connectionFailed:ECONNRESET];
+        [self connectionFailed:ECONNRESET];
         [self invalidateSocket];
     }
     return r;
@@ -381,7 +381,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
     int r = SSL_write(ssl, data, (int)len);
     if (r == 0) {
         NSLog(@"Closing connection from write = 0");
-        //[self connectionFailed:ECONNRESET];
+        [self connectionFailed:ECONNRESET];
         [self invalidateSocket];
     }
     return r;

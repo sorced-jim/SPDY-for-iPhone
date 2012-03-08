@@ -49,8 +49,10 @@ static const int port = 9783;
 
 - (void)onError:(CFErrorRef)e {
     NSLog(@"Got error %@, will exit loop.", (NSError *)e);
-    self.error = (NSError *)e;
-    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ CFRunLoopStop(CFRunLoopGetCurrent()); });
+    if (self.error == nil) {
+        self.error = (NSError *)e;
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ CFRunLoopStop(CFRunLoopGetCurrent()); });
+    }
 }
 
 - (void)onNotSpdyError {
@@ -210,6 +212,7 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     
     CFErrorRef error = CFReadStreamCopyError(readStream);
     STAssertTrue(error != NULL, @"Cancelled stream error.");
+    STAssertEquals(CFErrorGetCode(error), (CFIndex)kSpdyRequestCancelled, @"Cancelled request.");
     if (error != NULL) {
         CFRelease(error);
     }
