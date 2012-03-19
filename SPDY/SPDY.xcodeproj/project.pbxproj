@@ -35,6 +35,8 @@
 		3889D69014FEE41200DDED3F /* SpdyInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 3889D68E14FEE41200DDED3F /* SpdyInputStream.m */; };
 		3889D69D15001BD400DDED3F /* EndToEndTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3889D69C15001BD400DDED3F /* EndToEndTests.m */; };
 		3889D6A1150022DC00DDED3F /* SpdyInputStreamTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3889D6A0150022DC00DDED3F /* SpdyInputStreamTests.m */; };
+		388C2EA01517CB7000DEDB34 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 388C2E9F1517CB7000DEDB34 /* SystemConfiguration.framework */; };
+		388C2EA21517CBB400DEDB34 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 388C2E9F1517CB7000DEDB34 /* SystemConfiguration.framework */; };
 		38FFF69414E9A303001A974E /* SPDY.h in Headers */ = {isa = PBXBuildFile; fileRef = 3870AF5A14E47F8E009D8118 /* SPDY.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -85,6 +87,7 @@
 		3889D69C15001BD400DDED3F /* EndToEndTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EndToEndTests.m; sourceTree = "<group>"; };
 		3889D69F150022DC00DDED3F /* SpdyInputStreamTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyInputStreamTests.h; sourceTree = "<group>"; };
 		3889D6A0150022DC00DDED3F /* SpdyInputStreamTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyInputStreamTests.m; sourceTree = "<group>"; };
+		388C2E9F1517CB7000DEDB34 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +98,7 @@
 				3800CAF414E499E200B85319 /* libcrypto.a in Frameworks */,
 				3800CAF214E499D400B85319 /* libssl.a in Frameworks */,
 				3800CAE714E491F800B85319 /* libspdylay.a in Frameworks */,
+				388C2EA01517CB7000DEDB34 /* SystemConfiguration.framework in Frameworks */,
 				3800CADD14E48BC800B85319 /* MobileCoreServices.framework in Frameworks */,
 				380A213614EC364A00262B13 /* CFNetwork.framework in Frameworks */,
 				3870AF5614E47F8E009D8118 /* Foundation.framework in Frameworks */,
@@ -109,6 +113,7 @@
 				380A212F14EC34C200262B13 /* libz.a in Frameworks */,
 				3870AF6414E47F8E009D8118 /* SenTestingKit.framework in Frameworks */,
 				3870AF6614E47F8E009D8118 /* UIKit.framework in Frameworks */,
+				388C2EA21517CBB400DEDB34 /* SystemConfiguration.framework in Frameworks */,
 				380A212D14EC348B00262B13 /* MobileCoreServices.framework in Frameworks */,
 				380A213714EC366100262B13 /* CFNetwork.framework in Frameworks */,
 				3870AF6714E47F8E009D8118 /* Foundation.framework in Frameworks */,
@@ -121,6 +126,7 @@
 		3870AF4714E47F8E009D8118 = {
 			isa = PBXGroup;
 			children = (
+				388C2E9F1517CB7000DEDB34 /* SystemConfiguration.framework */,
 				380A213414EC362800262B13 /* CFNetwork.framework */,
 				380A213214EC360900262B13 /* CFNetwork.framework */,
 				380A212E14EC34C200262B13 /* libz.a */,

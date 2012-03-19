@@ -77,6 +77,7 @@ static const int priority = 1;
 @synthesize session;
 @synthesize host;
 @synthesize connectState;
+@synthesize networkStatus;
 
 static void sessionCallBack(CFSocketRef s,
                             CFSocketCallBackType callbackType,

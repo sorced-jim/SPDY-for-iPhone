@@ -93,7 +93,7 @@ static const int port = 9783;
 
 - (void)setUp {
     self.exitNeeded = YES;
-    self.delegate = [[[E2ECallback alloc]init] autorelease];
+    self.delegate = [[[E2ECallback alloc] init] autorelease];
     
     // Run the run loop and perform any pending loop exits.
     CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ if (self.exitNeeded) { CFRunLoopStop(CFRunLoopGetCurrent()); } });
@@ -110,6 +110,18 @@ static const int port = 9783;
     [[SPDY sharedSPDY]fetch:@"http://localhost:9793/" delegate:self.delegate];
     CFRunLoopRun();
     STAssertTrue(self.delegate.closeCalled, @"Run loop finished as expected.");
+}
+
+// All code under test must be linked into the Unit Test bundle
+- (void)testFetchOnTwoPorts {
+    [[SPDY sharedSPDY]fetch:@"http://localhost:9793/" delegate:self.delegate];
+    CFRunLoopRun();
+    STAssertTrue(self.delegate.closeCalled, @"Run loop finished as expected.");
+
+    self.delegate = [[[E2ECallback alloc] init] autorelease];
+    [[SPDY sharedSPDY]fetch:@"http://localhost:9794/" delegate:self.delegate];
+    CFRunLoopRun();
+    STAssertNotNil(self.delegate.error, @"Got an error");
 }
 
 static const unsigned char smallBody[] =

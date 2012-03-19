@@ -21,6 +21,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreFoundation/CoreFoundation.h>
+#import <SystemConfiguration/SystemConfiguration.h>
 #import <CFNetwork/CFNetwork.h>
 
 #include <sys/socket.h>
@@ -36,27 +37,101 @@
 static SPDY *spdy = NULL;
 CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
 
+@interface SessionKey : NSObject<NSCopying>
+- (SessionKey *)initFromUrl:(NSURL *)url;
+- (NSUInteger)hash;
+- (BOOL)isEqual:(id)other;
+- (BOOL)isEqualToKey:(SessionKey *)other;
+- (id)copyWithZone:(NSZone *)zone;
+
+@property (retain) NSString *host;
+@property (retain) NSNumber *port;
+@end
+
+@implementation SessionKey
+@synthesize host;
+@synthesize port;
+
+- (SessionKey *)initFromUrl:(NSURL *)url {
+    self.host = url.host;
+    self.port = url.port;
+    return self;
+}
+
+- (void)dealloc {
+    self.host = nil;
+    self.port = nil;
+    [super dealloc];
+}
+
+- (NSUInteger)hash {
+    return [host hash] + [port hash];
+}
+
+- (BOOL)isEqual:(id)other {
+    if (other == self)
+        return YES;
+    if (!other || ![other isKindOfClass:[self class]])
+        return NO;
+    return [self isEqualToKey:other];
+}
+
+- (BOOL)isEqualToKey:(SessionKey *)other {
+    return [host isEqualToString:other.host] && [port isEqualToNumber:other.port];
+}
+
+- (id)copyWithZone:(NSZone *)zone {
+    SessionKey *other = [SessionKey allocWithZone:zone];
+    other.host = [self.host copyWithZone:zone];
+    other.port = [self.port copyWithZone:zone];
+    return other;
+}
+
+@end
+
 @interface SPDY ()
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body;
++ (enum SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host;
 @end
 
 @implementation SPDY {
     NSMutableDictionary *sessions;
 }
 
++ (enum SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host {	
+	SCNetworkReachabilityRef ref = SCNetworkReachabilityCreateWithName(NULL, [host UTF8String]);
+	if (ref) {
+        SCNetworkReachabilityFlags flags = 0;
+        if (SCNetworkReachabilityGetFlags(ref, &flags)) {
+            if (flags & kSCNetworkReachabilityFlagsReachable) {
+                if (flags & kSCNetworkReachabilityFlagsIsWWAN)
+                    return kSpdyReachableViaWWAN;
+                return kSpdyReachableViaWiFi;
+            }
+        }
+        
+        CFRelease(ref);
+    }
+    return kSpdyNotReachable;
+}
+
+
 - (SpdySession *)getSession:(NSURL *)url {
-    SpdySession *session = [sessions objectForKey:[url host]];
-    if (session != nil && [session isInvalid]) {
-        [sessions removeObjectForKey:[url host]];
+    SessionKey *key = [[[SessionKey alloc] initFromUrl:url] autorelease];
+    SpdySession *session = [sessions objectForKey:key];
+    enum SpdyNetworkStatus currentStatus = [self.class reachabilityStatusForHost:key.host];
+    if (session != nil && ([session isInvalid] || currentStatus != session.networkStatus)) {
+        [sessions removeObjectForKey:key];
         session = nil;
     }
     if (session == nil) {
-        session = [[[SpdySession alloc]init] autorelease];
+        session = [[[SpdySession alloc] init] autorelease];
         if (![session connect:url]) {
             NSLog(@"Could not connect to %@", url);
             return nil;
         }
-        [sessions setObject:session forKey:[url host]];
+        session.networkStatus = currentStatus;
+        [sessions setObject:session forKey:key];
         [session addToLoop];
     }
     return session;
