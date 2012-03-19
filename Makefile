@@ -19,13 +19,18 @@ build/armv7/lib/libspdylay.a: spdylay/configure ios-configure
 	cd spdylay && ../ios-configure -p "$(BUILD)/armv7" -k $(PKG_CONFIG_PATH) iphone
 	cd spdylay && make install
 
+build/armv6/lib/libspdylay.a: spdylay/configure ios-configure
+	cd spdylay && make clean
+	cd spdylay && ../ios-configure -p "$(BUILD)/armv6" -k $(PKG_CONFIG_PATH) iphone-armv6
+	cd spdylay && make install
+
 build/i386/lib/libspdylay.a: spdylay/configure ios-configure
 	cd spdylay && make clean
 	cd spdylay && ../ios-configure -p "$(BUILD)/i386" -k $(PKG_CONFIG_PATH) simulator
 	cd spdylay && make install
 
-build/lib/libspdylay.a: build/armv7/lib/libspdylay.a build/i386/lib/libspdylay.a
-	lipo -create "build/armv7/lib/libspdylay.a" "build/i386/lib/libspdylay.a" -output "build/lib/libspdylay.a"
+build/lib/libspdylay.a: build/armv6/lib/libspdylay.a build/armv7/lib/libspdylay.a build/i386/lib/libspdylay.a
+	lipo -create "build/armv6/lib/libspdylay.a" "build/armv7/lib/libspdylay.a" "build/i386/lib/libspdylay.a" -output "build/lib/libspdylay.a"
 	cp -r build/armv7/include/* build/include
 
 spdylay: build/lib/libspdylay.a
@@ -37,9 +42,12 @@ build/i386/lib/libz.a: zlib/build-zlib.sh
 build/armv7/lib/libz.a: zlib/build-zlib.sh
 	cd zlib && PLATFORM=iPhoneOS ARCH=armv7 ROOTDIR=$(BUILD)/armv7 ./build-zlib.sh
 
-build/lib/libz.a: build/i386/lib/libz.a build/armv7/lib/libz.a
+build/armv6/lib/libz.a: zlib/build-zlib.sh
+	cd zlib && PLATFORM=iPhoneOS ARCH=armv6 ROOTDIR=$(BUILD)/armv6 ./build-zlib.sh
+
+build/lib/libz.a: build/i386/lib/libz.a build/armv7/lib/libz.a build/armv6/lib/libz.a
 	-mkdir -p build/lib/pkgconfig
-	lipo -create build/armv7/lib/libz.a build/i386/lib/libz.a -output build/lib/libz.a
+	lipo -create build/armv6/lib/libz.a build/armv7/lib/libz.a build/i386/lib/libz.a -output build/lib/libz.a
 	sed -e 's,prefix=\(.*\)/armv7,prefix=\1,g' build/armv7/lib/pkgconfig/zlib.pc > build/lib/pkgconfig/zlib.pc
 
 zlib: build/lib/libz.a
@@ -57,7 +65,7 @@ clean:
 
 update-spdylay:
 	cd spdylay && git pull
-	-rm build/lib/libspdylay.* build/{armv7,i386}/lib/libspdylay.*
+	-rm build/lib/libspdylay.* build/{armv6,armv7,i386}/lib/libspdylay.*
 
 
 .PHONY: all spdylay zlib openssl SPDY clean update-spdylay

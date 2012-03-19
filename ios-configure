@@ -67,6 +67,12 @@ target=$1
 shift
 
 case $target in
+    iphone-armv6 )
+        arch=armv6
+        platform=iPhoneOS
+        host=arm-apple-darwin10
+        ;;
+
     iphone )
         arch=armv7
         platform=iPhoneOS
