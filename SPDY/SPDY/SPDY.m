@@ -36,21 +36,6 @@
 static SPDY *spdy = NULL;
 CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
 
-typedef struct {
-    CFIndex version; /* == 0 */
-    Boolean (*open)(CFReadStreamRef stream, CFStreamError *error, Boolean *openComplete, void *info);
-    Boolean (*openCompleted)(CFReadStreamRef stream, CFStreamError *error, void *info);
-    CFIndex (*read)(CFReadStreamRef stream, UInt8 *buffer, CFIndex bufferLength, CFStreamError *error, Boolean *atEOF, void *info);
-    const UInt8 *(*getBuffer)(CFReadStreamRef stream, CFIndex maxBytesToRead, CFIndex *numBytesRead, CFStreamError *error, Boolean *atEOF, void *info);
-    Boolean (*canRead)(CFReadStreamRef stream, void *info);
-    void (*close)(CFReadStreamRef stream, void *info);
-    CFTypeRef (*copyProperty)(CFReadStreamRef stream, CFStringRef propertyName, void *info);
-    void (*schedule)(CFReadStreamRef stream, CFRunLoopRef runLoop, CFStringRef runLoopMode, void *info);
-    void (*unschedule)(CFReadStreamRef stream, CFRunLoopRef runLoop, CFStringRef runLoopMode, void *info);
-} _CFReadStreamCallBacksV0Copy;
-
-CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCallBacksV0Copy *callbacks, void *info);
-
 @interface SPDY ()
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body;
 @end
@@ -257,7 +242,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
     
     CFReadStreamRef baseReadStream;
     CFStreamCreateBoundPair(a, &baseReadStream, &writeStreamPair, 16 * 1024);
-    self.readStreamPair = [[[SpdyInputStream alloc]init:(NSInputStream *)baseReadStream] autorelease];
+    self.readStreamPair = [[[SpdyInputStream alloc] init:(NSInputStream *)baseReadStream] autorelease];
     self.opened = NO;
     requestBytesWritten = 0;
     return self;
@@ -319,7 +304,7 @@ CFReadStreamRef CFReadStreamCreate(CFAllocatorRef alloc, const _CFReadStreamCall
 @end
 
 CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody) {
-    _SpdyCFStream *ctx = [[[_SpdyCFStream alloc]init:alloc] autorelease];
+    _SpdyCFStream *ctx = [[[_SpdyCFStream alloc] init:alloc] autorelease];
     if (ctx) {
         SPDY *spdy = [SPDY sharedSPDY];
         [spdy fetchFromMessage:requestHeaders delegate:ctx body:(NSInputStream *)requestBody];
