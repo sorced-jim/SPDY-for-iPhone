@@ -168,7 +168,7 @@ static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventTy
     CFRelease(url);
 
     CFErrorRef errors = CFReadStreamCopyError(readStream);
-    STAssertTrue(errors == NULL, @"No errors.");
+    STAssertTrue(errors == NULL, @"No errors: %@.", errors);
     if (errors != NULL) {
         CFRelease(errors);
     }
