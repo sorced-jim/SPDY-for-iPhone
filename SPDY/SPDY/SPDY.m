@@ -121,6 +121,7 @@ CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
     SpdySession *session = [sessions objectForKey:key];
     enum SpdyNetworkStatus currentStatus = [self.class reachabilityStatusForHost:key.host];
     if (session != nil && ([session isInvalid] || currentStatus != session.networkStatus)) {
+        [session resetStreamsAndGoAway];
         [sessions removeObjectForKey:key];
         session = nil;
     }
