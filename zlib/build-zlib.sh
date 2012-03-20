@@ -29,7 +29,7 @@ set -e
 # Download source
 ZLIB_VERSION=${ZLIB_VERSION:-1.2.6}
 ARCH=${ARCH:-armv7}
-DEVELOPER=${DEVELOPER:-/Developer}
+DEVELOPER=${DEVELOPER:-`xcode-select --print-path`}
 PLATFORM=${PLATFORM:-iPhoneOS}
 SDK=${SDK:-4.3}
 if [ ! -e "zlib-${ZLIB_VERSION}.tar.gz" ]
