@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		38D64AC8152237DF00EF9CB6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38D64AC7152237DF00EF9CB6 /* SystemConfiguration.framework */; };
+		38D64AD715223CE400EF9CB6 /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38D64AD615223CE400EF9CB6 /* libSPDY.a */; };
+		38D64AD915223EDE00EF9CB6 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38D64AD815223EDE00EF9CB6 /* libz.a */; };
 		38E9E0E114E597FA0085531C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E9E0E014E597FA0085531C /* UIKit.framework */; };
 		38E9E0E314E597FA0085531C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E9E0E214E597FA0085531C /* Foundation.framework */; };
 		38E9E0E514E597FA0085531C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E9E0E414E597FA0085531C /* CoreGraphics.framework */; };
@@ -22,9 +25,7 @@
 		38E9E10C14E597FA0085531C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 38E9E10A14E597FA0085531C /* InfoPlist.strings */; };
 		38E9E10F14E597FA0085531C /* spdy_demoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E9E10E14E597FA0085531C /* spdy_demoTests.m */; };
 		38FFF69014E99702001A974E /* FetchedUrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 38FFF68F14E99702001A974E /* FetchedUrl.m */; };
-		38FFF6C014E9F717001A974E /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38FFF6BF14E9F717001A974E /* libSPDY.a */; };
 		38FFF6C214E9F860001A974E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38FFF6C114E9F860001A974E /* CFNetwork.framework */; };
-		38FFF6C414E9F8B5001A974E /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38FFF6C314E9F8B5001A974E /* libz.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		38D64AC61522376400EF9CB6 /* SPDY.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPDY.h; path = ../../install/include/SPDY/SPDY.h; sourceTree = "<group>"; };
+		38D64AC7152237DF00EF9CB6 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		38D64AD615223CE400EF9CB6 /* libSPDY.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSPDY.a; path = ../../install/lib/libSPDY.a; sourceTree = "<group>"; };
+		38D64AD815223EDE00EF9CB6 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../build/lib/libz.a; sourceTree = "<group>"; };
 		38E9E0DC14E597FA0085531C /* spdy-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "spdy-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		38E9E0E014E597FA0085531C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		38E9E0E214E597FA0085531C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -61,9 +66,7 @@
 		38E9E10E14E597FA0085531C /* spdy_demoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = spdy_demoTests.m; sourceTree = "<group>"; };
 		38FFF68E14E99702001A974E /* FetchedUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FetchedUrl.h; sourceTree = "<group>"; };
 		38FFF68F14E99702001A974E /* FetchedUrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FetchedUrl.m; sourceTree = "<group>"; };
-		38FFF6BF14E9F717001A974E /* libSPDY.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSPDY.a; path = ../../build/lib/libSPDY.a; sourceTree = "<group>"; };
 		38FFF6C114E9F860001A974E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		38FFF6C314E9F8B5001A974E /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../build/lib/libz.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,9 +74,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				38FFF6C414E9F8B5001A974E /* libz.a in Frameworks */,
+				38D64AD915223EDE00EF9CB6 /* libz.a in Frameworks */,
+				38D64AD715223CE400EF9CB6 /* libSPDY.a in Frameworks */,
+				38D64AC8152237DF00EF9CB6 /* SystemConfiguration.framework in Frameworks */,
 				38FFF6C214E9F860001A974E /* CFNetwork.framework in Frameworks */,
-				38FFF6C014E9F717001A974E /* libSPDY.a in Frameworks */,
 				38E9E0E114E597FA0085531C /* UIKit.framework in Frameworks */,
 				38E9E0E314E597FA0085531C /* Foundation.framework in Frameworks */,
 				38E9E0E514E597FA0085531C /* CoreGraphics.framework in Frameworks */,
@@ -96,9 +100,11 @@
 		38E9E0D114E597FA0085531C = {
 			isa = PBXGroup;
 			children = (
-				38FFF6C314E9F8B5001A974E /* libz.a */,
+				38D64AD815223EDE00EF9CB6 /* libz.a */,
+				38D64AD615223CE400EF9CB6 /* libSPDY.a */,
+				38D64AC7152237DF00EF9CB6 /* SystemConfiguration.framework */,
+				38D64AC61522376400EF9CB6 /* SPDY.h */,
 				38FFF6C114E9F860001A974E /* CFNetwork.framework */,
-				38FFF6BF14E9F717001A974E /* libSPDY.a */,
 				38E9E0E614E597FA0085531C /* spdy-demo */,
 				38E9E10714E597FA0085531C /* spdy-demoTests */,
 				38E9E0DF14E597FA0085531C /* Frameworks */,
@@ -218,7 +224,7 @@
 		38E9E0D314E597FA0085531C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 38E9E0D614E597FA0085531C /* Build configuration list for PBXProject "spdy-demo" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -383,11 +389,12 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spdy-demo/spdy-demo-Prefix.pch";
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SPDY/build/include";
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "spdy-demo/spdy-demo-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../build/lib\"",
+					"\"$(SRCROOT)/../../install/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -399,11 +406,12 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spdy-demo/spdy-demo-Prefix.pch";
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SPDY/build/include";
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "spdy-demo/spdy-demo-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../build/lib\"",
+					"\"$(SRCROOT)/../../install/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

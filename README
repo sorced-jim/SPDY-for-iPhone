@@ -1,21 +1,32 @@
-This is a project to build an easy to use SPDY library for the iPhone.
+SPDY-for-iPhone is a project to create an easy to use library for SPDY.  A
+pre-built binary is available in install/lib/libSPDY.a.
 
-The following external libraries are used:
+To use libSPDY.a:
+1) Copy both install/lib/libSPDY.a and install/include/SPDY/SPDY.h into your
+project.
+2) Add the CFNetwork and SystemConfiguration frameworks to your list of
+libraries to link against.
+3) Follow the API in SPDY.h .
+
+==========================================================================
+Building libSPDY.a
+==========================================================================
+libSPDY.a has a few external dependencies.  These are included as git
+submodules and built using the venerable make.  The external libraries are:
 - spdylay
 - openssl (Included until Apple releases iOS with an NPN enabled OpenSSL)
 - zlib
 
-The external libraries are pulled in through git submodules.  To build
-the demo, you must first run do the following:
-git submodule init
-git submodule update
-make
-
-Then the demo can be loaded in xcode and run from xcode or from the
-command line.
-
-To actually build the code the following packages from ports are needed:
+The external libraries require the following programs need to build:
 - pkgconfig
 - automake
 - autoconf
 - libtool
+
+I typically install these programs through MacPorts (http://www.macports.org/).
+Fink or homebrew should also have these packages.
+
+To build build the external libraries and libSPDY.a run the following commands:
+$ git submodule init
+$ git submodule update
+$ make

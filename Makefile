@@ -68,4 +68,8 @@ update-spdylay:
 	-rm build/lib/libspdylay.* build/{armv6,armv7,i386}/lib/libspdylay.*
 
 
-.PHONY: all spdylay zlib openssl SPDY clean update-spdylay
+check: SPDY
+	cd SPDY && make check
+
+
+.PHONY: all check spdylay zlib openssl SPDY clean update-spdylay

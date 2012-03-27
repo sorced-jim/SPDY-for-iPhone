@@ -7,7 +7,7 @@
 //
 
 #import "WSAppDelegate.h"
-#import "SPDY/SPDY.h"
+#import "SPDY.h"
 
 // Create CFHTTPMessage.
 static CFHTTPMessageRef createHttpMessage() {

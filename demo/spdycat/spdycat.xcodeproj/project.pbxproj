@@ -18,12 +18,10 @@
 		380A217814F2B56E00262B13 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A215F14F2B56E00262B13 /* Foundation.framework */; };
 		380A218014F2B56E00262B13 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 380A217E14F2B56E00262B13 /* InfoPlist.strings */; };
 		380A218314F2B56E00262B13 /* spdycatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 380A218214F2B56E00262B13 /* spdycatTests.m */; };
-		380A219214F2B5E600262B13 /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218D14F2B5E600262B13 /* libSPDY.a */; };
 		380A219714F2BAA200262B13 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219614F2BAA200262B13 /* CFNetwork.framework */; };
-		380A219D14F2CDFB00262B13 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A219014F2B5E600262B13 /* libz.a */; };
-		380A21A214F2D67200262B13 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218F14F2B5E600262B13 /* libssl.a */; };
-		380A21A314F2D67E00262B13 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218C14F2B5E600262B13 /* libcrypto.a */; };
-		380A21A414F2E07400262B13 /* libspdylay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A218E14F2B5E600262B13 /* libspdylay.a */; };
+		38D64AE41522405000EF9CB6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38D64AE01522401A00EF9CB6 /* SystemConfiguration.framework */; };
+		38D64AE51522405200EF9CB6 /* libSPDY.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38D64AE21522402600EF9CB6 /* libSPDY.a */; };
+		38D64AE8152240AB00EF9CB6 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38D64AE61522407900EF9CB6 /* libz.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,12 +51,11 @@
 		380A217F14F2B56E00262B13 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		380A218114F2B56E00262B13 /* spdycatTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spdycatTests.h; sourceTree = "<group>"; };
 		380A218214F2B56E00262B13 /* spdycatTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = spdycatTests.m; sourceTree = "<group>"; };
-		380A218C14F2B5E600262B13 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = ../../build/lib/libcrypto.a; sourceTree = "<group>"; };
-		380A218D14F2B5E600262B13 /* libSPDY.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSPDY.a; path = ../../build/lib/libSPDY.a; sourceTree = "<group>"; };
-		380A218E14F2B5E600262B13 /* libspdylay.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspdylay.a; path = ../../build/lib/libspdylay.a; sourceTree = "<group>"; };
-		380A218F14F2B5E600262B13 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = ../../build/lib/libssl.a; sourceTree = "<group>"; };
-		380A219014F2B5E600262B13 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../build/lib/libz.a; sourceTree = "<group>"; };
 		380A219614F2BAA200262B13 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		38D64ADF15223F5E00EF9CB6 /* SPDY.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPDY.h; path = ../../install/include/SPDY/SPDY.h; sourceTree = "<group>"; };
+		38D64AE01522401A00EF9CB6 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		38D64AE21522402600EF9CB6 /* libSPDY.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSPDY.a; path = ../../install/lib/libSPDY.a; sourceTree = "<group>"; };
+		38D64AE61522407900EF9CB6 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../build/lib/libz.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,12 +63,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				380A219214F2B5E600262B13 /* libSPDY.a in Frameworks */,
-				380A21A414F2E07400262B13 /* libspdylay.a in Frameworks */,
-				380A21A214F2D67200262B13 /* libssl.a in Frameworks */,
-				380A21A314F2D67E00262B13 /* libcrypto.a in Frameworks */,
-				380A219D14F2CDFB00262B13 /* libz.a in Frameworks */,
 				380A219714F2BAA200262B13 /* CFNetwork.framework in Frameworks */,
+				38D64AE8152240AB00EF9CB6 /* libz.a in Frameworks */,
+				38D64AE41522405000EF9CB6 /* SystemConfiguration.framework in Frameworks */,
+				38D64AE51522405200EF9CB6 /* libSPDY.a in Frameworks */,
 				380A215E14F2B56E00262B13 /* UIKit.framework in Frameworks */,
 				380A216014F2B56E00262B13 /* Foundation.framework in Frameworks */,
 				380A216214F2B56E00262B13 /* CoreGraphics.framework in Frameworks */,
@@ -94,11 +89,6 @@
 		380A214E14F2B56E00262B13 = {
 			isa = PBXGroup;
 			children = (
-				380A218C14F2B5E600262B13 /* libcrypto.a */,
-				380A218D14F2B5E600262B13 /* libSPDY.a */,
-				380A218E14F2B5E600262B13 /* libspdylay.a */,
-				380A218F14F2B5E600262B13 /* libssl.a */,
-				380A219014F2B5E600262B13 /* libz.a */,
 				380A216314F2B56E00262B13 /* spdycat */,
 				380A217B14F2B56E00262B13 /* spdycatTests */,
 				380A215C14F2B56E00262B13 /* Frameworks */,
@@ -118,6 +108,10 @@
 		380A215C14F2B56E00262B13 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				38D64AE61522407900EF9CB6 /* libz.a */,
+				38D64ADF15223F5E00EF9CB6 /* SPDY.h */,
+				38D64AE21522402600EF9CB6 /* libSPDY.a */,
+				38D64AE01522401A00EF9CB6 /* SystemConfiguration.framework */,
 				380A219614F2BAA200262B13 /* CFNetwork.framework */,
 				380A215D14F2B56E00262B13 /* UIKit.framework */,
 				380A215F14F2B56E00262B13 /* Foundation.framework */,
@@ -369,11 +363,12 @@
 				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spdycat/spdycat-Prefix.pch";
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../build/include";
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "spdycat/spdycat-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../build/lib\"",
+					"\"$(SRCROOT)/../../install/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PROVISIONING_PROFILE[sdk=iphonesimulator*]" = "";
@@ -386,11 +381,12 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spdycat/spdycat-Prefix.pch";
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../build/include";
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "spdycat/spdycat-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../build/lib\"",
+					"\"$(SRCROOT)/../../install/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

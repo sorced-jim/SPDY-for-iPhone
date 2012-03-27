@@ -9,7 +9,7 @@
 #import "WSMasterViewController.h"
 
 #import "FetchedUrl.h"
-#import "SPDY/SPDY.h"
+#import "SPDY.h"
 #import "WSDetailViewController.h"
 
 @implementation WSMasterViewController {

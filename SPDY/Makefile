@@ -1,8 +1,8 @@
 
-all: armv6 armv7 i386
-	lipo -create build/lib/armv6/libSPDY.a build/lib/armv7/libSPDY.a build/lib/i386/libSPDY.a -output ../build/lib/libSPDY.a
-	mkdir -p ../build/include/SPDY
-	cp build/include/SPDY/*.h ../build/include/SPDY/
+install: armv6 armv7 i386
+	mkdir -p ../install/include/SPDY ../install/lib
+	lipo -create build/lib/armv6/libSPDY.a build/lib/armv7/libSPDY.a build/lib/i386/libSPDY.a -output ../install/lib/libSPDY.a
+	cp build/include/SPDY/*.h ../install/include/SPDY/
 
 check:
 	xcodebuild -configuration Debug -sdk iphonesimulator4.3 clean

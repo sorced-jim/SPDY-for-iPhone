@@ -7,7 +7,7 @@
 //
 
 #import "FetchedUrl.h"
-#import "SPDY/SPDY.h"
+#import "SPDY.h"
 
 @interface Callback : BufferedCallback {
     FetchedUrl *fetchedUrl;
@@ -92,5 +92,6 @@
     self.body = nil;
     self.state = nil;
     [delegate release];
+    [super dealloc];
 }
 @end
