@@ -28,7 +28,7 @@
     [self setDelegate:self];
     if (self) {
         self.requestId = nil;
-        self.error = nil;
+        _error = nil;
         parentStream = [parent retain];
         [parentStream setDelegate:self];
         properties = [[NSMutableDictionary alloc]initWithCapacity:4];
@@ -42,7 +42,7 @@
     [properties removeAllObjects];
     [properties release];
     self.requestId = nil;
-    self.error = nil;
+    [_error release];
     [super dealloc];
 }
 

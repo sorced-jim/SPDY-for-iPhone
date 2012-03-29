@@ -20,6 +20,7 @@
 		380A212D14EC348B00262B13 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3800CADC14E48BC800B85319 /* MobileCoreServices.framework */; };
 		380A21A714F2FCBC00262B13 /* SpdySessionTests.h in Headers */ = {isa = PBXBuildFile; fileRef = 380A21A514F2FCBC00262B13 /* SpdySessionTests.h */; };
 		380A21A914F2FCE100262B13 /* SpdySessionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 380A21A614F2FCBC00262B13 /* SpdySessionTests.m */; };
+		38436CD91524F6A600C56017 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A213214EC360900262B13 /* CFNetwork.framework */; };
 		3870AF5614E47F8E009D8118 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF5514E47F8E009D8118 /* Foundation.framework */; };
 		3870AF5C14E47F8E009D8118 /* SPDY.m in Sources */ = {isa = PBXBuildFile; fileRef = 3870AF5B14E47F8E009D8118 /* SPDY.m */; };
 		3870AF6414E47F8E009D8118 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3870AF6314E47F8E009D8118 /* SenTestingKit.framework */; };
@@ -111,6 +112,7 @@
 				388C2EA21517CBB400DEDB34 /* SystemConfiguration.framework in Frameworks */,
 				380A212D14EC348B00262B13 /* MobileCoreServices.framework in Frameworks */,
 				3870AF6714E47F8E009D8118 /* Foundation.framework in Frameworks */,
+				38436CD91524F6A600C56017 /* CFNetwork.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
