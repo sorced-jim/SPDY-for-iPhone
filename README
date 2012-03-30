@@ -6,7 +6,7 @@ To use libSPDY.a:
 project.
 2) Add the CFNetwork and SystemConfiguration frameworks to your list of
 libraries to link against.
-3) Follow the API in SPDY.h .
+3) Follow the API in SPDY.h.
 
 ==========================================================================
 Building libSPDY.a
@@ -17,7 +17,7 @@ submodules and built using the venerable make.  The external libraries are:
 - openssl (Included until Apple releases iOS with an NPN enabled OpenSSL)
 - zlib
 
-The external libraries require the following programs need to build:
+The external libraries require the following programs to build:
 - pkgconfig
 - automake
 - autoconf
