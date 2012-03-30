@@ -6,7 +6,7 @@ To use libSPDY.a:
 project.
 2) Add the CFNetwork and SystemConfiguration frameworks to your list of
 libraries to link against.
-3) Follow the API in SPDY.h .
+3) Follow the API in SPDY.h.
 
 ==========================================================================
 Building libSPDY.a
