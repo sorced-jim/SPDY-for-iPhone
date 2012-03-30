@@ -17,7 +17,7 @@ submodules and built using the venerable make.  The external libraries are:
 - openssl (Included until Apple releases iOS with an NPN enabled OpenSSL)
 - zlib
 
-The external libraries require the following programs need to build:
+The external libraries require the following programs to build:
 - pkgconfig
 - automake
 - autoconf
