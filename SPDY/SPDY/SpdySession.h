@@ -38,7 +38,7 @@ enum SpdyNetworkStatus {
 };
 
 @interface SpdySession : NSObject {
-    NSURL* host;
+    NSURL *host;
     struct spdylay_session *session;
     
     BOOL spdyNegotiated;
@@ -52,8 +52,9 @@ enum SpdyNetworkStatus {
 @property enum ConnectState connectState;
 @property enum SpdyNetworkStatus networkStatus;
 
-- (BOOL)connect:(NSURL *) host;
-- (void)fetch:(NSURL *) path delegate:(RequestCallback *)delegate;
+// Returns nil if the session is able to start a connection to host.
+- (NSError *)connect:(NSURL *)host;
+- (void)fetch:(NSURL *)path delegate:(RequestCallback *)delegate;
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body;
 - (void)addToLoop;
 

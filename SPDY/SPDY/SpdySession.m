@@ -49,8 +49,8 @@ static const int priority = 1;
 @property (assign) uint16_t spdyVersion;
 
 - (void)_cancelStream:(SpdyStream *)stream;
-- (void)connectTo:(NSURL *)url;
-- (void)connectionFailed:(int)error;
+- (NSError *)connectTo:(NSURL *)url;
+- (void)connectionFailed:(int)error domain:(CFStringRef)domain;
 - (void)invalidateSocket;
 - (void)removeStream:(SpdyStream *)stream;
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags;
@@ -146,7 +146,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     return bytesRead;
 }
 
-- (void)connectTo:(NSURL *)url {
+- (NSError *)connectTo:(NSURL *)url {
     struct addrinfo hints;
     
     char service[10];
@@ -162,9 +162,19 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     
     struct addrinfo *res;
     int err = getaddrinfo([[url host] UTF8String], service, &hints, &res);
-    if (err != 0)
-        return;
-    
+    if (err != 0) {
+        NSError *error;
+        if (err == EAI_SYSTEM) {
+            NSLog(@"Die here.");
+            error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
+        } else {
+            NSLog(@"Die other.");
+            error = [NSError errorWithDomain:@"kCFStreamErrorDomainNetDB" code:err userInfo:nil];
+        }
+        self.connectState = ERROR;
+        return error;
+    }
+
     struct addrinfo* rp = res;
     if (rp != NULL) {
         CFSocketContext ctx = {0, self, NULL, NULL, NULL};
@@ -173,9 +183,12 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
                                 &sessionCallBack, &ctx);
         CFSocketConnectToAddress(socket, address, -1);
         CFRelease(address);
+        self.connectState = CONNECTING;
+        freeaddrinfo(res);
+        return nil;
     }
-    self.connectState = CONNECTING;
-    freeaddrinfo(res);
+    self.connectState = ERROR;
+    return [NSError errorWithDomain:(NSString *)kCFErrorDomainCFNetwork code:kCFHostErrorHostNotFound userInfo:nil];
 }
 
 - (void)notSpdyError {
@@ -186,12 +199,12 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     }
 }
 
-- (void)connectionFailed:(int)error {
+- (void)connectionFailed:(int)error domain:(CFStringRef)domain {
     self.connectState = ERROR;
     [self invalidateSocket];
-    CFErrorRef cfError = CFErrorCreate(kCFAllocatorDefault, kCFErrorDomainPOSIX, error, NULL);
-    for (id value in streams) {
-        [[value delegate]onError:cfError];
+    CFErrorRef cfError = CFErrorCreate(kCFAllocatorDefault, domain, error, NULL);
+    for (SpdyStream *value in streams) {
+        [value.delegate onError:cfError];
     }
     CFRelease(cfError);
 }
@@ -300,19 +313,10 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 }
 
 
-- (CFSocketRef) newSocket:(NSURL *)url {
-    [self connectTo:url];
-    return socket;
-}
 
-
-- (BOOL)connect:(NSURL *)h {
+- (NSError *)connect:(NSURL *)h {
     [self setHost:h];
-    socket = [self newSocket:h];
-    if (socket == nil) {
-        return NO;
-    }
-    return YES;
+    return [self connectTo:h];
 }
 
 - (void)addStream:(SpdyStream *)stream {
@@ -348,7 +352,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     r = SSL_read(ssl, data, (int)len);
     if (r == 0) {
         NSLog(@"Closing connection from read = 0");
-        [self connectionFailed:ECONNRESET];
+        [self connectionFailed:ECONNRESET domain:kCFErrorDomainPOSIX];
         [self invalidateSocket];
     }
     return r;
@@ -382,7 +386,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
     int r = SSL_write(ssl, data, (int)len);
     if (r == 0) {
         NSLog(@"Closing connection from write = 0");
-        [self connectionFailed:ECONNRESET];
+        [self connectionFailed:ECONNRESET domain:kCFErrorDomainPOSIX];
         [self invalidateSocket];
     }
     return r;
@@ -480,7 +484,7 @@ static void sessionCallBack(CFSocketRef s,
     if (session.connectState == CONNECTING) {
         if (data != NULL) {
             int e = *(int *)data;
-            [session connectionFailed:e];
+            [session connectionFailed:e domain:kCFErrorDomainPOSIX];
             return;
         }
         session.connectState = SSL_HANDSHAKE;

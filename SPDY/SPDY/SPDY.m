@@ -116,7 +116,7 @@ CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
 }
 
 
-- (SpdySession *)getSession:(NSURL *)url {
+- (SpdySession *)getSession:(NSURL *)url withError:(NSError **)error {
     SessionKey *key = [[[SessionKey alloc] initFromUrl:url] autorelease];
     SpdySession *session = [sessions objectForKey:key];
     enum SpdyNetworkStatus currentStatus = [self.class reachabilityStatusForHost:key.host];
@@ -127,8 +127,9 @@ CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
     }
     if (session == nil) {
         session = [[[SpdySession alloc] init] autorelease];
-        if (![session connect:url]) {
-            NSLog(@"Could not connect to %@", url);
+        *error = [session connect:url];
+        if (*error != nil) {
+            NSLog(@"Could not connect to %@ because %@", url, *error);
             return nil;
         }
         session.networkStatus = currentStatus;
@@ -146,9 +147,10 @@ CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
         CFRelease(error);
         return;
     }
-    SpdySession *session = [self getSession:u];
+    NSError *error;
+    SpdySession *session = [self getSession:u withError:&error];
     if (session == nil) {
-        [delegate onNotSpdyError];
+        [delegate onError:(CFErrorRef)error];
         return;
     }
     [session fetch:u delegate:delegate];
@@ -160,9 +162,10 @@ CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
 
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body {
     CFURLRef url = CFHTTPMessageCopyRequestURL(request);
-    SpdySession *session = [self getSession:(NSURL *)url];
+    NSError *error;
+    SpdySession *session = [self getSession:(NSURL *)url withError:&error];
     if (session == nil) {
-        [delegate onNotSpdyError];
+        [delegate onError:(CFErrorRef)error];
     } else {
         [session fetchFromMessage:request delegate:delegate body:body];
     }

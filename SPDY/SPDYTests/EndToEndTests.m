@@ -9,6 +9,8 @@
 #import "EndToEndTests.h"
 #import "SPDY.h"
 
+#include <netdb.h>
+
 static const int port = 9783;
 
 @interface E2ECallback : RequestCallback {
@@ -148,6 +150,15 @@ static const unsigned char smallBody[] =
     CFRunLoopRun();
     STAssertEquals([(CloseOnConnectCallback *)self.delegate closedStreams], 1, @"One stream closed.");
     STAssertNotNil(self.delegate.error, @"An error was set.");
+}
+
+// A bad host name should be equivalent to the network being down.
+- (void)testBadHostName {
+    [[SPDY sharedSPDY]fetch:@"http://bad.localhost:9793/" delegate:self.delegate];
+    CFRunLoopRun();
+    STAssertNotNil(self.delegate.error, @"Error for bad host.");
+    STAssertEquals(self.delegate.error.code, EAI_NONAME, @"");
+    STAssertTrue([self.delegate.error.domain isEqualToString:@"kCFStreamErrorDomainNetDB"], @"NetDb domain, but is %@", self.delegate.error.domain);
 }
 
 static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventType type, void *info) {
