@@ -36,6 +36,8 @@
 		38D64ACD15223B2F00EF9CB6 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A212E14EC34C200262B13 /* libz.a */; };
 		38D64AED152244F300EF9CB6 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A213214EC360900262B13 /* CFNetwork.framework */; };
 		38D64AEE152244FB00EF9CB6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 388C2E9F1517CB7000DEDB34 /* SystemConfiguration.framework */; };
+		38D935B8152A417E00383797 /* SpdyUrlConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 38D935B6152A417E00383797 /* SpdyUrlConnection.h */; };
+		38D935B9152A417E00383797 /* SpdyUrlConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 38D935B7152A417E00383797 /* SpdyUrlConnection.m */; };
 		38FFF69414E9A303001A974E /* SPDY.h in Headers */ = {isa = PBXBuildFile; fileRef = 3870AF5A14E47F8E009D8118 /* SPDY.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -85,6 +87,8 @@
 		3889D69F150022DC00DDED3F /* SpdyInputStreamTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyInputStreamTests.h; sourceTree = "<group>"; };
 		3889D6A0150022DC00DDED3F /* SpdyInputStreamTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyInputStreamTests.m; sourceTree = "<group>"; };
 		388C2E9F1517CB7000DEDB34 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		38D935B6152A417E00383797 /* SpdyUrlConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyUrlConnection.h; sourceTree = "<group>"; };
+		38D935B7152A417E00383797 /* SpdyUrlConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyUrlConnection.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +172,8 @@
 				3800CADF14E48CAE00B85319 /* SpdySession.m */,
 				3800CAE014E48CAE00B85319 /* SpdyStream.h */,
 				3800CAE114E48CAE00B85319 /* SpdyStream.m */,
+				38D935B6152A417E00383797 /* SpdyUrlConnection.h */,
+				38D935B7152A417E00383797 /* SpdyUrlConnection.m */,
 				3870AF5814E47F8E009D8118 /* Supporting Files */,
 			);
 			path = SPDY;
@@ -221,6 +227,7 @@
 				380A212814EC30F200262B13 /* SpdyStreamTests.h in Headers */,
 				380A21A714F2FCBC00262B13 /* SpdySessionTests.h in Headers */,
 				3889D68F14FEE41200DDED3F /* SpdyInputStream.h in Headers */,
+				38D935B8152A417E00383797 /* SpdyUrlConnection.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -325,6 +332,7 @@
 				3800CAE314E48CAE00B85319 /* SpdySession.m in Sources */,
 				3800CAE514E48CAE00B85319 /* SpdyStream.m in Sources */,
 				3889D69014FEE41200DDED3F /* SpdyInputStream.m in Sources */,
+				38D935B9152A417E00383797 /* SpdyUrlConnection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

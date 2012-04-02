@@ -142,8 +142,8 @@
 }
 
 - (BOOL)_setCFClientFlags:(CFOptionFlags)inFlags
-                    callback:(CFReadStreamClientCallBack)inCallback
-                    context:(CFStreamClientContext *)inContext {
+                 callback:(CFReadStreamClientCallBack)inCallback
+                context:(CFStreamClientContext *)inContext {
     if (inCallback != NULL) {
         requestedEvents = inFlags;
         copiedCallback = inCallback;

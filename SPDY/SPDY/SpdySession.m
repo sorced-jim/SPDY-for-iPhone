@@ -182,6 +182,12 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         socket = CFSocketCreate(NULL, PF_INET, SOCK_STREAM, IPPROTO_TCP, kCFSocketConnectCallBack | kCFSocketReadCallBack | kCFSocketWriteCallBack,
                                 &sessionCallBack, &ctx);
         CFSocketConnectToAddress(socket, address, -1);
+        
+        // Ignore write failures, and deal with then on write.
+        int set = 1;
+        int sock = CFSocketGetNative(socket);
+        setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+        
         CFRelease(address);
         self.connectState = CONNECTING;
         freeaddrinfo(res);
@@ -280,7 +286,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     }
     if (r == 0) {
         self.connectState = ERROR;
-        [self notSpdyError];
+        [self connectionFailed:SSL_get_error(ssl, r) domain:kOpenSSLErrorDomain];
         [self invalidateSocket];
     }
     return NO;
@@ -338,6 +344,11 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body {
     SpdyStream *stream = [[SpdyStream newFromCFHTTPMessage:request delegate:delegate body:body] autorelease];
+    [self addStream:stream];
+}
+
+- (void)fetchFromRequest:(NSURLRequest *)request delegate:(RequestCallback *)delegate {
+    SpdyStream *stream = [[SpdyStream newFromRequest:(NSURLRequest *)request delegate:delegate] autorelease];
     [self addStream:stream];
 }
 

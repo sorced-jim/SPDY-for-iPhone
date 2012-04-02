@@ -32,10 +32,12 @@
 #include "openssl/ssl.h"
 #import "SpdySession.h"
 #import "SpdyInputStream.h"
+#import "SpdyStream.h"
 
 // The shared spdy instance.
 static SPDY *spdy = NULL;
 CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
+CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
 
 @interface SessionKey : NSObject<NSCopying>
 - (SessionKey *)initFromUrl:(NSURL *)url;
@@ -172,6 +174,17 @@ CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
     CFRelease(url);    
 }
 
+- (void)fetchFromRequest:(NSURLRequest *)request delegate:(RequestCallback *)delegate {
+    NSURL *url = [request URL];
+    NSError *error;
+    SpdySession *session = [self getSession:(NSURL *)url withError:&error];
+    if (session == nil) {
+        [delegate onError:(CFErrorRef)error];
+    } else {
+        [session fetchFromRequest:request delegate:delegate];
+    }
+}
+
 - (NSInteger)closeAllSessions {
     NSInteger cancelledRequests = 0;
     NSEnumerator *enumerator = [sessions objectEnumerator];
@@ -198,7 +211,8 @@ CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
 + (SPDY *)sharedSPDY {
     if (spdy == NULL) {
         SSL_library_init();
-        spdy = [[SPDY alloc]init];
+        spdy = [[SPDY alloc] init];
+        [SpdyStream staticInit];
     }
     return spdy;
 }

@@ -152,6 +152,16 @@ static const unsigned char smallBody[] =
     STAssertNotNil(self.delegate.error, @"An error was set.");
 }
 
+- (void)Disabled_testConnectToNonSSL {
+    self.delegate = [[CloseOnConnectCallback alloc]init];
+    [[SPDY sharedSPDY]fetch:@"http://localhost:9795/index.html" delegate:self.delegate];
+    CFRunLoopRun();
+    STAssertNotNil(self.delegate.error, @"Error for bad host.");
+    STAssertEquals(self.delegate.error.code, 2, @"");
+    STAssertTrue([self.delegate.error.domain isEqualToString:@"kOpenSSLErrorDomain"], @"OpenSSL error, but is %@", self.delegate.error.domain);
+}
+
+
 // A bad host name should be equivalent to the network being down.
 - (void)testBadHostName {
     [[SPDY sharedSPDY]fetch:@"http://bad.localhost:9793/" delegate:self.delegate];

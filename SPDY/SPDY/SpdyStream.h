@@ -26,7 +26,6 @@
 
 @interface SpdyStream : NSObject<SpdyRequestIdentifier> {
     const char **nameValues;
-    NSURL *url;
 
     BOOL streamClosed;
     RequestCallback *delegate;
@@ -47,9 +46,11 @@
 
 + (SpdyStream*)newFromCFHTTPMessage:(CFHTTPMessageRef)msg delegate:(RequestCallback*)delegate body:(NSInputStream *)body;
 + (SpdyStream*)newFromNSURL:(NSURL *)url delegate:(RequestCallback*)delegate;
++ (SpdyStream*)newFromRequest:(NSURLRequest *)request delegate:(RequestCallback*)delegate;
+
++ (void)staticInit;
 
 @property const char **nameValues;
-@property (retain) NSURL *url;
 @property (retain) RequestCallback *delegate;
 @property (retain) NSInputStream *body;
 @property (assign) NSInteger streamId;

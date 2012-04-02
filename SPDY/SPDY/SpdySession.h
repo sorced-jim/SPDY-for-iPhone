@@ -56,6 +56,7 @@ enum SpdyNetworkStatus {
 - (NSError *)connect:(NSURL *)host;
 - (void)fetch:(NSURL *)path delegate:(RequestCallback *)delegate;
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body;
+- (void)fetchFromRequest:(NSURLRequest *)request delegate:(RequestCallback *)delegate;
 - (void)addToLoop;
 
 - (NSInteger)resetStreamsAndGoAway;
