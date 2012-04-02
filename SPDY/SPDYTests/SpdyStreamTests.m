@@ -124,19 +124,18 @@ static int countItems(const char **nv) {
     STAssertEquals(0, items % 2, @"There must be an even number of pairs.");
     STAssertEquals(0, strcmp(nv[0], ":method"), @"First value is not method");
     STAssertEquals(0, strcmp(nv[1], "OPTIONS"), @"Pull the method from the message '%s'.", nv[1]);
-    STAssertEquals(0, strcmp(nv[2], "user-agent"), @"The user-agent value doesn't matter: %s", nv[2]);
+    STAssertEquals(0, strcmp(nv[2], ":scheme"), @"The scheme exists: '%s'", nv[2]);
+    STAssertEquals(0, strcmp(nv[3], "http"), @"It's pulled from the url.");
+    STAssertEquals(0, strcmp(nv[4], ":path"), @"");
+    STAssertEquals(0, strcmp(nv[5], "/bar;foo?q=123&q=bar&j=3"), @"The path and query parameters must be in the url: '%s'", nv[5]);
+    STAssertEquals(0, strcmp(nv[6], ":host"), @"The host is separate.");
+    STAssertEquals(0, strcmp(nv[7], "example.com"), @"No www here: %s", nv[7]);
     
-    STAssertEquals(0, strcmp(nv[4], ":version"), @"We'll send http/1.1, %s", nv[4]);
-    STAssertEquals(0, strcmp(nv[5], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[5]);
-    
-    STAssertEquals(0, strcmp(nv[6], ":scheme"), @"The scheme exists: '%s'", nv[4]);
-    STAssertEquals(0, strcmp(nv[7], "http"), @"It's pulled from the url.");
-    STAssertEquals(0, strcmp(nv[8], ":host"), @"The host is separate.");
-    STAssertEquals(0, strcmp(nv[9], "example.com"), @"No www here: %s", nv[9]);
+    STAssertEquals(0, strcmp(nv[8], "user-agent"), @"The user-agent value doesn't matter: %s", nv[8]);
+    STAssertEquals(0, strcmp(nv[10], ":version"), @"We'll send http/1.1, %s", nv[10]);
+    STAssertEquals(0, strcmp(nv[11], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[11]);
 
-    STAssertEquals(0, strcmp(nv[10], ":path"), @"");
-    STAssertEquals(0, strcmp(nv[11], "/bar;foo?q=123&q=bar&j=3"), @"The path and query parameters must be in the url: '%s'", nv[11]);
-    STAssertEquals(0, strcmp(nv[12], "Boy"), @"Boy is a header.");
+    STAssertEquals(0, strcmp(nv[12], "boy"), @"Boy is a header.");
     STAssertEquals(0, strcmp(nv[13], "Bad"), @"The boy was bad.");
     STAssertNil(stream.body, @"No Body.");
     CFRelease(msg);
@@ -155,8 +154,8 @@ static int countItems(const char **nv) {
     if (items < 12) {
         return;
     }
-    STAssertEquals(0, strcmp(nv[5], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[5]);
-    STAssertEquals(0, strcmp(nv[11], "/"), @"The path and query parameters must be in the url: '%s'", nv[11]);
+    STAssertEquals(0, strcmp(nv[5], "/"), @"The path and query parameters must be in the url: '%s'", nv[5]);
+    STAssertEquals(0, strcmp(nv[11], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[11]);
     CFRelease(msg);
 }
 
@@ -178,8 +177,8 @@ static int countItems(const char **nv) {
     if (items < 12) {
         return;
     }
-    STAssertEquals(0, strcmp(nv[5], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[5]);
-    STAssertEquals(0, strncmp(nv[11], "/path?q=1234&q=1234&", 20), @"The path and query parameters must be in the url: '%.*s'", 30, nv[11]);
+    STAssertEquals(0, strncmp(nv[5], "/path?q=1234&q=1234&", 20), @"The path and query parameters must be in the url: '%.*s'", 30, nv[5]);
+    STAssertEquals(0, strcmp(nv[11], "HTTP/1.0"), @"Yup, 1.0 is in the request: '%s'", nv[11]);
     
     CFRelease(msg);
     CFRelease(urlRef);

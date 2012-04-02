@@ -29,7 +29,7 @@ static NSSet *headersNotToCopy = nil;
 - (const char *)getStringFromCFHTTPMessage:(CFHTTPMessageRef)msg func:(CFStringRef(*)(CFHTTPMessageRef))func;
 - (const char *)copyCFString:(CFStringRef)str;
 - (NSMutableData *)createArena:(NSInteger)capacity;
-- (int)serializeUrl:(NSURL *)url withMethod:(NSString *)method;
+- (int)serializeUrl:(NSURL *)url withMethod:(NSString *)method withVersion:(NSString *)version;
 - (int)serializeHeadersDict:(NSDictionary *)headers fromIndex:(int)index;
 
 @property (retain) NSMutableData *stringArena;
@@ -161,83 +161,27 @@ static NSSet *headersNotToCopy = nil;
     return (const char*)[self.stringArena mutableBytes] + arenaLength;
 }
 
-- (const char *)copyCFString:(CFStringRef)str {
-    const char *utf8 = CFStringGetCStringPtr(str, CFStringGetFastestEncoding(str));
-    if (utf8 == NULL) {
-        NSLog(@"Can't get raw version of %@: %@", str, CFStringGetFastestEncoding(str));
-        return "";
-    }
-    
-    unsigned long length = strlen(utf8) + 1;
-    [self fixArena:length];
-    NSInteger arenaLength = [self.stringArena length];
-    [self.stringArena appendBytes:utf8 length:length];
-    return (const char *)[self.stringArena mutableBytes] + arenaLength;
-}
-
-- (const char *)getStringFromCFHTTPMessage:(CFHTTPMessageRef)msg func:(CFStringRef(*)(CFHTTPMessageRef))func {
-    CFStringRef str = func(msg);
-    const char *utf8 = [self copyCFString:str];
-    CFRelease(str);
-    return utf8;
-}
-
-- (const char *)getStringFromCFURL:(CFURLRef)u func:(CFStringRef(*)(CFURLRef))func {
-    CFStringRef str = func(u);
-    const char *utf8 = [self copyCFString:str];
-    CFRelease(str);
-    return utf8;
-}
-
 - (void)serializeHeaders:(CFHTTPMessageRef)msg {
     CFDictionaryRef d = CFHTTPMessageCopyAllHeaderFields(msg);
     CFURLRef url = CFHTTPMessageCopyRequestURL(msg);
     CFStringRef method = CFHTTPMessageCopyRequestMethod(msg);
+    CFStringRef version = CFHTTPMessageCopyVersion(msg);
     CFIndex count = CFDictionaryGetCount(d);
 
     self.nameValues = malloc((count * 2 + 6*2 + 1) * sizeof(const char *));
     
-        CFStringRef *keys = CFAllocatorAllocate(NULL, sizeof(CFStringRef)*count*2, 0);
-    CFTypeRef *values = (CFTypeRef *)(keys + count);
-    CFIndex index;
-    const char **nv = self.nameValues;
-    CFDictionaryGetKeysAndValues(d, (const void **)keys, (const void **)values);
-    nv[0] = ":method";
-    nv[1] = [self getStringFromCFHTTPMessage:msg func:CFHTTPMessageCopyRequestMethod];
-    nv[2] = "user-agent";
-    nv[3] = "SPDY objc-0.0.3";
-    nv[4] = ":version";
-    nv[5] = [self getStringFromCFHTTPMessage:msg func:CFHTTPMessageCopyVersion];
-    nv[6] = ":scheme";
-    nv[7] = [self getStringFromCFURL:url func:CFURLCopyScheme];
-    nv[8] = ":host";
-    nv[9] = [self getStringFromCFURL:url func:CFURLCopyHostName];
-    nv[10] = ":path";
-    CFStringRef resourceSpecifier = CFURLCopyResourceSpecifier(url);
-    CFStringRef path = CFURLCopyPath(url);
-    if (resourceSpecifier != NULL) {
-        NSMutableString *nsPath = [[[NSMutableString alloc]init] autorelease];
-        [nsPath appendFormat:@"%@%@", (NSString *)path, (NSString *)resourceSpecifier];
-        nv[11] = [self copyString:nsPath];
-        CFRelease(resourceSpecifier);
-    } else {
-        nv[11] = [self copyCFString:path];
-    }
-    CFRelease(path);
-    for (index = 0; index < count; ++index) {
-        nv[index*2 + 12] = [self copyCFString:keys[index]];
-        nv[index*2 + 13] = [self copyCFString:values[index]];
-    }
-    nv[count*2+6*2] = NULL;
+    int index = [self serializeUrl:(NSURL *)url withMethod:(NSString *)method withVersion:(NSString *)version];
+    index = [self serializeHeadersDict:(NSDictionary *)d fromIndex:index];
+    self.nameValues[index] = NULL;
 
-    CFAllocatorDeallocate(NULL, keys);
     CFRelease(url);
+    CFRelease(version);
     CFRelease(method);
     CFRelease(d);
 }
 
 // Assumes self.nameValues is at least 12 elements long.
-- (int)serializeUrl:(NSURL *)url withMethod:(NSString *)method {
+- (int)serializeUrl:(NSURL *)url withMethod:(NSString *)method withVersion:(NSString *)version {
     self.url = url;
     const char** nv = self.nameValues;
     nv[0] = ":method";
@@ -253,7 +197,7 @@ static NSSet *headersNotToCopy = nil;
     nv[8] = "user-agent";
     nv[9] = "SPDY obj-c/0.0.0";
     nv[10] = ":version";
-    nv[11] = "HTTP/1.1";
+    nv[11] = [self copyString:version];
     return 12;
 }
 
@@ -304,7 +248,7 @@ static NSSet *headersNotToCopy = nil;
     stream.nameValues = malloc(sizeof(const char *) * (6*2 + 1));
     stream.delegate = delegate;
     stream.stringArena = [stream createArena:512];
-    [stream serializeUrl:url withMethod:@"GET"];
+    [stream serializeUrl:url withMethod:@"GET" withVersion:@"HTTP/1.1"];
     stream.nameValues[12] = NULL;
     return stream;
 }
@@ -312,13 +256,11 @@ static NSSet *headersNotToCopy = nil;
 + (SpdyStream *)newFromRequest:(NSURLRequest *)request delegate:(RequestCallback *)delegate {
     SpdyStream *stream = [[SpdyStream alloc] init];
     NSDictionary *headers = [request allHTTPHeaderFields];
-    NSLog(@"headers: %@, stream: %@", headers, stream);
     stream.delegate = delegate;
     stream.stringArena = [stream createArena:2048];
     int maxElements = [headers count]*2 + 6*2 + 1;
     stream.nameValues = malloc(sizeof(const char *) * maxElements);
-    int nameValueIndex = [stream serializeUrl:[request URL] withMethod:[request HTTPMethod]];
-    NSLog(@"index is: %d, max elements: %d", nameValueIndex, maxElements);
+    int nameValueIndex = [stream serializeUrl:[request URL] withMethod:[request HTTPMethod] withVersion:@"HTTP/1.1"];
     nameValueIndex = [stream serializeHeadersDict:headers fromIndex:nameValueIndex];
     stream.nameValues[nameValueIndex] = NULL;
     return stream;
