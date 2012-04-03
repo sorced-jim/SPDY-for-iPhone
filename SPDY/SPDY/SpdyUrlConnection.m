@@ -104,7 +104,7 @@ static NSMutableDictionary *disabledHosts;
 @synthesize cancelled = _cancelled;
 @synthesize closed = _closed;
 
-+ (void)register {
++ (void)registerSpdy {
     disabledHosts = [[NSMutableDictionary alloc] init];
     [NSURLProtocol registerClass:[SpdyUrlConnection class]];
 }

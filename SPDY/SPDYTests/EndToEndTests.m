@@ -128,7 +128,7 @@ static const int port = 9783;
     CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ if (self.exitNeeded) { CFRunLoopStop(CFRunLoopGetCurrent()); } });
     CFRunLoopRun();
     self.exitNeeded = NO;
-    [SpdyUrlConnection register];
+    [SpdyUrlConnection registerSpdy];
 }
 
 - (void)tearDown {

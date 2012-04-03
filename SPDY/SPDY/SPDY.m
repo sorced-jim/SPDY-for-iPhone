@@ -33,6 +33,7 @@
 #import "SpdySession.h"
 #import "SpdyInputStream.h"
 #import "SpdyStream.h"
+#import "SpdyUrlConnection.h"
 
 // The shared spdy instance.
 static SPDY *spdy = NULL;
@@ -215,6 +216,15 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
         [SpdyStream staticInit];
     }
     return spdy;
+}
+
+// These methods are object methods so that sharedSpdy is called before registering SpdyUrlConnection with NSURLConnection.
+- (void)registerForNSURLConnection {
+    [SpdyUrlConnection registerSpdy];
+}
+
+- (void)unregisterForNSURLConnection {
+    [SpdyUrlConnection unregister];
 }
 @end
 

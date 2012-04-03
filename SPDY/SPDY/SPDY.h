@@ -42,10 +42,13 @@ enum SpdyErrors {
 - (void)close;
 @end
 
-@interface SPDY : NSObject {
-}
+@interface SPDY : NSObject
 
 + (SPDY *)sharedSPDY;
+
+// Call registerForNSURLConnection to enable spdy when using NSURLConnection.
+- (void)registerForNSURLConnection;
+- (void)unregisterForNSURLConnection;
 
 // A reference to delegate is kept until the stream is closed.  The caller will get an onError or onStreamClose before the stream is closed.
 - (void)fetch:(NSString *)path delegate:(RequestCallback *)delegate;
