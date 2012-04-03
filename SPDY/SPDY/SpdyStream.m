@@ -261,6 +261,10 @@ static NSSet *headersNotToCopy = nil;
     int nameValueIndex = [stream serializeUrl:[request URL] withMethod:[request HTTPMethod] withVersion:@"HTTP/1.1"];
     nameValueIndex = [stream serializeHeadersDict:headers fromIndex:nameValueIndex];
     stream.nameValues[nameValueIndex] = NULL;
+    stream.body = request.HTTPBodyStream;
+    if (request.HTTPBodyStream == nil && request.HTTPBody != nil)
+        stream.body = [NSInputStream inputStreamWithData:request.HTTPBody];
+
     return stream;
 }
 

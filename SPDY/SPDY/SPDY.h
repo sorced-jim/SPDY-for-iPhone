@@ -46,7 +46,8 @@ enum SpdyErrors {
 
 + (SPDY *)sharedSPDY;
 
-// Call registerForNSURLConnection to enable spdy when using NSURLConnection.
+// Call registerForNSURLConnection to enable spdy when using NSURLConnection.  WARNING: Using NSURLConnection means that no upload progress can
+// not be monitored.  This is because of a lack of an API in URLProtocolClient.
 - (void)registerForNSURLConnection;
 - (void)unregisterForNSURLConnection;
 

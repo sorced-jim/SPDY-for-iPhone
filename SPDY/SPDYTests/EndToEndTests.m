@@ -90,12 +90,19 @@ static const int port = 9783;
 @property (retain) NSURLConnection *connection;
 @property (retain) NSError *error;
 @property (retain) NSURLResponse *response;
+@property (assign) NSInteger bytesSent;
 @end
 
 @implementation SpdyTestConnectionDelegate
+@synthesize bytesSent = _bytesSent;
 @synthesize connection = _connection;
 @synthesize error = _error;
 @synthesize response = _response;
+
+- (void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
+    NSLog(@"bytesWritten: %d", bytesWritten);
+    self.bytesSent = totalBytesWritten;
+}
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     self.connection = connection;
@@ -368,6 +375,30 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     CFRunLoopRun();
     STAssertNil(delegate.error, @"Error: %@", delegate.error);
     //STAssertEquals([delegate.connection class], [SpdyUrlConnection class], @"The response should be a spdy response: %@", delegate.connection);
+    [delegate release];
+}
+
+- (void)testNSURLRequestWithBodyStream {
+    SpdyTestConnectionDelegate *delegate = [[[SpdyTestConnectionDelegate alloc] init] retain];
+    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/"];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    request.HTTPBodyStream = [NSInputStream inputStreamWithData:[NSData dataWithBytes:"1234" length:4]];
+    [NSURLConnection connectionWithRequest:request delegate:delegate];
+    CFRunLoopRun();
+    STAssertNil(delegate.error, @"Error: %@", delegate.error);
+    //STAssertEquals([delegate.response class], [SpdyUrlResponse class], @"The response should be a spdy response: %@", delegate.response);
+    [delegate release];
+}
+
+- (void)testNSURLRequestWithBody {
+    SpdyTestConnectionDelegate *delegate = [[[SpdyTestConnectionDelegate alloc] init] retain];
+    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/"];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    request.HTTPBody = [NSData dataWithBytes:"12345" length:5];
+    [NSURLConnection connectionWithRequest:request delegate:delegate];
+    CFRunLoopRun();
+    STAssertNil(delegate.error, @"Error: %@", delegate.error);
+    //STAssertEquals([delegate.response class], [SpdyUrlResponse class], @"The response should be a spdy response: %@", delegate.response);
     [delegate release];
 }
 

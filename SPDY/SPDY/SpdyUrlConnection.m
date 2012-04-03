@@ -13,17 +13,10 @@
 static NSMutableDictionary *disabledHosts;
 
 
-// This class exists because NSHTTPURLResponse does not have a useful constructor in iOS 4.3 and below.
-@interface SpdyUrlResponse : NSURLResponse
-@property (assign) NSInteger statusCode;
-@property (retain) NSDictionary *allHeaderFields;
-
-- (id)initWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers;
-@end
-
 @implementation SpdyUrlResponse
 @synthesize statusCode = _statusCode;
 @synthesize allHeaderFields = _allHeaderFields;
+@synthesize requestBytes = _requestBytes;
 
 - (id)initWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers {
     NSDictionary *headersDict = [NSMakeCollectable(CFHTTPMessageCopyAllHeaderFields(headers)) autorelease];
@@ -41,10 +34,12 @@ static NSMutableDictionary *disabledHosts;
 @interface SpdyUrlCallback : RequestCallback
 - (id)initWithConnection:(SpdyUrlConnection *)protocol;
 @property (retain) SpdyUrlConnection *protocol;
+@property (assign) NSInteger requestBytesSent;
 @end
 
 @implementation SpdyUrlCallback
 @synthesize protocol = _protocol;
+@synthesize requestBytesSent = _requestBytesSent;
 
 - (id)initWithConnection:(SpdyUrlConnection *)protocol {
     self = [super init];
@@ -77,8 +72,15 @@ static NSMutableDictionary *disabledHosts;
     [[self.protocol client] URLProtocol:self.protocol didFailWithError:error];    
 }
 
+- (void)onRequestBytesSent:(NSInteger)bytesSend {
+    // The updated byte count should be sent, but the URLProtocolClient doesn't have a method to do that.
+    //[[self.protocol client] URLProtocol:self.protocol didSendBodyData:bytesSend];
+    self.requestBytesSent += bytesSend;
+}
+
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
     SpdyUrlResponse *response = [[[SpdyUrlResponse alloc] initWithURL:[self.protocol.spdyIdentifier url] withResponse:headers] autorelease];
+    response.requestBytes = self.requestBytesSent;
     [[self.protocol client] URLProtocol:self.protocol didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 }
 
@@ -126,7 +128,9 @@ static NSMutableDictionary *disabledHosts;
 
 // This could be a good place to remove the connection headers.
 + (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
-    return request;
+    NSMutableURLRequest *spdyRequest = [request mutableCopy];
+    [NSURLProtocol setProperty:[NSNumber numberWithBool:YES] forKey:@"spdy" inRequest:spdyRequest];
+    return spdyRequest;
 }
 
 - (void)startLoading {
