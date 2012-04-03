@@ -235,7 +235,7 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
     
 }
 
-- (void)onNotSpdyError {
+- (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier {
     
 }
 
@@ -385,7 +385,7 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
     CFWriteStreamClose(writeStreamPair);
 }
 
-- (void)onNotSpdyError {
+- (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier {
     self.readStreamPair.error = [NSMakeCollectable(CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyConnectionNotSpdy, NULL)) autorelease];
 }
 

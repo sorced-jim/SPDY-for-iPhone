@@ -8,6 +8,7 @@
 
 #import "EndToEndTests.h"
 #import "SPDY.h"
+#import "SpdyUrlConnection.h"
 
 #include <netdb.h>
 
@@ -57,7 +58,7 @@ static const int port = 9783;
     }
 }
 
-- (void)onNotSpdyError {
+- (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier {
     NSLog(@"Not connecting to a spdy server.");
     CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ CFRunLoopStop(CFRunLoopGetCurrent()); });
 }
@@ -83,6 +84,32 @@ static const int port = 9783;
 
 @end
 
+@interface SpdyTestConnectionDelegate : NSObject // NSURLConnectionDelegate
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
+
+@property (retain) NSURLConnection *connection;
+@property (retain) NSError *error;
+@property (retain) NSURLResponse *response;
+@end
+
+@implementation SpdyTestConnectionDelegate
+@synthesize connection = _connection;
+@synthesize error = _error;
+@synthesize response = _response;
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    self.connection = connection;
+    self.response = response;
+    CFRunLoopStop(CFRunLoopGetCurrent());
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    self.connection = connection;
+    self.error = error;
+    CFRunLoopStop(CFRunLoopGetCurrent());
+}
+@end
+
 @interface EndToEndTests ()
 @property (retain) E2ECallback *delegate;
 @property (assign) BOOL exitNeeded;
@@ -90,7 +117,7 @@ static const int port = 9783;
 
 @implementation EndToEndTests
 
-@synthesize delegate;
+@synthesize delegate = _delegate;
 @synthesize exitNeeded;
 
 - (void)setUp {
@@ -101,15 +128,17 @@ static const int port = 9783;
     CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ if (self.exitNeeded) { CFRunLoopStop(CFRunLoopGetCurrent()); } });
     CFRunLoopRun();
     self.exitNeeded = NO;
+    [SpdyUrlConnection register];
 }
 
 - (void)tearDown {
     self.delegate = nil;
+    [SpdyUrlConnection unregister];
 }
 
 // All code under test must be linked into the Unit Test bundle
 - (void)testSimpleFetch {
-    [[SPDY sharedSPDY]fetch:@"http://localhost:9793/" delegate:self.delegate];
+    [[SPDY sharedSPDY] fetch:@"http://localhost:9793/" delegate:self.delegate];
     CFRunLoopRun();
     STAssertTrue(self.delegate.closeCalled, @"Run loop finished as expected.");
 }
@@ -121,7 +150,7 @@ static const int port = 9783;
     STAssertTrue(self.delegate.closeCalled, @"Run loop finished as expected.");
 
     self.delegate = [[[E2ECallback alloc] init] autorelease];
-    [[SPDY sharedSPDY]fetch:@"http://localhost:9794/" delegate:self.delegate];
+    [[SPDY sharedSPDY] fetch:@"http://localhost:9794/" delegate:self.delegate];
     CFRunLoopRun();
     STAssertNotNil(self.delegate.error, @"Got an error");
 }
@@ -136,7 +165,7 @@ static const unsigned char smallBody[] =
     CFURLRef url = CFURLCreateWithString(kCFAllocatorDefault, CFSTR("https://localhost:9793/"), NULL);
     CFHTTPMessageRef request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("POST"), url, kCFHTTPVersion1_1);
     CFHTTPMessageSetBody(request, body);
-    [[SPDY sharedSPDY]fetchFromMessage:request delegate:self.delegate];
+    [[SPDY sharedSPDY] fetchFromMessage:request delegate:self.delegate];
     CFRunLoopRun();
     CFRelease(request);
     CFRelease(url);
@@ -145,7 +174,7 @@ static const unsigned char smallBody[] =
 }
 
 - (void)testCancelOnConnect {
-    self.delegate = [[CloseOnConnectCallback alloc]init];
+    self.delegate = [[CloseOnConnectCallback alloc] init];
     [[SPDY sharedSPDY]fetch:@"http://localhost:9793/index.html" delegate:self.delegate];
     CFRunLoopRun();
     STAssertEquals([(CloseOnConnectCallback *)self.delegate closedStreams], 1, @"One stream closed.");
@@ -153,8 +182,8 @@ static const unsigned char smallBody[] =
 }
 
 - (void)Disabled_testConnectToNonSSL {
-    self.delegate = [[CloseOnConnectCallback alloc]init];
-    [[SPDY sharedSPDY]fetch:@"http://localhost:9795/index.html" delegate:self.delegate];
+    self.delegate = [[CloseOnConnectCallback alloc] init];
+    [[SPDY sharedSPDY] fetch:@"http://localhost:9795/index.html" delegate:self.delegate];
     CFRunLoopRun();
     STAssertNotNil(self.delegate.error, @"Error for bad host.");
     STAssertEquals(self.delegate.error.code, 2, @"");
@@ -164,7 +193,7 @@ static const unsigned char smallBody[] =
 
 // A bad host name should be equivalent to the network being down.
 - (void)testBadHostName {
-    [[SPDY sharedSPDY]fetch:@"http://bad.localhost:9793/" delegate:self.delegate];
+    [[SPDY sharedSPDY] fetch:@"http://bad.localhost:9793/" delegate:self.delegate];
     CFRunLoopRun();
     STAssertNotNil(self.delegate.error, @"Error for bad host.");
     STAssertEquals(self.delegate.error.code, EAI_NONAME, @"");
@@ -329,6 +358,17 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     
     CFReadStreamClose(readStream);
     CFRelease(readStream);
+}
+
+- (void)testNSURLRequest {
+    SpdyTestConnectionDelegate *delegate = [[[SpdyTestConnectionDelegate alloc] init] retain];
+    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/"];
+    [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url]
+                                  delegate:delegate];
+    CFRunLoopRun();
+    STAssertNil(delegate.error, @"Error: %@", delegate.error);
+    //STAssertEquals([delegate.connection class], [SpdyUrlConnection class], @"The response should be a spdy response: %@", delegate.connection);
+    [delegate release];
 }
 
 @end

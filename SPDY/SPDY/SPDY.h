@@ -66,7 +66,7 @@ enum SpdyErrors {
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers;
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length;
 - (void)onStreamClose;
-- (void)onNotSpdyError;
+- (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier;
 
 // TODO(jim): Change CFErrorRef to NSError *.
 - (void)onError:(CFErrorRef)error;

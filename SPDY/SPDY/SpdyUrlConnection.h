@@ -10,8 +10,13 @@
 
 @interface SpdyUrlConnection : NSURLProtocol
 
+// Registers and unregisters the SpdyUrlConnection with NSURLProtocol.  Any hosts found not to support spdy after register is called
+// are cleared when unregister is called.
 + (void)register;
++ (void)unregister;
 
 @property (assign) id<SpdyRequestIdentifier> spdyIdentifier;
+@property (assign, readonly) BOOL cancelled;
+@property (assign) BOOL closed;
 
 @end

@@ -26,8 +26,6 @@ static NSSet *headersNotToCopy = nil;
 @interface SpdyStream ()
 - (void)fixArena:(NSInteger)length;
 - (const char *)copyString:(NSString *)str;
-- (const char *)getStringFromCFHTTPMessage:(CFHTTPMessageRef)msg func:(CFStringRef(*)(CFHTTPMessageRef))func;
-- (const char *)copyCFString:(CFStringRef)str;
 - (NSMutableData *)createArena:(NSInteger)capacity;
 - (int)serializeUrl:(NSURL *)url withMethod:(NSString *)method withVersion:(NSString *)version;
 - (int)serializeHeadersDict:(NSDictionary *)headers fromIndex:(int)index;
@@ -125,7 +123,7 @@ static NSSet *headersNotToCopy = nil;
 }
 
 - (void)notSpdyError {
-    [delegate onNotSpdyError];
+    [delegate onNotSpdyError:self];
 }
 
 - (void)connectionError {

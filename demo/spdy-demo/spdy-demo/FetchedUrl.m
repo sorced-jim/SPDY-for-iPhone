@@ -26,7 +26,7 @@
     return self;
 }
 
-- (void)onNotSpdyError {
+- (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier {
     fetchedUrl.state = @"Host does not support SPDY";
     [fetchedUrl.parent reloadData];
 }

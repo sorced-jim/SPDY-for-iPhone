@@ -29,7 +29,7 @@ static CFHTTPMessageRef createHttpMessage() {
     NSLog(@"Got an error!");
 }
 
-- (void)onNotSpdyError {
+- (void)onNotSpdyError:(id<SpdyRequestIdentifier)identifier {
     NSLog(@"Not spdy!");
 }
 
