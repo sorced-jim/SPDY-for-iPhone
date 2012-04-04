@@ -223,8 +223,8 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 }
 
 - (void)cancelStream:(SpdyStream *)stream {
+    // Do not remove the stream here as it will be removed on the close callback when spdylay is done with the object.
     [self _cancelStream:stream];
-    [streams removeObject:stream];
 }
 
 - (NSInteger)resetStreamsAndGoAway {

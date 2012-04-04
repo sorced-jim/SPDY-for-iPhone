@@ -378,11 +378,10 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     [delegate release];
 }
 
-// Disabled until I can stop the request from being sent out.
-- (void)disabled_testNSURLRequestTimeout {
+- (void)testNSURLRequestTimeout {
     SpdyTestConnectionDelegate *delegate = [[[SpdyTestConnectionDelegate alloc] init] retain];
-    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/"];
-    [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:0.001]
+    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/?spdyd_do_not_respond_to_req=yes"];
+    [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:0.1]
                                   delegate:delegate];
     CFRunLoopRun();
     STAssertNotNil(delegate.error, @"Error: %@", delegate.error);

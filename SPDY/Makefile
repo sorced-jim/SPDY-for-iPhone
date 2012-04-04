@@ -1,4 +1,6 @@
 
+CONFIGURATION=Release
+
 install: armv6 armv7 i386
 	mkdir -p ../install/include/SPDY ../install/lib
 	lipo -create build/lib/armv6/libSPDY.a build/lib/armv7/libSPDY.a build/lib/i386/libSPDY.a -output ../install/lib/libSPDY.a
@@ -17,11 +19,11 @@ i386:
 armv6:
 	mkdir -p build/lib/armv6
 	xcodebuild clean
-	xcodebuild -arch armv6 -sdk iphoneos4.3 install
+	xcodebuild -configuration $(CONFIGURATION) -arch armv6 -sdk iphoneos4.3 install
 	cp build/UninstalledProducts/libSPDY.a build/lib/armv6/libSPDY.a
 
 armv7:
 	mkdir -p build/lib/armv7
 	xcodebuild clean
-	xcodebuild -arch armv7 -sdk iphoneos4.3 install
+	xcodebuild -configuration $(CONFIGURATION) -arch armv7 -sdk iphoneos4.3 install
 	cp build/UninstalledProducts/libSPDY.a build/lib/armv7/libSPDY.a
