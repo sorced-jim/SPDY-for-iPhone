@@ -111,8 +111,13 @@ static NSMutableDictionary *disabledHosts;
     [NSURLProtocol registerClass:[SpdyUrlConnection class]];
 }
 
++ (BOOL)isRegistered {
+    return disabledHosts != nil;
+}
+
 + (void)unregister {
     [disabledHosts release];
+    disabledHosts = nil;
     [NSURLProtocol unregisterClass:[SpdyUrlConnection class]];
 }
 

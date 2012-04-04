@@ -22,6 +22,7 @@
 // Registers and unregisters the SpdyUrlConnection with NSURLProtocol.  Any hosts found not to support spdy after register is called
 // are cleared when unregister is called.
 + (void)registerSpdy;
++ (BOOL)isRegistered;
 + (void)unregister;
 
 @property (assign) id<SpdyRequestIdentifier> spdyIdentifier;

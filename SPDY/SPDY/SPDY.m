@@ -223,6 +223,10 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
     [SpdyUrlConnection registerSpdy];
 }
 
+- (BOOL)isSpdyRegistered {
+    return [SpdyUrlConnection isRegistered];
+}
+
 - (void)unregisterForNSURLConnection {
     [SpdyUrlConnection unregister];
 }

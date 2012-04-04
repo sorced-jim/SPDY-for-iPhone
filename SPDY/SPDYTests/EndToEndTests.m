@@ -378,6 +378,18 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     [delegate release];
 }
 
+// Disabled until I can stop the request from being sent out.
+- (void)disabled_testNSURLRequestTimeout {
+    SpdyTestConnectionDelegate *delegate = [[[SpdyTestConnectionDelegate alloc] init] retain];
+    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/"];
+    [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:0.001]
+                                  delegate:delegate];
+    CFRunLoopRun();
+    STAssertNotNil(delegate.error, @"Error: %@", delegate.error);
+    //STAssertEquals([delegate.connection class], [SpdyUrlConnection class], @"The response should be a spdy response: %@", delegate.connection);
+    [delegate release];
+}
+
 - (void)testNSURLRequestWithBodyStream {
     SpdyTestConnectionDelegate *delegate = [[[SpdyTestConnectionDelegate alloc] init] retain];
     NSURL *url = [NSURL URLWithString:@"https://localhost:9793/"];
@@ -400,6 +412,12 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     STAssertNil(delegate.error, @"Error: %@", delegate.error);
     //STAssertEquals([delegate.response class], [SpdyUrlResponse class], @"The response should be a spdy response: %@", delegate.response);
     [delegate release];
+}
+
+- (void)testRegisteredForSpdy {
+    STAssertTrue([[SPDY sharedSPDY] isSpdyRegistered], @"Spdy should be registered");
+    [[SPDY sharedSPDY] unregisterForNSURLConnection];
+    STAssertFalse([[SPDY sharedSPDY] isSpdyRegistered], @"Spdy should no longer be registered");
 }
 
 @end
