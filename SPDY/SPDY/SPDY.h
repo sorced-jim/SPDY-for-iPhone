@@ -46,8 +46,9 @@ enum SpdyErrors {
 
 + (SPDY *)sharedSPDY;
 
-// Call registerForNSURLConnection to enable spdy when using NSURLConnection.  WARNING: Using NSURLConnection means that upload progress can not
-// be monitored.  This is because of a lack of an API in URLProtocolClient.
+// Call registerForNSURLConnection to enable spdy when using NSURLConnection.  SPDY responses can be identified (in iOS 5.0+) by looking for
+// the @"protocol-was: spdy" header with the value @"YES".  "protocol-was: spdy" is not a valid http header, thus it is save to add it.
+// WARNING: Using NSURLConnection means that upload progress can not be monitored.  This is because of a lack of an API in URLProtocolClient.
 - (void)registerForNSURLConnection;
 - (BOOL)isSpdyRegistered;
 - (void)unregisterForNSURLConnection;

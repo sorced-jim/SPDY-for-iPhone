@@ -18,17 +18,27 @@ static NSMutableDictionary *disabledHosts;
 @synthesize allHeaderFields = _allHeaderFields;
 @synthesize requestBytes = _requestBytes;
 
-- (id)initWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers {
-    NSDictionary *headersDict = [NSMakeCollectable(CFHTTPMessageCopyAllHeaderFields(headers)) autorelease];
++ (NSURLResponse *)responseWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers withRequestBytes:(NSInteger)requestBytesSent {
+    NSMutableDictionary *headersDict = [[[NSMakeCollectable(CFHTTPMessageCopyAllHeaderFields(headers)) autorelease] mutableCopy] autorelease];
+    [headersDict setObject:@"YES" forKey:@"protocol-was: spdy"];
     NSNumberFormatter *f = [[[NSNumberFormatter alloc] init] autorelease];
     NSString *contentType = [headersDict objectForKey:@"content-type"];
     NSString *contentLength = [headersDict objectForKey:@"content-length"];
     NSNumber *length = [f numberFromString:contentLength];
-    self = [super initWithURL:url MIMEType:contentType expectedContentLength:[length intValue] textEncodingName:nil];
-    self.statusCode = CFHTTPMessageGetResponseStatusCode(headers);
-    self.allHeaderFields = headersDict;
-    return self;
+    NSInteger statusCode = CFHTTPMessageGetResponseStatusCode(headers);
+    NSString *version = [NSMakeCollectable(CFHTTPMessageCopyVersion(headers)) autorelease];
+    if ([[NSHTTPURLResponse class] instancesRespondToSelector:@selector(initWithURL:statusCode:HTTPVersion:headerFields:)]) {
+        return [[[NSHTTPURLResponse alloc] initWithURL:url statusCode:statusCode  HTTPVersion:version headerFields:headersDict] autorelease];
+    }
+    
+    SpdyUrlResponse *response = [[SpdyUrlResponse alloc] autorelease];
+    [response initWithURL:url MIMEType:contentType expectedContentLength:[length intValue] textEncodingName:nil];
+    response.statusCode = statusCode;
+    response.allHeaderFields = headersDict;
+    response.requestBytes = requestBytesSent;
+    return response;
 }
+
 @end
 
 @interface SpdyUrlCallback : RequestCallback
@@ -79,8 +89,7 @@ static NSMutableDictionary *disabledHosts;
 }
 
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
-    SpdyUrlResponse *response = [[[SpdyUrlResponse alloc] initWithURL:[self.protocol.spdyIdentifier url] withResponse:headers] autorelease];
-    response.requestBytes = self.requestBytesSent;
+    NSURLResponse *response = [SpdyUrlResponse responseWithURL:[self.protocol.spdyIdentifier url] withResponse:headers withRequestBytes:self.requestBytesSent];
     [[self.protocol client] URLProtocol:self.protocol didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 }
 
@@ -116,9 +125,9 @@ static NSMutableDictionary *disabledHosts;
 }
 
 + (void)unregister {
+    [NSURLProtocol unregisterClass:[SpdyUrlConnection class]];
     [disabledHosts release];
     disabledHosts = nil;
-    [NSURLProtocol unregisterClass:[SpdyUrlConnection class]];
 }
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request {

@@ -374,7 +374,12 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
                                   delegate:delegate];
     CFRunLoopRun();
     STAssertNil(delegate.error, @"Error: %@", delegate.error);
-    //STAssertEquals([delegate.connection class], [SpdyUrlConnection class], @"The response should be a spdy response: %@", delegate.connection);
+    if ([delegate.response class] == [NSHTTPURLResponse class]) {
+        NSHTTPURLResponse *response = (NSHTTPURLResponse *)delegate.response;
+        STAssertEquals([delegate.response class], [NSHTTPURLResponse class], @"The response should be an http response with 5.0+ response: %@", delegate.response);
+        STAssertEquals(response.statusCode, 200, @"Good reply");
+        STAssertEquals([response.allHeaderFields objectForKey:@"protocol-was: spdy"], @"YES", @"Headers are: %@", response.allHeaderFields);
+    }
     [delegate release];
 }
 

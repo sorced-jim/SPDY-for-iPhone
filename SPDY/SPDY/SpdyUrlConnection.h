@@ -9,12 +9,12 @@
 #import "SPDY.h"
 
 // This class exists because NSHTTPURLResponse does not have a useful constructor in iOS 4.3 and below.
-@interface SpdyUrlResponse : NSURLResponse
+@interface SpdyUrlResponse : NSHTTPURLResponse
 @property (assign) NSInteger statusCode;
 @property (retain) NSDictionary *allHeaderFields;
 @property (assign) NSInteger requestBytes;
 
-- (id)initWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers;
++ (NSURLResponse *)responseWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers withRequestBytes:(NSInteger)requestBytesSent;
 @end
 
 @interface SpdyUrlConnection : NSURLProtocol
