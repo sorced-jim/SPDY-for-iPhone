@@ -16,10 +16,11 @@
 # 
 
 default_gcc_version=4.2
-default_ios_version=4.3
+default_ios_version=`xcodebuild -showsdks | grep iphoneos | sed -e 's/.*iphoneos//' | tail -n 1`
 default_min_ios_version=4.3
 default_macosx_version=10.6
 
+DEVELOPER=${DEVELOPER:-`xcode-select -print-path`}
 GCC_VERSION="${GCC_VERSION:-$default_gcc_version}"
 export IOS_VERSION="${IOS_VERSION:-$default_ios_version}"
 export MIN_IOS_VERSION="${MIN_IOS_VERSION:-$default_min_ios_version}"
@@ -95,7 +96,7 @@ case $target in
         exit 2
 esac
 
-export DEVROOT="/Developer/Platforms/${platform}.platform/Developer"
+export DEVROOT="${DEVELOPER}/Platforms/${platform}.platform/Developer"
 export SDKROOT="$DEVROOT/SDKs/${platform}${IOS_VERSION}.sdk"
 prefix="${prefix:-`pwd`/build/${target}-${IOS_VERSION}}"
 

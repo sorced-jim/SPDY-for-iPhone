@@ -32,6 +32,7 @@ ARCH=${ARCH:-armv7}
 DEVELOPER=${DEVELOPER:-`xcode-select --print-path`}
 PLATFORM=${PLATFORM:-iPhoneOS}
 SDK=${SDK:-`xcodebuild -showsdks | grep iphoneos | sed -e 's/.*iphoneos//g' | tail -n 1`}
+MIN_IOS_VERSION=${MIN_IOS_VERSION:-4.3}
 if [ ! -e "zlib-${ZLIB_VERSION}.tar.gz" ]
 then
   curl -O "http://zlib.net/zlib-${ZLIB_VERSION}.tar.gz"
@@ -55,8 +56,8 @@ export NM=${DEVROOT}/usr/bin/nm
 export CXXCPP=${DEVROOT}/usr/bin/cpp
 export RANLIB=${DEVROOT}/usr/bin/ranlib
 export LDFLAGS="-arch ${ARCH} -pipe -no-cpp-precomp -isysroot ${SDKROOT} -L${ROOTDIR}/lib"
-export CFLAGS="-arch ${ARCH} -pipe -no-cpp-precomp -isysroot ${SDKROOT} -I${ROOTDIR}/include"
-export CXXFLAGS="-arch ${ARCH} -pipe -no-cpp-precomp -isysroot ${SDKROOT} -I${ROOTDIR}/include"
+export CFLAGS="-miphoneos-version-min=${MIN_IOS_VERSION} -arch ${ARCH} -pipe -no-cpp-precomp -isysroot ${SDKROOT} -I${ROOTDIR}/include"
+export CXXFLAGS="-miphoneos-version-min=${MIN_IOS_VERSION} -arch ${ARCH} -pipe -no-cpp-precomp -isysroot ${SDKROOT} -I${ROOTDIR}/include"
 ./configure --prefix=${ROOTDIR}
 make
 make install
