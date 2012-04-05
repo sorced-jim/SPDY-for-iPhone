@@ -33,6 +33,7 @@
 		3889D69D15001BD400DDED3F /* EndToEndTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3889D69C15001BD400DDED3F /* EndToEndTests.m */; };
 		3889D6A1150022DC00DDED3F /* SpdyInputStreamTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3889D6A0150022DC00DDED3F /* SpdyInputStreamTests.m */; };
 		388C2EA21517CBB400DEDB34 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 388C2E9F1517CB7000DEDB34 /* SystemConfiguration.framework */; };
+		38CE176E152D270400C7F65D /* SpdyUrlConnectionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 38CE176D152D270400C7F65D /* SpdyUrlConnectionTest.m */; };
 		38D64ACD15223B2F00EF9CB6 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A212E14EC34C200262B13 /* libz.a */; };
 		38D64AED152244F300EF9CB6 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 380A213214EC360900262B13 /* CFNetwork.framework */; };
 		38D64AEE152244FB00EF9CB6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 388C2E9F1517CB7000DEDB34 /* SystemConfiguration.framework */; };
@@ -87,6 +88,8 @@
 		3889D69F150022DC00DDED3F /* SpdyInputStreamTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyInputStreamTests.h; sourceTree = "<group>"; };
 		3889D6A0150022DC00DDED3F /* SpdyInputStreamTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyInputStreamTests.m; sourceTree = "<group>"; };
 		388C2E9F1517CB7000DEDB34 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		38CE176C152D270400C7F65D /* SpdyUrlConnectionTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyUrlConnectionTest.h; sourceTree = "<group>"; };
+		38CE176D152D270400C7F65D /* SpdyUrlConnectionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyUrlConnectionTest.m; sourceTree = "<group>"; };
 		38D935B6152A417E00383797 /* SpdyUrlConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpdyUrlConnection.h; sourceTree = "<group>"; };
 		38D935B7152A417E00383797 /* SpdyUrlConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpdyUrlConnection.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -198,6 +201,8 @@
 				380A21A614F2FCBC00262B13 /* SpdySessionTests.m */,
 				3889D69F150022DC00DDED3F /* SpdyInputStreamTests.h */,
 				3889D6A0150022DC00DDED3F /* SpdyInputStreamTests.m */,
+				38CE176C152D270400C7F65D /* SpdyUrlConnectionTest.h */,
+				38CE176D152D270400C7F65D /* SpdyUrlConnectionTest.m */,
 				3889D69B15001BD400DDED3F /* EndToEndTests.h */,
 				3889D69C15001BD400DDED3F /* EndToEndTests.m */,
 				3870AF6C14E47F8E009D8118 /* Supporting Files */,
@@ -345,6 +350,7 @@
 				380A212A14EC312300262B13 /* SpdyStreamTests.m in Sources */,
 				3889D69D15001BD400DDED3F /* EndToEndTests.m in Sources */,
 				3889D6A1150022DC00DDED3F /* SpdyInputStreamTests.m in Sources */,
+				38CE176E152D270400C7F65D /* SpdyUrlConnectionTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,6 +1,6 @@
 //
 //  SpdyUrlConnection.h
-//  SPDY
+//  An implementation of NSURLProtocol for Spdy.
 //
 //  Created by Jim Morrison on 4/2/12.
 //  Copyright (c) 2012 Twist Inc. All rights reserved.
@@ -24,6 +24,9 @@
 + (void)registerSpdy;
 + (BOOL)isRegistered;
 + (void)unregister;
+
++ (void)disableUrl:(NSURL *)url;
++ (BOOL)canInitWithUrl:(NSURL *)url;
 
 @property (assign) id<SpdyRequestIdentifier> spdyIdentifier;
 @property (assign, readonly) BOOL cancelled;

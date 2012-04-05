@@ -1,6 +1,7 @@
 //
 //  SpdyUrlConnection.m
-//  SPDY
+//  NOTE: iOS makes a copy of the return value of responseWithURL:withResponse:withRequestBytes, so the original type is
+//  lost.
 //
 //  Created by Jim Morrison on 4/2/12.
 //  Copyright (c) 2012 Twist Inc. All rights reserved.
@@ -72,12 +73,7 @@ static NSMutableDictionary *disabledHosts;
 
 - (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier {
     NSURL *url = [identifier url];
-    NSMutableSet *ports = [disabledHosts objectForKey:[url host]];
-    if (ports == nil) {
-        ports = [NSMutableSet set];
-        [disabledHosts setObject:ports forKey:[url host]];
-    }
-    [ports addObject:[url port]];
+    [SpdyUrlConnection disableUrl:url];
     NSError *error = [NSError errorWithDomain:(NSString *)kSpdyErrorDomain code:kSpdyConnectionNotSpdy userInfo:nil];
     [[self.protocol client] URLProtocol:self.protocol didFailWithError:error];    
 }
@@ -131,13 +127,37 @@ static NSMutableDictionary *disabledHosts;
 }
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request {
-    BOOL isHttps = [[[[request URL] scheme] lowercaseString] isEqualToString:@"https"];
+    return [SpdyUrlConnection canInitWithUrl:[request URL]];
+}
+
++ (BOOL)canInitWithUrl:(NSURL *)url {
+    BOOL isHttps = [[[url scheme] lowercaseString] isEqualToString:@"https"];
     if (isHttps) {
-        NSSet *ports = [disabledHosts objectForKey:[[request URL] host]];
-        if (ports == nil || ![ports containsObject:[[request URL] port]])
-            return YES;
+        NSSet *ports = [disabledHosts objectForKey:[url host]];
+        if (ports != nil) {
+            NSNumber *port = [url port];
+            if (port == nil)
+                port = [NSNumber numberWithInt:443];
+            if ([ports containsObject:port])
+                return NO;
+        }
+        return YES;
     }
     return NO;
+}
+
++ (void)disableUrl:(NSURL *)url {
+    NSMutableSet *ports = [disabledHosts objectForKey:[url host]];
+    if (ports == nil) {
+        ports = [NSMutableSet set];
+        [disabledHosts setObject:ports forKey:[url host]];
+    }
+    if ([url port] == nil) {
+        [ports addObject:[NSNumber numberWithInt:80]];
+        [ports addObject:[NSNumber numberWithInt:443]];
+    } else {
+        [ports addObject:[url port]];
+    }
 }
 
 // This could be a good place to remove the connection headers.
