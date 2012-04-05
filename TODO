@@ -1,7 +1,0 @@
-- Close all connections on reachability change.
- - Or close the connection when all CFReadStreams are closed for
-   a given host.  This is like HTTP where the client needs to hold
-   on to a stream reference to keep a connection alive.  It's messy
-   but it works.
-- Pass in a timeout to SPDY:fetch.
-- Write tests for SpdySession
