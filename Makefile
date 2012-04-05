@@ -15,17 +15,17 @@ spdylay/configure: spdylay/configure.ac build/lib/libz.a build/lib/libcrypto.a
 	touch spdylay/configure
 
 build/armv7/lib/libspdylay.a: spdylay/configure ios-configure
-	cd spdylay && make clean
+	-cd spdylay && make clean
 	cd spdylay && ../ios-configure -p "$(BUILD)/armv7" -k $(PKG_CONFIG_PATH) iphone
 	cd spdylay && make install
 
 build/armv6/lib/libspdylay.a: spdylay/configure ios-configure
-	cd spdylay && make clean
+	-cd spdylay && make clean
 	cd spdylay && ../ios-configure -p "$(BUILD)/armv6" -k $(PKG_CONFIG_PATH) iphone-armv6
 	cd spdylay && make install
 
 build/i386/lib/libspdylay.a: spdylay/configure ios-configure
-	cd spdylay && make clean
+	-cd spdylay && make clean
 	cd spdylay && ../ios-configure -p "$(BUILD)/i386" -k $(PKG_CONFIG_PATH) simulator
 	cd spdylay && make install
 
