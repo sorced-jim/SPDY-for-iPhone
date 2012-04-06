@@ -369,7 +369,7 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
 }
 
 - (void)testNSURLRequest {
-    SpdyTestConnectionDelegate *delegate = [[[SpdyTestConnectionDelegate alloc] init] retain];
+    SpdyTestConnectionDelegate *delegate = [[SpdyTestConnectionDelegate alloc] init];
     NSURL *url = [NSURL URLWithString:@"https://localhost:9793/"];
     [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url]
                                   delegate:delegate];
@@ -385,13 +385,40 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
 }
 
 - (void)testNSURLRequestTimeout {
-    SpdyTestConnectionDelegate *delegate = [[[SpdyTestConnectionDelegate alloc] init] retain];
+    SpdyTestConnectionDelegate *delegate = [[SpdyTestConnectionDelegate alloc] init];
     NSURL *url = [NSURL URLWithString:@"https://localhost:9793/?spdyd_do_not_respond_to_req=yes"];
     [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:0.1]
                                   delegate:delegate];
     CFRunLoopRun();
     STAssertNotNil(delegate.error, @"Error: %@", delegate.error);
-    //STAssertEquals([delegate.connection class], [SpdyUrlConnection class], @"The response should be a spdy response: %@", delegate.connection);
+    STAssertTrue([delegate.error.domain isEqualToString:@"NSURLErrorDomain"], @"Unexpected error: %@", delegate.error);
+    STAssertTrue([[delegate.error.userInfo objectForKey:@"NSLocalizedDescription"] isEqualToString:@"The request timed out."], @"Error is: %@", delegate.error);
+    [delegate release];
+}
+
+// This test is disabled since it takes 240s seconds to complete.  Apple doesn't let overriding the timeout when a request has a body.
+- (void)DISABLED_testNSURLRequestTimeoutWithBody {
+    SpdyTestConnectionDelegate *delegate = [[SpdyTestConnectionDelegate alloc] init];
+    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/?spdyd_do_not_respond_to_req=yes"];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:0.1];
+    request.HTTPBody = [NSData dataWithBytes:"1234" length:4];
+    request.timeoutInterval = 0.2;
+    [NSURLConnection connectionWithRequest:request delegate:delegate];
+    CFRunLoopRun();
+    STAssertNotNil(delegate.error, @"Error: %@", delegate.error);
+    STAssertTrue([delegate.error.domain isEqualToString:@"NSURLErrorDomain"], @"Unexpected error: %@", delegate.error);
+    STAssertTrue([[delegate.error.userInfo objectForKey:@"NSLocalizedDescription"] isEqualToString:@"The request timed out."], @"Error is: %@", delegate.error);
+    [delegate release];
+}
+
+- (void)testNSURLRequestCancel {
+    SpdyTestConnectionDelegate *delegate = [[SpdyTestConnectionDelegate alloc] init];
+    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/?spdyd_do_not_respond_to_req=yes"];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:240];
+    NSConnection *connection = [NSURLConnection connectionWithRequest:request delegate:delegate];
+    CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ [connection cancel]; CFRunLoopStop(CFRunLoopGetCurrent()); });
+    CFRunLoopRun();
+    STAssertNil(delegate.error, @"Error: %@", delegate.error);
     [delegate release];
 }
 
