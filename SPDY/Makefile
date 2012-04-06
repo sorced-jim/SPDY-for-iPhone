@@ -1,6 +1,6 @@
 
 CONFIGURATION=Release
-LATEST_SDK=`xcodebuild -showsdks | grep iphoneos | sed -e 's/.*iphoneos//g' | tail -n 1`
+LATEST_SDK=$(shell xcodebuild -showsdks | grep iphoneos | sed -e 's/.*iphoneos//g' | tail -n 1)
 
 
 install: armv6 armv7 i386
@@ -13,8 +13,7 @@ check-%:
 	xcodebuild -configuration Debug -sdk iphonesimulator`echo $@ | sed -e 's/check-//'` -target SPDYTests
 
 check: check-$(LATEST_SDK)
-	xcodebuild -configuration Debug -sdk iphonesimulator5.0 clean
-	xcodebuild -configuration Debug -sdk iphonesimulator5.0 -target SPDYTests
+
 
 i386:
 	mkdir -p build/lib/i386

@@ -23,11 +23,15 @@
 
 @implementation SpdyStreamCallback
 
+@synthesize closeCalled;
+@synthesize error = _error;
+@synthesize responseHeaders;
+
 - (void)dealloc {
     if (responseHeaders != NULL) {
         CFRelease(responseHeaders);
     }
-    self.error = nil;
+    [_error release];
     [super dealloc];
 }
 
@@ -39,13 +43,9 @@
     self.responseHeaders = (CFHTTPMessageRef)CFRetain(headers);
 }
 
-- (void)onError:(CFErrorRef)e {
-    self.error = (NSError *)e;
+- (void)onError:(NSError *)e {
+    self.error = e;
 }
-
-@synthesize closeCalled;
-@synthesize error;
-@synthesize responseHeaders;
 
 @end
 

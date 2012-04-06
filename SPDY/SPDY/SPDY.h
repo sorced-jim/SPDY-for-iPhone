@@ -27,8 +27,8 @@
 // will be used.
 CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody);
 
-extern CFStringRef kSpdyErrorDomain;
-extern CFStringRef kOpenSSLErrorDomain;
+extern NSString *kSpdyErrorDomain;
+extern NSString *kOpenSSLErrorDomain;
 
 enum SpdyErrors {
     kSpdyConnectionOk = 0,
@@ -74,8 +74,7 @@ enum SpdyErrors {
 - (void)onStreamClose;
 - (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier;
 
-// TODO(jim): Change CFErrorRef to NSError *.
-- (void)onError:(CFErrorRef)error;
+- (void)onError:(NSError *)error;
 
 @end
 
@@ -84,7 +83,7 @@ enum SpdyErrors {
 
 // Derived classses should override these methods since BufferedCallback overrides the rest of the callbacks from RequestCallback.
 - (void)onResponse:(CFHTTPMessageRef)response;
-- (void)onError:(CFErrorRef)error;
+- (void)onError:(NSError *)error;
 
 @property (retain) NSURL *url;
 

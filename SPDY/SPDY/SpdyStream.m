@@ -113,9 +113,7 @@ static NSSet *headersNotToCopy = nil;
 
 - (void)cancelStream {
     streamClosed = YES;
-    CFErrorRef error = CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyRequestCancelled, NULL);
-    [delegate onError:error];
-    CFRelease(error);
+    [delegate onError:[NSError errorWithDomain:kSpdyErrorDomain code:kSpdyRequestCancelled userInfo:nil]];
 }
 
 - (void)close {
@@ -127,9 +125,7 @@ static NSSet *headersNotToCopy = nil;
 }
 
 - (void)connectionError {
-    CFErrorRef error = CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyConnectionFailed, NULL);
-    [delegate onError:error];
-    CFRelease(error);
+    [delegate onError:[NSError errorWithDomain:kSpdyErrorDomain code:kSpdyConnectionFailed userInfo:nil]];
 }
 
 - (NSMutableData *)createArena:(NSInteger)capacity {

@@ -67,14 +67,16 @@ static NSMutableDictionary *disabledHosts;
     }
 }
 
-- (void)onError:(CFErrorRef)error {
-    [[self.protocol client] URLProtocol:self.protocol didFailWithError:(NSError *)error];
+- (void)onError:(NSError *)error {
+    if (!self.protocol.cancelled) {
+        [[self.protocol client] URLProtocol:self.protocol didFailWithError:error];
+    }
 }
 
 - (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier {
     NSURL *url = [identifier url];
     [SpdyUrlConnection disableUrl:url];
-    NSError *error = [NSError errorWithDomain:(NSString *)kSpdyErrorDomain code:kSpdyConnectionNotSpdy userInfo:nil];
+    NSError *error = [NSError errorWithDomain:kSpdyErrorDomain code:kSpdyConnectionNotSpdy userInfo:nil];
     [[self.protocol client] URLProtocol:self.protocol didFailWithError:error];    
 }
 

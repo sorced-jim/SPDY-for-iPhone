@@ -50,7 +50,7 @@ static const int priority = 1;
 
 - (void)_cancelStream:(SpdyStream *)stream;
 - (NSError *)connectTo:(NSURL *)url;
-- (void)connectionFailed:(int)error domain:(CFStringRef)domain;
+- (void)connectionFailed:(NSInteger)error domain:(NSString *)domain;
 - (void)invalidateSocket;
 - (void)removeStream:(SpdyStream *)stream;
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags;
@@ -205,14 +205,13 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     }
 }
 
-- (void)connectionFailed:(int)error domain:(CFStringRef)domain {
+- (void)connectionFailed:(NSInteger)err domain:(NSString *)domain {
     self.connectState = ERROR;
     [self invalidateSocket];
-    CFErrorRef cfError = CFErrorCreate(kCFAllocatorDefault, domain, error, NULL);
+    NSError *error = [NSError errorWithDomain:domain code:err userInfo:nil];
     for (SpdyStream *value in streams) {
-        [value.delegate onError:cfError];
+        [value.delegate onError:error];
     }
-    CFRelease(cfError);
 }
 
 - (void)_cancelStream:(SpdyStream *)stream {
@@ -233,8 +232,10 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         [self _cancelStream:stream];
     }
     [streams removeAllObjects];
-    spdylay_submit_goaway(session, SPDYLAY_GOAWAY_OK);
-    spdylay_session_send(self.session);
+    if (session != nil) {
+        spdylay_submit_goaway(session, SPDYLAY_GOAWAY_OK);
+        spdylay_session_send(session);
+    }
     return cancelledStreams;
 }
 
@@ -286,7 +287,12 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     }
     if (r == 0) {
         self.connectState = ERROR;
-        [self connectionFailed:SSL_get_error(ssl, r) domain:kOpenSSLErrorDomain];
+        NSInteger oldErrno = errno;
+        NSInteger err = SSL_get_error(ssl, r);
+        if (err == SSL_ERROR_SYSCALL)
+            [self connectionFailed:oldErrno domain:(NSString *)kCFErrorDomainPOSIX];
+        else
+            [self connectionFailed:err domain:kOpenSSLErrorDomain];
         [self invalidateSocket];
     }
     return NO;
@@ -363,7 +369,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     r = SSL_read(ssl, data, (int)len);
     if (r == 0) {
         NSLog(@"Closing connection from read = 0");
-        [self connectionFailed:ECONNRESET domain:kCFErrorDomainPOSIX];
+        [self connectionFailed:ECONNRESET domain:(NSString *)kCFErrorDomainPOSIX];
         [self invalidateSocket];
     }
     return r;
@@ -397,7 +403,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
     int r = SSL_write(ssl, data, (int)len);
     if (r == 0) {
         NSLog(@"Closing connection from write = 0");
-        [self connectionFailed:ECONNRESET domain:kCFErrorDomainPOSIX];
+        [self connectionFailed:ECONNRESET domain:(NSString *)kCFErrorDomainPOSIX];
         [self invalidateSocket];
     }
     return r;
@@ -495,7 +501,7 @@ static void sessionCallBack(CFSocketRef s,
     if (session.connectState == CONNECTING) {
         if (data != NULL) {
             int e = *(int *)data;
-            [session connectionFailed:e domain:kCFErrorDomainPOSIX];
+            [session connectionFailed:e domain:(NSString *)kCFErrorDomainPOSIX];
             return;
         }
         session.connectState = SSL_HANDSHAKE;

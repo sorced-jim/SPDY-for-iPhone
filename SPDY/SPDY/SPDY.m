@@ -37,8 +37,8 @@
 
 // The shared spdy instance.
 static SPDY *spdy = NULL;
-CFStringRef kSpdyErrorDomain = CFSTR("SpdyErrorDomain");
-CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
+NSString *kSpdyErrorDomain = @"SpdyErrorDomain";
+NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 
 @interface SessionKey : NSObject<NSCopying>
 - (SessionKey *)initFromUrl:(NSURL *)url;
@@ -145,15 +145,14 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
 - (void)fetch:(NSString *)url delegate:(RequestCallback *)delegate {
     NSURL *u = [NSURL URLWithString:url];
     if (u == nil || u.host == nil) {
-        CFErrorRef error = CFErrorCreate(kCFAllocatorDefault, kCFErrorDomainCFNetwork, kCFHostErrorHostNotFound, NULL);
+        NSError *error = [NSError errorWithDomain:(NSString *)kCFErrorDomainCFNetwork code:kCFHostErrorHostNotFound userInfo:nil];
         [delegate onError:error];
-        CFRelease(error);
         return;
     }
     NSError *error;
     SpdySession *session = [self getSession:u withError:&error];
     if (session == nil) {
-        [delegate onError:(CFErrorRef)error];
+        [delegate onError:error];
         return;
     }
     [session fetch:u delegate:delegate];
@@ -168,7 +167,7 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
     NSError *error;
     SpdySession *session = [self getSession:(NSURL *)url withError:&error];
     if (session == nil) {
-        [delegate onError:(CFErrorRef)error];
+        [delegate onError:error];
     } else {
         [session fetchFromMessage:request delegate:delegate body:body];
     }
@@ -180,7 +179,7 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
     NSError *error;
     SpdySession *session = [self getSession:(NSURL *)url withError:&error];
     if (session == nil) {
-        [delegate onError:(CFErrorRef)error];
+        [delegate onError:error];
     } else {
         [session fetchFromRequest:request delegate:delegate];
     }
@@ -245,7 +244,7 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
 }
 
-- (void)onError:(CFErrorRef)error {
+- (void)onError:(NSError *)error {
     
 }
 
@@ -320,7 +319,7 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
     
 }
 
-- (void)onError:(CFErrorRef)error {
+- (void)onError:(NSError *)error {
     
 }
 @end
@@ -400,11 +399,11 @@ CFStringRef kOpenSSLErrorDomain = CFSTR("OpenSSLErrorDomain");
 }
 
 - (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier {
-    self.readStreamPair.error = [NSMakeCollectable(CFErrorCreate(kCFAllocatorDefault, kSpdyErrorDomain, kSpdyConnectionNotSpdy, NULL)) autorelease];
+    self.readStreamPair.error = [NSError errorWithDomain:kSpdyErrorDomain code:kSpdyConnectionNotSpdy userInfo:[NSDictionary dictionaryWithObject:[identifier url] forKey:@"url"]];
 }
 
-- (void)onError:(CFErrorRef)error_code {
-    self.readStreamPair.error = (NSError *)error_code;
+- (void)onError:(NSError *)error_code {
+    self.readStreamPair.error = error_code;
     self.opened = NO;
 }
 

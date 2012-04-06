@@ -25,11 +25,11 @@ static CFHTTPMessageRef createHttpMessage() {
 
 @implementation ShowBody
 
-- (void)onError:(CFErrorRef)error {
-    NSLog(@"Got an error!");
+- (void)onError:(NSError *)error {
+    NSLog(@"Got an error: %@", error);
 }
 
-- (void)onNotSpdyError:(id<SpdyRequestIdentifier)identifier {
+- (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier {
     NSLog(@"Not spdy!");
 }
 

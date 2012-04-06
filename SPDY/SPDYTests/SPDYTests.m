@@ -9,25 +9,22 @@
 #import "SPDYTests.h"
 #import "SPDY.h"
 
-@interface CountError : RequestCallback {
-    CFErrorRef error;
-}
+@interface CountError : RequestCallback
 @property BOOL onErrorCalled;
-@property (assign) CFErrorRef error;
+@property (retain) NSError *error;
 @end
 
 @implementation CountError
 @synthesize onErrorCalled;
-@synthesize error;
+@synthesize error = _error;
 
--(void)onError:(CFErrorRef)e {
-    error = e;
-    CFRetain(error);
+-(void)onError:(NSError *)error {
+    self.error = error;
     self.onErrorCalled = YES;
 }
 
 - (void)dealloc {
-    CFRelease(error);
+    [_error release];
     [super dealloc];
 }
 @end
@@ -35,12 +32,12 @@
 @implementation SPDYTests
 
 - (void)testFetchNoHost {
-    CountError *count = [[[CountError alloc]init]autorelease];
-    SPDY *spdy = [[[SPDY alloc]init] autorelease];
+    CountError *count = [[[CountError alloc] init] autorelease];
+    SPDY *spdy = [[[SPDY alloc] init] autorelease];
     [spdy fetch:@"go" delegate:count];
     STAssertTrue(count.onErrorCalled, @"onError was called.");
-    STAssertEquals(kCFErrorDomainCFNetwork, CFErrorGetDomain(count.error), @"CFNetwork error domain");
-    STAssertEquals((CFIndex)kCFHostErrorHostNotFound, CFErrorGetCode(count.error), @"Host not found error.");
+    STAssertEquals((NSString *)kCFErrorDomainCFNetwork, count.error.domain, @"CFNetwork error domain");
+    STAssertEquals((NSInteger)kCFHostErrorHostNotFound, count.error.code, @"Host not found error.");
 }
 
 @end

@@ -31,7 +31,8 @@
     [fetchedUrl.parent reloadData];
 }
 
-- (void)onError:(CFErrorRef)error {
+- (void)onError:(NSError *)error {
+    NSLog(@"Got error: %@", error);
     fetchedUrl.state = @"Error";
     [fetchedUrl.parent reloadData];
 }

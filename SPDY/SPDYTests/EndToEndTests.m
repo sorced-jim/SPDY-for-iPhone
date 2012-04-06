@@ -28,7 +28,13 @@ static const int port = 9783;
 
 @implementation E2ECallback
 
+@synthesize error = _error;
+@synthesize closeCalled;
+@synthesize responseHeaders;
+@synthesize skipTests;
+
 - (void)dealloc {
+    [_error release];
     if (responseHeaders != NULL) {
         CFRelease(responseHeaders);
     }
@@ -50,10 +56,10 @@ static const int port = 9783;
     self.responseHeaders = (CFHTTPMessageRef)CFRetain(headers);
 }
 
-- (void)onError:(CFErrorRef)e {
-    NSLog(@"Got error %@, will exit loop.", (NSError *)e);
+- (void)onError:(NSError *)error {
+    NSLog(@"Got error %@, will exit loop.", error);
     if (self.error == nil) {
-        self.error = (NSError *)e;
+        self.error = error;
         CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ CFRunLoopStop(CFRunLoopGetCurrent()); });
     }
 }
@@ -62,11 +68,6 @@ static const int port = 9783;
     NSLog(@"Not connecting to a spdy server.");
     CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ CFRunLoopStop(CFRunLoopGetCurrent()); });
 }
-
-@synthesize error;
-@synthesize closeCalled;
-@synthesize responseHeaders;
-@synthesize skipTests;
 
 @end
 
