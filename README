@@ -41,3 +41,9 @@ Build errors
 ./configure: line 15731: `PKG_PROG_PKG_CONFIG(0.20)'
 
  - Solution: Go back and install pkgconfig and delete spdylay/configure.
+
+- Test button doesn't work in xcode 4.3.1
+ - Problem:
+  Lexical or Preprocessor issue
+  NS_AVAILABLE' macro redefined
+ - Solution: Run the tests with make check from the command line.
