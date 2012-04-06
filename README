@@ -30,3 +30,14 @@ To build build the external libraries and libSPDY.a run the following commands:
 $ git submodule init
 $ git submodule update
 $ make
+
+
+==========================================================================
+Build errors
+==========================================================================
+- Syntax error in configure
+ - Problem:
+./configure: line 15731: syntax error near unexpected token `0.20'
+./configure: line 15731: `PKG_PROG_PKG_CONFIG(0.20)'
+
+ - Solution: Go back and install pkgconfig and delete spdylay/configure.
