@@ -38,7 +38,6 @@ enum SpdyNetworkStatus {
 };
 
 @interface SpdySession : NSObject {
-    NSURL *host;
     struct spdylay_session *session;
     
     BOOL spdyNegotiated;

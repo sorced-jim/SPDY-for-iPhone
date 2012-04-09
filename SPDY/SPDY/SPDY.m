@@ -52,8 +52,8 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 @end
 
 @implementation SessionKey
-@synthesize host;
-@synthesize port;
+@synthesize host = _host;
+@synthesize port = _port;
 
 - (SessionKey *)initFromUrl:(NSURL *)url {
     self.host = url.host;
@@ -62,13 +62,17 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 }
 
 - (void)dealloc {
-    self.host = nil;
-    self.port = nil;
+    [_host release];
+    [_port release];
     [super dealloc];
 }
 
+- (NSString *)description {
+    return [NSString stringWithFormat:@"%@ %@:%@ (%u)", [super description], self.host, self.port, [self hash]];
+}
+
 - (NSUInteger)hash {
-    return [host hash] + [port hash];
+    return [self.host hash] + [self.port hash];
 }
 
 - (BOOL)isEqual:(id)other {
@@ -80,7 +84,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 }
 
 - (BOOL)isEqualToKey:(SessionKey *)other {
-    return [host isEqualToString:other.host] && [port isEqualToNumber:other.port];
+    return [self.host isEqualToString:other.host] && [self.port isEqualToNumber:other.port];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -138,8 +142,10 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (SpdySession *)getSession:(NSURL *)url withError:(NSError **)error {
     SessionKey *key = [[[SessionKey alloc] initFromUrl:url] autorelease];
     SpdySession *session = [sessions objectForKey:key];
+    SPDY_LOG(@"Looking up %@, found %@", key, session);
     enum SpdyNetworkStatus currentStatus = [self.class reachabilityStatusForHost:key.host];
     if (session != nil && ([session isInvalid] || currentStatus != session.networkStatus)) {
+        SPDY_LOG(@"Resetting %@ because invalid: %i or %d != %d", session, [session isInvalid], currentStatus, session.networkStatus);
         [session resetStreamsAndGoAway];
         [sessions removeObjectForKey:key];
         session = nil;

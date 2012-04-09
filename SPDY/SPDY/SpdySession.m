@@ -327,7 +327,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 
 
 - (NSError *)connect:(NSURL *)h {
-    [self setHost:h];
+    self.host = h;
     return [self connectTo:h];
 }
 
@@ -491,7 +491,7 @@ static void before_ctrl_send_callback(spdylay_session *session, spdylay_frame_ty
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ host: %@, spdyVersion=%d, state=%d", [super description], host, self.spdyVersion, self.connectState];
+    return [NSString stringWithFormat:@"%@ host: %@, spdyVersion=%d, state=%d, networkStatus: %d", [super description], host, self.spdyVersion, self.connectState, self.networkStatus];
 }
 @end
 
