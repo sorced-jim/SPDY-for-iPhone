@@ -117,7 +117,7 @@ static int select_next_proto_cb(SSL *ssl,
 }
 
 - (void)sslError {
-    NSLog(@"%s", ERR_error_string(ERR_get_error(), 0));
+    SPDY_LOG(@"%s", ERR_error_string(ERR_get_error(), 0));
     [self invalidateSocket];
 }
 
@@ -161,16 +161,16 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     hints.ai_socktype = SOCK_STREAM;
     
     struct addrinfo *res;
+    SPDY_LOG(@"Looking up hostname for %@", [url host]);
     int err = getaddrinfo([[url host] UTF8String], service, &hints, &res);
     if (err != 0) {
         NSError *error;
         if (err == EAI_SYSTEM) {
-            NSLog(@"Die here.");
             error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
         } else {
-            NSLog(@"Die other.");
             error = [NSError errorWithDomain:@"kCFStreamErrorDomainNetDB" code:err userInfo:nil];
         }
+        SPDY_LOG(@"Error getting IP address for %@ (%@)", url, error);
         self.connectState = ERROR;
         return error;
     }
@@ -256,7 +256,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         data_prd.read_callback = read_from_data_callback;
     }
     if (spdylay_submit_request(session, priority, [stream nameValues], &data_prd, stream) < 0) {
-        NSLog(@"Failed to submit request.");
+        SPDY_LOG(@"Failed to submit request for %@", stream);
         [stream connectionError];
         return NO;
     }
@@ -368,7 +368,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     int r;
     r = SSL_read(ssl, data, (int)len);
     if (r == 0) {
-        NSLog(@"Closing connection from read = 0");
+        SPDY_LOG(@"Closing connection from read = 0");
         [self connectionFailed:ECONNRESET domain:(NSString *)kCFErrorDomainPOSIX];
         [self invalidateSocket];
     }
@@ -402,7 +402,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags {
     int r = SSL_write(ssl, data, (int)len);
     if (r == 0) {
-        NSLog(@"Closing connection from write = 0");
+        SPDY_LOG(@"Closing connection from write = 0");
         [self connectionFailed:ECONNRESET domain:(NSString *)kCFErrorDomainPOSIX];
         [self invalidateSocket];
     }
@@ -423,6 +423,7 @@ static void on_data_chunk_recv_callback(spdylay_session *session, uint8_t flags,
 
 static void on_stream_close_callback(spdylay_session *session, int32_t stream_id, spdylay_status_code status_code, void *user_data) {
     SpdyStream *stream = spdylay_session_get_stream_user_data(session, stream_id);
+    SPDY_LOG(@"Stream closed %@, because spdylay_status_code=%d", stream, status_code);
     [stream closeStream];
     SpdySession *ss = (SpdySession *)user_data;
     [ss removeStream:stream];
@@ -441,6 +442,7 @@ static void before_ctrl_send_callback(spdylay_session *session, spdylay_frame_ty
         spdylay_syn_stream *syn = &frame->syn_stream;
         SpdyStream *stream = spdylay_session_get_stream_user_data(session, syn->stream_id);
         [stream setStreamId:syn->stream_id];
+        SPDY_LOG(@"Sending SYN_STREAM for %@", stream);
         [stream.delegate onConnect:stream];
     }
 }
@@ -487,6 +489,10 @@ static void before_ctrl_send_callback(spdylay_session *session, spdylay_frame_ty
     free(callbacks);
     [super dealloc];
 }
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"%@ host: %@, spdyVersion=%d, state=%d", [super description], host, self.spdyVersion, self.connectState];
+}
 @end
 
 static void sessionCallBack(CFSocketRef s,
@@ -504,6 +510,7 @@ static void sessionCallBack(CFSocketRef s,
             [session connectionFailed:e domain:(NSString *)kCFErrorDomainPOSIX];
             return;
         }
+        SPDY_LOG(@"Connected to %@", info);
         session.connectState = SSL_HANDSHAKE;
         if (![session sslConnect]) {
             return;

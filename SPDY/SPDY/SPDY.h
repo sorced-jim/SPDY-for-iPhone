@@ -42,6 +42,12 @@ enum SpdyErrors {
 - (void)close;
 @end
 
+// The SpdyLogger protocol is used to log from the spdy library.  The default SpdyLogger prints out ugly logs with NSLog.  You'll probably
+// want to override the default.
+@protocol SpdyLogger
+- (void)writeSpdyLog:(NSString *)format file:(const char *)file line:(int)line, ...;
+@end
+
 @interface SPDY : NSObject
 
 + (SPDY *)sharedSPDY;
@@ -61,6 +67,7 @@ enum SpdyErrors {
 // Cancels all active requests and closes all connections.  Returns the number of requests that were cancelled.  Ideally this should be called when all requests have already been canceled.
 - (NSInteger)closeAllSessions;
 
+@property (retain) NSObject<SpdyLogger> *logger;
 @end
 
 @interface RequestCallback : NSObject {
@@ -88,3 +95,8 @@ enum SpdyErrors {
 @property (retain) NSURL *url;
 
 @end
+
+#define SPDY_LOG(fmt, ...) do { \
+  [[SPDY sharedSPDY].logger writeSpdyLog:fmt file:__FILE__ line:__LINE__, ##__VA_ARGS__];\
+  if (0) NSLog(fmt, ## __VA_ARGS__); \
+} while (0);

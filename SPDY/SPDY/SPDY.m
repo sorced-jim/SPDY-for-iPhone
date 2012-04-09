@@ -92,14 +92,31 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 
 @end
 
+@interface SpdyLogImpl : NSObject<SpdyLogger>
+@end
+
+@implementation SpdyLogImpl
+- (void)writeSpdyLog:(NSString *)format file:(const char *)file line:(int)line, ... {
+    NSLog(@"[%s:%d]", file, line);
+
+    va_list args;
+    va_start(args, line);
+    NSLogv(format, args);
+    va_end(args);
+}
+@end
+
 @interface SPDY ()
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body;
 + (enum SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host;
+
 @end
 
 @implementation SPDY {
     NSMutableDictionary *sessions;
 }
+
+@synthesize logger = _logger;
 
 + (enum SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host {	
 	SCNetworkReachabilityRef ref = SCNetworkReachabilityCreateWithName(NULL, [host UTF8String]);
@@ -117,7 +134,6 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
     }
     return kSpdyNotReachable;
 }
-
 
 - (SpdySession *)getSession:(NSURL *)url withError:(NSError **)error {
     SessionKey *key = [[[SessionKey alloc] initFromUrl:url] autorelease];
@@ -199,11 +215,15 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 
 - (SPDY *)init {
     self = [super init];
-    sessions = [[NSMutableDictionary alloc]init];
+    if (self) {
+        sessions = [[NSMutableDictionary alloc] init];
+        self.logger = [[[SpdyLogImpl alloc] init] autorelease];
+    }
     return self;
 }
 
 - (void)dealloc {
+    [_logger release];
     [sessions release];
     [super dealloc];
 }

@@ -143,6 +143,7 @@ static NSMutableDictionary *disabledHosts;
             if ([ports containsObject:port])
                 return NO;
         }
+        SPDY_LOG(@"Can use spdy for: %@", url);
         return YES;
     }
     return NO;
@@ -154,6 +155,7 @@ static NSMutableDictionary *disabledHosts;
         ports = [NSMutableSet set];
         [disabledHosts setObject:ports forKey:[url host]];
     }
+    SPDY_LOG(@"Disabling spdy for %@", url);
     if ([url port] == nil) {
         [ports addObject:[NSNumber numberWithInt:80]];
         [ports addObject:[NSNumber numberWithInt:443]];
@@ -178,8 +180,10 @@ static NSMutableDictionary *disabledHosts;
     if (self.closed)
         return;
     self.cancelled = YES;
-    if (self.spdyIdentifier != nil)
+    if (self.spdyIdentifier != nil) {
+        SPDY_LOG(@"Cancelling request for %@", self.spdyIdentifier.url);
         [self.spdyIdentifier close];
+    }
 }
 
 @end

@@ -81,6 +81,10 @@ static NSSet *headersNotToCopy = nil;
     [super dealloc];
 }
 
+- (NSString *)description {
+    return [NSString stringWithFormat:@"%@: %@, streamId=%d", [super description], self.url, self.streamId];
+}
+
 - (void)parseHeaders:(const char **)nameValuePairs {
     while (*nameValuePairs != NULL && *(nameValuePairs+1) != NULL) {
         CFStringRef key = CFStringCreateWithCString(NULL, nameValuePairs[0], kCFStringEncodingUTF8);
@@ -135,7 +139,7 @@ static NSSet *headersNotToCopy = nil;
 
 - (void)fixArena:(NSInteger)length {
     if ([self.stringArena length] + length > arenaCapacity) {
-        NSLog(@"Adding an arena. %d > %d", [self.stringArena length] + length, arenaCapacity);
+        SPDY_LOG(@"Adding an arena. %d > %d", [self.stringArena length] + length, arenaCapacity);
         if (arenas == nil) {
             arenas = [[NSMutableArray alloc]initWithCapacity:2];
         }
