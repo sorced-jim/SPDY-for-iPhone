@@ -84,7 +84,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 }
 
 - (BOOL)isEqualToKey:(SessionKey *)other {
-    return [self.host isEqualToString:other.host] && [self.port isEqualToNumber:other.port];
+    return [self.host isEqualToString:other.host] && (self.port == other.port || [self.port isEqualToNumber:other.port]);
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -154,9 +154,10 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
         session = [[[SpdySession alloc] init] autorelease];
         *error = [session connect:url];
         if (*error != nil) {
-            NSLog(@"Could not connect to %@ because %@", url, *error);
+            SPDY_LOG(@"Could not connect to %@ because %@", url, *error);
             return nil;
         }
+        SPDY_LOG(@"Adding %@ to sessions (size = %u)", key, [sessions count] + 1);
         session.networkStatus = currentStatus;
         [sessions setObject:session forKey:key];
         [session addToLoop];
