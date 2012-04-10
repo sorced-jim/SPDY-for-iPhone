@@ -231,7 +231,6 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     for (SpdyStream *stream in streams) {
         [self _cancelStream:stream];
     }
-    [streams removeAllObjects];
     if (session != nil) {
         spdylay_submit_goaway(session, SPDYLAY_GOAWAY_OK);
         spdylay_session_send(session);
@@ -346,7 +345,6 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     SpdyStream *stream = [[SpdyStream newFromNSURL:u delegate:delegate] autorelease];
     [self addStream:stream];
 }
-
 
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body {
     SpdyStream *stream = [[SpdyStream newFromCFHTTPMessage:request delegate:delegate body:body] autorelease];

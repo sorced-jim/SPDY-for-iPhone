@@ -47,6 +47,7 @@
     self.file = file;
     self.line = line;
     va_end(args);
+    NSLog(@"[%s:%d] %@", self.file, self.line, self.lastLogLine);
 }
 
 @end
