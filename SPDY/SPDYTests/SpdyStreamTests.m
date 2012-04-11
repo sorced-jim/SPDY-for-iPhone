@@ -100,7 +100,22 @@ static int countItems(const char **nv) {
     
     STAssertNil(stream.body, @"No body for NSURL.");
 }
-
+- (void)testNameValuePairsWithPort {
+    stream = [SpdyStream newFromNSURL:[NSURL URLWithString:@"ftp://bar:27/asd;212?12=3"] delegate:self.delegate];
+    const char **nv = [stream nameValues];
+    int items = countItems(nv);
+    STAssertEquals(12, items, @"There should only be 6 pairs");
+    STAssertEquals(0, items % 2, @"There must be an even number of pairs.");
+    STAssertEquals(0, strcmp(nv[0], ":method"), @"First value is not method");
+    STAssertEquals(0, strcmp(nv[1], "GET"), @"A NSURL uses get");
+    STAssertEquals(0, strcmp(nv[2], ":scheme"), @"The scheme exists");
+    STAssertEquals(0, strcmp(nv[3], "ftp"), @"It's pulled from the url.");
+    STAssertEquals(0, strcmp(nv[4], ":path"), @"");
+    STAssertEquals(0, strcmp(nv[5], "/asd;212?12=3"), @"The path and query parameters must be in the url.");
+    STAssertEquals(0, strcmp(nv[6], ":host"), @"The host is separate.");
+    STAssertEquals(0, strcmp(nv[7], "bar"), @"No www here.");
+}
+    
 - (void)testCloseStream {
     stream = [SpdyStream newFromNSURL:self.url delegate:self.delegate];
     [stream closeStream];
