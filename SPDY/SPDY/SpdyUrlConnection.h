@@ -14,7 +14,7 @@
 @property (retain) NSDictionary *allHeaderFields;
 @property (assign) NSInteger requestBytes;
 
-+ (NSURLResponse *)responseWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers withRequestBytes:(NSInteger)requestBytesSent;
++ (NSHTTPURLResponse *)responseWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers withRequestBytes:(NSInteger)requestBytesSent;
 @end
 
 @interface SpdyUrlConnection : NSURLProtocol

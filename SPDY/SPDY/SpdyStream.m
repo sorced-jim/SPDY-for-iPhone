@@ -29,6 +29,7 @@ static NSSet *headersNotToCopy = nil;
 - (NSMutableData *)createArena:(NSInteger)capacity;
 - (int)serializeUrl:(NSURL *)url withMethod:(NSString *)method withVersion:(NSString *)version;
 - (int)serializeHeadersDict:(NSDictionary *)headers fromIndex:(int)index;
+- (CFHTTPMessageRef)newResponseMessage:(const char **)nameValuePairs;
 
 @property (retain) NSMutableData *stringArena;
 @property (retain) NSURL *url;
@@ -36,7 +37,6 @@ static NSSet *headersNotToCopy = nil;
 @end
 
 @implementation SpdyStream {
-    CFHTTPMessageRef response;
     NSMutableArray *arenas;
     NSInteger arenaCapacity;
 }
@@ -60,7 +60,6 @@ static NSSet *headersNotToCopy = nil;
     if (self == nil) {
         return nil;
     }
-    response = CFHTTPMessageCreateEmpty(NULL, NO);
     streamClosed = NO;
     self.body = nil;
     self.streamId = -1;
@@ -74,9 +73,7 @@ static NSSet *headersNotToCopy = nil;
     self.body = nil;
     self.stringArena = nil;
     self.parentSession = nil;
-    if (arenas != nil) {
-        [arenas release];
-    }
+    [arenas release];
     free(nameValues);
     [super dealloc];
 }
@@ -85,7 +82,43 @@ static NSSet *headersNotToCopy = nil;
     return [NSString stringWithFormat:@"%@: %@, streamId=%d", [super description], self.url, self.streamId];
 }
 
+- (CFHTTPMessageRef)newResponseMessage:(const char **)nameValuePairs {
+    CFIndex statusCode = -1;
+    CFStringRef statusDescription = CFSTR("");
+    CFStringRef httpVersion = NULL;
+    while (*nameValuePairs != NULL && *(nameValuePairs + 1) != NULL) {
+        if (strcmp(nameValuePairs[0], ":status") == 0) {
+            char *description;
+            statusCode = strtol(nameValuePairs[1], &description, 10);
+            if (statusDescription != NULL)
+                CFRelease(statusDescription);
+            statusDescription = CFStringCreateWithCString(kCFAllocatorSystemDefault, description, kCFStringEncodingUTF8);
+        }
+        if (nameValuePairs[0] && strcmp(nameValuePairs[0], ":version") == 0) {
+            if (httpVersion != NULL)
+                CFRelease(httpVersion);
+            httpVersion = CFStringCreateWithCString(kCFAllocatorSystemDefault, nameValuePairs[1], kCFStringEncodingASCII);
+        }
+        nameValuePairs += 2;
+        if (statusCode > 0 && httpVersion != NULL)
+            break;
+    }
+    CFHTTPMessageRef response = NULL;
+    if (statusCode > 0 && httpVersion)
+        response = CFHTTPMessageCreateResponse(kCFAllocatorSystemDefault, statusCode, statusDescription, httpVersion);
+    if (statusDescription != NULL)
+        CFRelease(statusDescription);
+    if (httpVersion != NULL)
+        CFRelease(httpVersion);
+    return response;
+}
+
 - (void)parseHeaders:(const char **)nameValuePairs {
+    CFHTTPMessageRef response = [self newResponseMessage:nameValuePairs];
+    if (response == NULL) {
+        [delegate onError:[NSError errorWithDomain:kSpdyErrorDomain code:kSpdyInvalidResponseHeaders userInfo:nil]];
+        return;
+    }
     while (*nameValuePairs != NULL && *(nameValuePairs+1) != NULL) {
         CFStringRef key = CFStringCreateWithCString(NULL, nameValuePairs[0], kCFStringEncodingUTF8);
         CFStringRef value = CFStringCreateWithCString(NULL, nameValuePairs[1], kCFStringEncodingUTF8);
@@ -102,6 +135,7 @@ static NSSet *headersNotToCopy = nil;
     }
     assert(CFHTTPMessageAppendBytes(response, (const UInt8 *)"\r\n", 2));
     [delegate onResponseHeaders:response];
+    CFRelease(response);
 }
 
 - (size_t)writeBytes:(const uint8_t *)bytes len:(size_t)length {
@@ -141,7 +175,7 @@ static NSSet *headersNotToCopy = nil;
     if ([self.stringArena length] + length > arenaCapacity) {
         SPDY_LOG(@"Adding an arena. %d > %d", [self.stringArena length] + length, arenaCapacity);
         if (arenas == nil) {
-            arenas = [[NSMutableArray alloc]initWithCapacity:2];
+            arenas = [[NSMutableArray alloc] initWithCapacity:2];
         }
         [arenas addObject:self.stringArena];
 
@@ -189,7 +223,8 @@ static NSSet *headersNotToCopy = nil;
     nv[4] = ":path";
     const char* pathPlus = [self copyString:[url resourceSpecifier]];
     const char* host = [self copyString:[url host]];
-    nv[5] = pathPlus + strlen(host) + 2;
+    int portLength = [url port] ? [[[url port] stringValue] length] + 1 : 0;
+    nv[5] = pathPlus + strlen(host) + 2 + portLength;
     nv[6] = ":host";
     nv[7] = host;
     nv[8] = ":version";

@@ -35,6 +35,7 @@ enum SpdyErrors {
     kSpdyConnectionFailed = 1,
     kSpdyRequestCancelled = 2,
     kSpdyConnectionNotSpdy = 3,
+    kSpdyInvalidResponseHeaders = 4,
 };
 
 @protocol SpdyRequestIdentifier

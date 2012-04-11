@@ -9,6 +9,7 @@
 
 #import "SpdyUrlConnection.h"
 #import "SPDY.h"
+#include "zlib.h"
 
 // This is actually a dictionary of sets.  The first set is the host names, the second is a set of ports.
 static NSMutableDictionary *disabledHosts;
@@ -19,7 +20,7 @@ static NSMutableDictionary *disabledHosts;
 @synthesize allHeaderFields = _allHeaderFields;
 @synthesize requestBytes = _requestBytes;
 
-+ (NSURLResponse *)responseWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers withRequestBytes:(NSInteger)requestBytesSent {
++ (NSHTTPURLResponse *)responseWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers withRequestBytes:(NSInteger)requestBytesSent {
     NSMutableDictionary *headersDict = [[[NSMakeCollectable(CFHTTPMessageCopyAllHeaderFields(headers)) autorelease] mutableCopy] autorelease];
     [headersDict setObject:@"YES" forKey:@"protocol-was: spdy"];
     NSNumberFormatter *f = [[[NSNumberFormatter alloc] init] autorelease];
@@ -32,8 +33,7 @@ static NSMutableDictionary *disabledHosts;
         return [[[NSHTTPURLResponse alloc] initWithURL:url statusCode:statusCode  HTTPVersion:version headerFields:headersDict] autorelease];
     }
     
-    SpdyUrlResponse *response = [[SpdyUrlResponse alloc] autorelease];
-    [response initWithURL:url MIMEType:contentType expectedContentLength:[length intValue] textEncodingName:nil];
+    SpdyUrlResponse *response = [[[SpdyUrlResponse alloc] initWithURL:url MIMEType:contentType expectedContentLength:[length intValue] textEncodingName:nil] autorelease];
     response.statusCode = statusCode;
     response.allHeaderFields = headersDict;
     response.requestBytes = requestBytesSent;
@@ -87,7 +87,7 @@ static NSMutableDictionary *disabledHosts;
 }
 
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
-    NSURLResponse *response = [SpdyUrlResponse responseWithURL:[self.protocol.spdyIdentifier url] withResponse:headers withRequestBytes:self.requestBytesSent];
+    NSHTTPURLResponse *response = [SpdyUrlResponse responseWithURL:[self.protocol.spdyIdentifier url] withResponse:headers withRequestBytes:self.requestBytesSent];
     [[self.protocol client] URLProtocol:self.protocol didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 }
 
@@ -166,9 +166,7 @@ static NSMutableDictionary *disabledHosts;
 
 // This could be a good place to remove the connection headers.
 + (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
-    NSMutableURLRequest *spdyRequest = [request mutableCopy];
-    [NSURLProtocol setProperty:[NSNumber numberWithBool:YES] forKey:@"spdy" inRequest:spdyRequest];
-    return spdyRequest;
+    return request;
 }
 
 - (void)startLoading {

@@ -14,10 +14,10 @@ _PORT = 9793
 
 
 def _run_server(builddir, testdata, port):
-  base_args = ['%s/spdyd' % builddir, '-d', testdata]
+  base_args = ['%s/spdyd' % builddir, '-d', os.path.normpath(testdata), '-v']
   base_args.extend([str(port), '%s/privkey.pem' % testdata,
                     '%s/cacert.pem' % testdata])
-  return subprocess.Popen(base_args)
+  return subprocess.Popen(base_args, stdout=open('/tmp/spdyd-log', 'w'))
 
 def _check_server_up(builddir, port):
   # Check this check for now.

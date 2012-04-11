@@ -195,6 +195,8 @@ static int countItems(const char **nv) {
 - (void)testParseHeaders {
     stream = [SpdyStream newFromNSURL:self.url delegate:self.delegate];
     static const char* nameValues[] = {
+        ":status", "452 hi",
+        ":version", "spdy/8",
         "Content-Type", "text/plain",
         NULL,
     };
@@ -206,6 +208,8 @@ static int countItems(const char **nv) {
 - (void)testParseHeadersBadValues {
     stream = [SpdyStream newFromNSURL:self.url delegate:self.delegate];
     static const char* nameValues[] = {
+        ":status", "111",
+        ":version", "http/1.2",
         "Content-Type", "text/plain",
         "bad\xc3\x28key", "good value",
         "dropped-key", "bad\xc3\x28value",
@@ -217,12 +221,14 @@ static int countItems(const char **nv) {
     STAssertTrue(self.delegate.responseHeaders != NULL, @"Have headers");
     STAssertTrue(CFHTTPMessageIsHeaderComplete(self.delegate.responseHeaders), @"Full headers.");
     NSDictionary *headers = [(NSDictionary *)CFHTTPMessageCopyAllHeaderFields(self.delegate.responseHeaders) autorelease];
-    STAssertEquals([headers count], 2U, @"Two headers kept %@", headers);
+    STAssertEquals([headers count], 4U, @"Four headers kept %@", headers);
 }
 
 - (void)testParseHeadersOddHeaders {
     stream = [SpdyStream newFromNSURL:self.url delegate:self.delegate];
     static const char* nameValues[] = {
+        ":status", "124 Yup",
+        ":version", "yup/yup",
         "Content-Type", "text/plain",
         "Used-Key", "good value",
         "Unmatched.",
@@ -232,7 +238,22 @@ static int countItems(const char **nv) {
     STAssertTrue(self.delegate.responseHeaders != NULL, @"Have headers");
     STAssertTrue(CFHTTPMessageIsHeaderComplete(self.delegate.responseHeaders), @"Full headers.");
     NSDictionary *headers = [(NSDictionary *)CFHTTPMessageCopyAllHeaderFields(self.delegate.responseHeaders) autorelease];
-    STAssertEquals([headers count], 2U, @"Two headers kept %@", headers);
+    STAssertEquals([headers count], 4U, @"Four headers kept %@", headers);
+}
+
+- (void)testParseHeadersNoStatus {
+    stream = [SpdyStream newFromNSURL:self.url delegate:self.delegate];
+    static const char* nameValues[] = {
+        ":stats", "124 Yup",
+        ":version", "yup/yup",
+        "Content-Type", "text/plain",
+        NULL,
+    };
+    [stream parseHeaders:nameValues];
+    STAssertTrue(self.delegate.responseHeaders == NULL, @"Have headers");
+    STAssertNotNil(self.delegate.error, @"Error");
+    STAssertEquals(self.delegate.error.domain, kSpdyErrorDomain, @"Error %@", self.delegate.error);
+    STAssertEquals(self.delegate.error.code, kSpdyInvalidResponseHeaders, @"Error %@", self.delegate.error);
 }
 
 - (void)testCancelStream {

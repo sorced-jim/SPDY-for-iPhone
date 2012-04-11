@@ -92,17 +92,29 @@ static const int port = 9783;
 @property (retain) NSError *error;
 @property (retain) NSURLResponse *response;
 @property (assign) NSInteger bytesSent;
+@property (retain) NSMutableData *bodyData;
 @end
 
 @implementation SpdyTestConnectionDelegate
+@synthesize bodyData = _bodyData;
 @synthesize bytesSent = _bytesSent;
 @synthesize connection = _connection;
 @synthesize error = _error;
 @synthesize response = _response;
 
+- (id)init {
+    self = [super init];
+    self.bodyData = [NSMutableData dataWithCapacity:256];
+    return self;
+}
+
 - (void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     NSLog(@"bytesWritten: %d", bytesWritten);
     self.bytesSent = totalBytesWritten;
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    [self.bodyData appendData:data];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
@@ -239,9 +251,6 @@ static void ReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEventTy
 
     CFErrorRef errors = CFReadStreamCopyError(readStream);
     STAssertTrue(errors == NULL, @"No errors: %@.", errors);
-    if (errors != NULL) {
-        CFRelease(errors);
-    }
     CFReadStreamClose(readStream);
     CFRelease(readStream);
 }
@@ -283,9 +292,6 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     CFErrorRef error = CFReadStreamCopyError(readStream);
     STAssertTrue(error != NULL, @"Cancelled stream error.");
     STAssertEquals(CFErrorGetCode(error), (CFIndex)kSpdyRequestCancelled, @"Cancelled request.");
-    if (error != NULL) {
-        CFRelease(error);
-    }
     CFRelease(readStream);
 }
 
@@ -378,8 +384,29 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     if ([delegate.response class] == [NSHTTPURLResponse class]) {
         NSHTTPURLResponse *response = (NSHTTPURLResponse *)delegate.response;
         STAssertEquals([delegate.response class], [NSHTTPURLResponse class], @"The response should be an http response with 5.0+ response: %@", delegate.response);
-        STAssertEquals(response.statusCode, 200, @"Good reply");
+        STAssertEquals(response.statusCode, 200, @"Good reply: %@", response.allHeaderFields);
         STAssertEquals([response.allHeaderFields objectForKey:@"protocol-was: spdy"], @"YES", @"Headers are: %@", response.allHeaderFields);
+    }
+    [delegate release];
+}
+
+- (void)testNSURLRequestGunzippedResponse {
+    SpdyTestConnectionDelegate *delegate = [[SpdyTestConnectionDelegate alloc] init];
+    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/really-unknown-path"];
+    [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:url]
+                                  delegate:delegate];
+    CFRunLoopRun();
+    STAssertNil(delegate.error, @"Error: %@", delegate.error);
+    if ([delegate.response class] == [NSHTTPURLResponse class]) {
+        NSHTTPURLResponse *response = (NSHTTPURLResponse *)delegate.response;
+        STAssertEquals([delegate.response class], [NSHTTPURLResponse class], @"The response should be an http response with 5.0+ response: %@", delegate.response);
+        STAssertEquals(response.statusCode, 404, @"Good reply");
+        STAssertEquals([response.allHeaderFields objectForKey:@"protocol-was: spdy"], @"YES", @"Headers are: %@", response.allHeaderFields);
+        STAssertTrue([[response.allHeaderFields objectForKey:@"content-encoding"] isEqualToString:@"gzip"], @"Headers are: %@", response.allHeaderFields);
+        NSString* bodyStr = [[[NSString alloc] initWithData:delegate.bodyData
+                                                   encoding:NSUTF8StringEncoding] autorelease];
+        NSRange serverRange = [bodyStr rangeOfString:@"spdyd spdylay/"];
+        STAssertTrue(serverRange.location != NSNotFound, @"%@", bodyStr);
     }
     [delegate release];
 }
@@ -415,7 +442,7 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     SpdyTestConnectionDelegate *delegate = [[SpdyTestConnectionDelegate alloc] init];
     NSURL *url = [NSURL URLWithString:@"https://localhost:9793/?spdyd_do_not_respond_to_req=yes"];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:240];
-    NSConnection *connection = [NSURLConnection connectionWithRequest:request delegate:delegate];
+    NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:delegate];
     CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^{ [connection cancel]; CFRunLoopStop(CFRunLoopGetCurrent()); });
     CFRunLoopRun();
     STAssertNil(delegate.error, @"Error: %@", delegate.error);

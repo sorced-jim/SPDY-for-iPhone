@@ -140,6 +140,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 }
 
 - (SpdySession *)getSession:(NSURL *)url withError:(NSError **)error {
+    assert(error != NULL);
     SessionKey *key = [[[SessionKey alloc] initFromUrl:url] autorelease];
     SpdySession *session = [sessions objectForKey:key];
     SPDY_LOG(@"Looking up %@, found %@", key, session);
