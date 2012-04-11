@@ -192,11 +192,9 @@ static NSSet *headersNotToCopy = nil;
     nv[5] = pathPlus + strlen(host) + 2;
     nv[6] = ":host";
     nv[7] = host;
-    nv[8] = "user-agent";
-    nv[9] = "SPDY obj-c/0.0.0";
-    nv[10] = ":version";
-    nv[11] = [self copyString:version];
-    return 12;
+    nv[8] = ":version";
+    nv[9] = [self copyString:version];
+    return 10;
 }
 
 // Returns the next index.
@@ -246,7 +244,10 @@ static NSSet *headersNotToCopy = nil;
     stream.nameValues = malloc(sizeof(const char *) * (6*2 + 1));
     stream.delegate = delegate;
     stream.stringArena = [stream createArena:512];
-    [stream serializeUrl:url withMethod:@"GET" withVersion:@"HTTP/1.1"];
+    NSInteger next = [stream serializeUrl:url withMethod:@"GET" withVersion:@"HTTP/1.1"];
+    assert(next == 10);
+    stream.nameValues[10] = "user-agent";
+    stream.nameValues[11] = "SPDY obj-c/0.7.5";
     stream.nameValues[12] = NULL;
     return stream;
 }

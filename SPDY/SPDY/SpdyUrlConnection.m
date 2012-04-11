@@ -181,7 +181,7 @@ static NSMutableDictionary *disabledHosts;
         return;
     self.cancelled = YES;
     if (self.spdyIdentifier != nil) {
-        SPDY_LOG(@"Cancelling request for %@", self.spdyIdentifier.url);
+        SPDY_LOG(@"Cancelling request for %@", self.spdyIdentifier);
         [self.spdyIdentifier close];
     }
 }

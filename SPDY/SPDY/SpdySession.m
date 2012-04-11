@@ -431,6 +431,7 @@ static void on_ctrl_recv_callback(spdylay_session *session, spdylay_frame_type t
     if (type == SPDYLAY_SYN_REPLY) {
         spdylay_syn_reply *reply = &frame->syn_reply;
         SpdyStream *stream = spdylay_session_get_stream_user_data(session, reply->stream_id);
+        SPDY_LOG(@"Received headers for %@", stream)
         [stream parseHeaders:(const char **)reply->nv];
     }
 }
