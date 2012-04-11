@@ -79,7 +79,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (BOOL)isEqual:(id)other {
     if (other == self)
         return YES;
-    if (!other || ![other isKindOfClass:[SessionKey class]])
+    if (!other || ![other isKindOfClass:[self class]])
         return NO;
     return [self isEqualToKey:other];
 }
@@ -129,25 +129,23 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
     if ((flags & kSCNetworkReachabilityFlagsReachable) == 0)
         return kSpdyNotReachable;
     
-    SpdyNetworkStatus status = kSpdyNotReachable;
+    // Host reachable by WWAN.
+    if ((flags & kSCNetworkReachabilityFlagsIsWWAN) == kSCNetworkReachabilityFlagsIsWWAN)
+        return kSpdyReachableViaWWAN;
     
     // Host reachable and no connection is required. Assume wifi.
     if ((flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0)
-        status = kSpdyReachableViaWiFi;
+        return kSpdyReachableViaWiFi;
     
     // Host reachable. Connection is on-demand or on-traffic. No user intervention needed. Assume wifi.
     if (((flags & kSCNetworkReachabilityFlagsConnectionOnDemand) != 0) ||
         ((flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0)) {
         if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0) {
-            status = kSpdyReachableViaWiFi;
+            return kSpdyReachableViaWiFi;
         }
     }
     
-    // Host reachable by WWAN.
-    if ((flags & kSCNetworkReachabilityFlagsIsWWAN) == kSCNetworkReachabilityFlagsIsWWAN)
-        status = kSpdyReachableViaWWAN;
-    
-    return status;
+    return kSpdyNotReachable;
 }
 
 + (SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host {	

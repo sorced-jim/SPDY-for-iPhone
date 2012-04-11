@@ -401,6 +401,7 @@
 				SDKROOT = iphoneos;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
+				TEST_AFTER_BUILD = YES;
 				VALID_ARCHS = "i386 armv6 armv7";
 			};
 			name = Debug;
@@ -422,6 +423,7 @@
 				SDKROOT = iphoneos;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
+				TEST_AFTER_BUILD = YES;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "i386 armv6 armv7";
 			};
