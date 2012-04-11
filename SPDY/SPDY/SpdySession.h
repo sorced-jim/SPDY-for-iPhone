@@ -31,25 +31,25 @@ enum ConnectState {
     ERROR,
 };
 
-enum SpdyNetworkStatus {
+typedef enum {
     kSpdyNotReachable = 0,
     kSpdyReachableViaWWAN,
     kSpdyReachableViaWiFi	
-};
+} SpdyNetworkStatus;
 
 @interface SpdySession : NSObject {
     struct spdylay_session *session;
     
     BOOL spdyNegotiated;
     enum ConnectState connectState;
-    enum SpdyNetworkStatus networkStatus;
+    SpdyNetworkStatus networkStatus;
 }
 
 @property BOOL spdyNegotiated;
 @property struct spdylay_session *session;
 @property (retain) NSURL *host;
 @property enum ConnectState connectState;
-@property enum SpdyNetworkStatus networkStatus;
+@property SpdyNetworkStatus networkStatus;
 
 // Returns nil if the session is able to start a connection to host.
 - (NSError *)connect:(NSURL *)host;

@@ -47,6 +47,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (BOOL)isEqualToKey:(SessionKey *)other;
 - (id)copyWithZone:(NSZone *)zone;
 
+// These properties should not be changed after initialization.
 @property (retain) NSString *host;
 @property (retain) NSNumber *port;
 @end
@@ -78,19 +79,19 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (BOOL)isEqual:(id)other {
     if (other == self)
         return YES;
-    if (!other || ![other isKindOfClass:[self class]])
+    if (!other || ![other isKindOfClass:[SessionKey class]])
         return NO;
     return [self isEqualToKey:other];
 }
 
 - (BOOL)isEqualToKey:(SessionKey *)other {
-    return [self.host isEqualToString:other.host] && (self.port == other.port || [self.port isEqualToNumber:other.port]);
+    return [self.host isEqualToString:other.host] && [self.port isEqualToNumber:other.port];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    SessionKey *other = [SessionKey allocWithZone:zone];
-    other.host = [self.host copyWithZone:zone];
-    other.port = [self.port copyWithZone:zone];
+    SessionKey *other = [[SessionKey allocWithZone:zone] init];
+    other.host = [[self.host copyWithZone:zone] autorelease];
+    other.port = [[self.port copyWithZone:zone] autorelease];
     return other;
 }
 
@@ -112,7 +113,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 
 @interface SPDY ()
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body;
-+ (enum SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host;
++ (SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host;
 
 @end
 
@@ -122,28 +123,51 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 
 @synthesize logger = _logger;
 
-+ (enum SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host {	
+// This logic was stripped from Apple's Reachability.m sample application.
++ (SpdyNetworkStatus)networkStatusForReachabilityFlags:(SCNetworkReachabilityFlags)flags {
+    // Host not reachable.
+    if ((flags & kSCNetworkReachabilityFlagsReachable) == 0)
+        return kSpdyNotReachable;
+    
+    SpdyNetworkStatus status = kSpdyNotReachable;
+    
+    // Host reachable and no connection is required. Assume wifi.
+    if ((flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0)
+        status = kSpdyReachableViaWiFi;
+    
+    // Host reachable. Connection is on-demand or on-traffic. No user intervention needed. Assume wifi.
+    if (((flags & kSCNetworkReachabilityFlagsConnectionOnDemand) != 0) ||
+        ((flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0)) {
+        if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0) {
+            status = kSpdyReachableViaWiFi;
+        }
+    }
+    
+    // Host reachable by WWAN.
+    if ((flags & kSCNetworkReachabilityFlagsIsWWAN) == kSCNetworkReachabilityFlagsIsWWAN)
+        status = kSpdyReachableViaWWAN;
+    
+    return status;
+}
+
++ (SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host {	
+    SpdyNetworkStatus status = kSpdyNotReachable;
 	SCNetworkReachabilityRef ref = SCNetworkReachabilityCreateWithName(NULL, [host UTF8String]);
 	if (ref) {
         SCNetworkReachabilityFlags flags = 0;
-        if (SCNetworkReachabilityGetFlags(ref, &flags)) {
-            if (flags & kSCNetworkReachabilityFlagsReachable) {
-                if (flags & kSCNetworkReachabilityFlagsIsWWAN)
-                    return kSpdyReachableViaWWAN;
-                return kSpdyReachableViaWiFi;
-            }
-        }
+        if (SCNetworkReachabilityGetFlags(ref, &flags))
+            status = [self networkStatusForReachabilityFlags:flags];
         
         CFRelease(ref);
     }
-    return kSpdyNotReachable;
+    return status;
 }
 
 - (SpdySession *)getSession:(NSURL *)url withError:(NSError **)error {
     SessionKey *key = [[[SessionKey alloc] initFromUrl:url] autorelease];
     SpdySession *session = [sessions objectForKey:key];
     SPDY_LOG(@"Looking up %@, found %@", key, session);
-    enum SpdyNetworkStatus currentStatus = [self.class reachabilityStatusForHost:key.host];
+    SpdyNetworkStatus currentStatus = [self.class reachabilityStatusForHost:key.host];
     if (session != nil && ([session isInvalid] || currentStatus != session.networkStatus)) {
         SPDY_LOG(@"Resetting %@ because invalid: %i or %d != %d", session, [session isInvalid], currentStatus, session.networkStatus);
         [session resetStreamsAndGoAway];
@@ -158,6 +182,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
             return nil;
         }
         SPDY_LOG(@"Adding %@ to sessions (size = %u)", key, [sessions count] + 1);
+        currentStatus = [self.class reachabilityStatusForHost:key.host];
         session.networkStatus = currentStatus;
         [sessions setObject:session forKey:key];
         [session addToLoop];
@@ -290,38 +315,34 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 
 @interface BufferedCallback ()
 
-@property (assign) CFHTTPMessageRef headers;
+@property (nonatomic, assign) CFHTTPMessageRef headers;
+@property (nonatomic, assign) CFMutableDataRef body;
 @end
 
-@implementation BufferedCallback {
-    CFMutableDataRef body;
-    CFHTTPMessageRef _headers;
-    NSURL *_url;
-}
+@implementation BufferedCallback
 
 @synthesize url = _url;
+@synthesize headers = _headers;
+@synthesize body = _body;
 
 - (id)init {
     self = [super init];
     self.url = nil;
-    body = CFDataCreateMutable(NULL, 0);
+    self.body = CFDataCreateMutable(NULL, 0);
     return self;
 }
 
 - (void)dealloc {
-    self.url = nil;
-    CFRelease(body);
+    [_url release];
+    CFRelease(_body);
     CFRelease(_headers);
     [super dealloc];
 }
 
 - (void)setHeaders:(CFHTTPMessageRef)h {
+    CFHTTPMessageRef oldRef = _headers;
     _headers = CFHTTPMessageCreateCopy(NULL, h);
-    CFRetain(_headers);
-}
-
-- (CFHTTPMessageRef)headers {
-    return _headers;
+    CFRelease(oldRef);
 }
 
 - (void)onConnect:(id<SpdyRequestIdentifier>)u {
@@ -333,13 +354,13 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 }
 
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
-    CFDataAppendBytes(body, bytes, length);
+    CFDataAppendBytes(self.body, bytes, length);
     return length;
 }
 
 - (void)onStreamClose {
-    CFHTTPMessageSetBody(_headers, body);
-    [self onResponse:_headers];
+    CFHTTPMessageSetBody(self.headers, self.body);
+    [self onResponse:self.headers];
 }
 
 - (void)onResponse:(CFHTTPMessageRef)response {
