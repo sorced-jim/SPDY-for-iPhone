@@ -34,68 +34,12 @@
 #import "SpdyInputStream.h"
 #import "SpdyStream.h"
 #import "SpdyUrlConnection.h"
+#import "SpdySessionKey.h"
 
 // The shared spdy instance.
 static SPDY *spdy = NULL;
 NSString *kSpdyErrorDomain = @"SpdyErrorDomain";
 NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
-
-@interface SessionKey : NSObject<NSCopying>
-- (SessionKey *)initFromUrl:(NSURL *)url;
-- (NSUInteger)hash;
-- (BOOL)isEqual:(id)other;
-- (BOOL)isEqualToKey:(SessionKey *)other;
-- (id)copyWithZone:(NSZone *)zone;
-
-// These properties should not be changed after initialization.
-@property (retain) NSString *host;
-@property (retain) NSNumber *port;
-@end
-
-@implementation SessionKey
-@synthesize host = _host;
-@synthesize port = _port;
-
-- (SessionKey *)initFromUrl:(NSURL *)url {
-    self.host = url.host;
-    self.port = url.port;
-    return self;
-}
-
-- (void)dealloc {
-    [_host release];
-    [_port release];
-    [super dealloc];
-}
-
-- (NSString *)description {
-    return [NSString stringWithFormat:@"%@ %@:%@ (%u)", [super description], self.host, self.port, [self hash]];
-}
-
-- (NSUInteger)hash {
-    return [self.host hash] + [self.port hash];
-}
-
-- (BOOL)isEqual:(id)other {
-    if (other == self)
-        return YES;
-    if (!other || ![other isKindOfClass:[self class]])
-        return NO;
-    return [self isEqualToKey:other];
-}
-
-- (BOOL)isEqualToKey:(SessionKey *)other {
-    return [self.host isEqualToString:other.host] && [self.port isEqualToNumber:other.port];
-}
-
-- (id)copyWithZone:(NSZone *)zone {
-    SessionKey *other = [[SessionKey allocWithZone:zone] init];
-    other.host = [[self.host copyWithZone:zone] autorelease];
-    other.port = [[self.port copyWithZone:zone] autorelease];
-    return other;
-}
-
-@end
 
 @interface SpdyLogImpl : NSObject<SpdyLogger>
 @end
@@ -162,7 +106,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 }
 
 - (SpdySession *)getSession:(NSURL *)url withError:(NSError **)error {
-    SessionKey *key = [[[SessionKey alloc] initFromUrl:url] autorelease];
+    SpdySessionKey *key = [[[SpdySessionKey alloc] initFromUrl:url] autorelease];
     SpdySession *session = [sessions objectForKey:key];
     SPDY_LOG(@"Looking up %@, found %@", key, session);
     SpdyNetworkStatus currentStatus = [self.class reachabilityStatusForHost:key.host];
