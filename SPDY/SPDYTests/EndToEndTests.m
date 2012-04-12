@@ -414,11 +414,12 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
         STAssertEquals(response.statusCode, 404, @"Good reply");
         STAssertEquals([response.allHeaderFields objectForKey:@"protocol-was: spdy"], @"YES", @"Headers are: %@", response.allHeaderFields);
         STAssertTrue([[response.allHeaderFields objectForKey:@"content-encoding"] isEqualToString:@"gzip"], @"Headers are: %@", response.allHeaderFields);
-        NSString* bodyStr = [[[NSString alloc] initWithData:delegate.bodyData
-                                                   encoding:NSUTF8StringEncoding] autorelease];
-        NSRange serverRange = [bodyStr rangeOfString:@"spdyd spdylay/"];
-        STAssertTrue(serverRange.location != NSNotFound, @"%@", bodyStr);
     }
+    NSString* bodyStr = [[[NSString alloc] initWithData:delegate.bodyData
+                                                encoding:NSUTF8StringEncoding] autorelease];
+    NSRange serverRange = [bodyStr rangeOfString:@"spdyd spdylay/"];
+    STAssertTrue(serverRange.location != NSNotFound, @"%@", bodyStr);
+    
     [delegate release];
 }
 
