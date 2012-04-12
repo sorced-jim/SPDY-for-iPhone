@@ -84,9 +84,8 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
     // Host reachable. Connection is on-demand or on-traffic. No user intervention needed. Assume wifi.
     if (((flags & kSCNetworkReachabilityFlagsConnectionOnDemand) != 0) ||
         ((flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0)) {
-        if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0) {
+        if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0)
             return kSpdyReachableViaWiFi;
-        }
     }
     
     return kSpdyNotReachable;
