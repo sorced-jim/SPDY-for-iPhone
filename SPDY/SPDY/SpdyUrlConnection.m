@@ -57,11 +57,15 @@ static NSMutableDictionary *disabledHosts;
 - (id)initWithConnection:(SpdyUrlConnection *)protocol;
 @property (retain) SpdyUrlConnection *protocol;
 @property (assign) NSInteger requestBytesSent;
+@property (nonatomic, assign) BOOL needUnzip;
+@property (nonatomic, assign) z_stream zlibContext;
 @end
 
 @implementation SpdyUrlCallback
 @synthesize protocol = _protocol;
 @synthesize requestBytesSent = _requestBytesSent;
+@synthesize needUnzip = _needUnzip;
+@synthesize zlibContext = _zlibContext;
 
 - (id)initWithConnection:(SpdyUrlConnection *)protocol {
     self = [super init];
@@ -69,6 +73,12 @@ static NSMutableDictionary *disabledHosts;
         self.protocol = protocol;
     }
     return self;
+}
+
+- (void)dealloc {
+    if (self.needUnzip)
+        inflateEnd(&_zlibContext);
+    [super dealloc];
 }
 
 - (void)onConnect:(id<SpdyRequestIdentifier>)spdyId {
@@ -99,12 +109,33 @@ static NSMutableDictionary *disabledHosts;
 
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
     NSHTTPURLResponse *response = [SpdyUrlResponse responseWithURL:[self.protocol.spdyIdentifier url] withResponse:headers withRequestBytes:self.requestBytesSent];
+    if ([[response.allHeaderFields objectForKey:@"content-encoding"] hasPrefix:@"gzip"]) {
+        self.needUnzip = YES;
+        memset(&_zlibContext, 0, sizeof(_zlibContext));
+        inflateInit2(&_zlibContext, 16+MAX_WBITS);
+    }
     [[self.protocol client] URLProtocol:self.protocol didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 }
 
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
-    NSData *data = [NSData dataWithBytes:bytes length:length];
-    [[self.protocol client] URLProtocol:self.protocol didLoadData:data];
+    if (self.needUnzip) {
+        _zlibContext.avail_in = length;
+        _zlibContext.next_in = (uint8_t *)bytes;
+        while (self.zlibContext.avail_in > 0) {
+            NSInteger bytesHad = self.zlibContext.total_out;
+            NSMutableData *inflateData = [NSMutableData dataWithCapacity:4096];
+            _zlibContext.next_out = [inflateData mutableBytes];
+            _zlibContext.avail_out = 4096;
+            int inflateStatus = inflate(&_zlibContext, Z_SYNC_FLUSH);
+            NSInteger inflatedBytes = self.zlibContext.total_out - bytesHad;
+            SPDY_LOG(@"Unzip status: %d, inflated %d bytes", inflateStatus, inflatedBytes);
+            NSData *data = [NSData dataWithBytes:[inflateData bytes] length:inflatedBytes];
+            [[self.protocol client] URLProtocol:self.protocol didLoadData:data];
+        }
+    } else {
+        NSData *data = [NSData dataWithBytes:bytes length:length];
+        [[self.protocol client] URLProtocol:self.protocol didLoadData:data];
+    }
     return length;
 }
 

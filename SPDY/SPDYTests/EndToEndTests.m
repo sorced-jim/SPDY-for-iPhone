@@ -417,6 +417,30 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     }
     NSString* bodyStr = [[[NSString alloc] initWithData:delegate.bodyData
                                                 encoding:NSUTF8StringEncoding] autorelease];
+    STAssertNotNil(bodyStr, @"The body must be valid utf8.");
+    NSRange serverRange = [bodyStr rangeOfString:@"spdyd spdylay/"];
+    STAssertTrue(serverRange.location != NSNotFound, @"%@", bodyStr);
+    
+    [delegate release];
+}
+
+- (void)testNSURLRequestGunzippedResponseWithAcceptEncoding {
+    SpdyTestConnectionDelegate *delegate = [[SpdyTestConnectionDelegate alloc] init];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://localhost:9793/really-unknown-path"]];
+    [request addValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
+    [NSURLConnection connectionWithRequest:request delegate:delegate];
+    CFRunLoopRun();
+    STAssertNil(delegate.error, @"Error: %@", delegate.error);
+    if ([delegate.response class] == [NSHTTPURLResponse class]) {
+        NSHTTPURLResponse *response = (NSHTTPURLResponse *)delegate.response;
+        STAssertEquals([delegate.response class], [NSHTTPURLResponse class], @"The response should be an http response with 5.0+ response: %@", delegate.response);
+        STAssertEquals(response.statusCode, 404, @"Good reply");
+        STAssertEquals([response.allHeaderFields objectForKey:@"protocol-was: spdy"], @"YES", @"Headers are: %@", response.allHeaderFields);
+        STAssertTrue([[response.allHeaderFields objectForKey:@"content-encoding"] isEqualToString:@"gzip"], @"Headers are: %@", response.allHeaderFields);
+    }
+    NSString* bodyStr = [[[NSString alloc] initWithData:delegate.bodyData
+                                               encoding:NSUTF8StringEncoding] autorelease];
+    STAssertNotNil(bodyStr, @"The body should be valid utf8");
     NSRange serverRange = [bodyStr rangeOfString:@"spdyd spdylay/"];
     STAssertTrue(serverRange.location != NSNotFound, @"%@", bodyStr);
     
@@ -435,18 +459,28 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
     [delegate release];
 }
 
-// This test is disabled since it takes 240s seconds to complete.  Apple doesn't let overriding the timeout when a request has a body.
-- (void)DISABLED_testNSURLRequestTimeoutWithBody {
+- (void)testNSURLRequestWithBody404 {
     SpdyTestConnectionDelegate *delegate = [[SpdyTestConnectionDelegate alloc] init];
-    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/?spdyd_do_not_respond_to_req=yes"];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:0.1];
+    NSURL *url = [NSURL URLWithString:@"https://localhost:9793/unknown-path"];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     request.HTTPBody = [NSData dataWithBytes:"1234" length:4];
-    request.timeoutInterval = 0.2;
     [NSURLConnection connectionWithRequest:request delegate:delegate];
     CFRunLoopRun();
-    STAssertNotNil(delegate.error, @"Error: %@", delegate.error);
-    STAssertTrue([delegate.error.domain isEqualToString:@"NSURLErrorDomain"], @"Unexpected error: %@", delegate.error);
-    STAssertTrue([[delegate.error.userInfo objectForKey:@"NSLocalizedDescription"] isEqualToString:@"The request timed out."], @"Error is: %@", delegate.error);
+
+    STAssertNil(delegate.error, @"Error: %@", delegate.error);
+    if ([delegate.response class] == [NSHTTPURLResponse class]) {
+        NSHTTPURLResponse *response = (NSHTTPURLResponse *)delegate.response;
+        STAssertEquals([delegate.response class], [NSHTTPURLResponse class], @"The response should be an http response with 5.0+ response: %@", delegate.response);
+        STAssertEquals(response.statusCode, 404, @"Good reply");
+        STAssertEquals([response.allHeaderFields objectForKey:@"protocol-was: spdy"], @"YES", @"Headers are: %@", response.allHeaderFields);
+        STAssertTrue([[response.allHeaderFields objectForKey:@"content-encoding"] isEqualToString:@"gzip"], @"Headers are: %@", response.allHeaderFields);
+    }
+    NSString* bodyStr = [[[NSString alloc] initWithData:delegate.bodyData
+                                               encoding:NSUTF8StringEncoding] autorelease];
+    STAssertNotNil(bodyStr, @"The body should be valid utf8");
+    NSRange serverRange = [bodyStr rangeOfString:@"spdyd spdylay/"];
+    STAssertTrue(serverRange.location != NSNotFound, @"%@", bodyStr);
+
     [delegate release];
 }
 
