@@ -101,3 +101,8 @@ enum SpdyErrors {
   [[SPDY sharedSPDY].logger writeSpdyLog:fmt file:__FILE__ line:__LINE__, ##__VA_ARGS__];\
   if (0) NSLog(fmt, ## __VA_ARGS__); \
 } while (0);
+
+#define SPDY_DEBUG_LOG(fmt, ...) do { \
+    [[SPDY sharedSPDY].logger writeSpdyLog:fmt file:__FILE__ line:__LINE__, ##__VA_ARGS__];\
+    if (0) NSLog(fmt, ## __VA_ARGS__); \
+} while (0);
