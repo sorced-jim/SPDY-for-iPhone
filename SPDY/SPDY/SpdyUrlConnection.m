@@ -72,6 +72,7 @@ static NSMutableDictionary *disabledHosts;
 }
 
 - (void)onConnect:(id<SpdyRequestIdentifier>)spdyId {
+    SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onConnect: %@", self.protocol, spdyId);
     self.protocol.spdyIdentifier = spdyId;
     if (self.protocol.cancelled) {
         [spdyId close];
@@ -79,12 +80,14 @@ static NSMutableDictionary *disabledHosts;
 }
 
 - (void)onError:(NSError *)error {
+    SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onError: %@", self.protocol, error);
     if (!self.protocol.cancelled) {
         [[self.protocol client] URLProtocol:self.protocol didFailWithError:error];
     }
 }
 
 - (void)onNotSpdyError:(id<SpdyRequestIdentifier>)identifier {
+    SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onNotSpdyError: %@", self.protocol, identifier);
     NSURL *url = [identifier url];
     [SpdyUrlConnection disableUrl:url];
     NSError *error = [NSError errorWithDomain:kSpdyErrorDomain code:kSpdyConnectionNotSpdy userInfo:nil];
@@ -92,6 +95,7 @@ static NSMutableDictionary *disabledHosts;
 }
 
 - (void)onRequestBytesSent:(NSInteger)bytesSend {
+    SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onRequestBytesSent: %d", self.protocol, bytesSend);
     // The updated byte count should be sent, but the URLProtocolClient doesn't have a method to do that.
     //[[self.protocol client] URLProtocol:self.protocol didSendBodyData:bytesSend];
     self.requestBytesSent += bytesSend;
@@ -99,16 +103,20 @@ static NSMutableDictionary *disabledHosts;
 
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
     NSHTTPURLResponse *response = [SpdyUrlResponse responseWithURL:[self.protocol.spdyIdentifier url] withResponse:headers withRequestBytes:self.requestBytesSent];
+    SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onResponseHeaders: %@", self.protocol, [response allHeaderFields]);
+
     [[self.protocol client] URLProtocol:self.protocol didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 }
 
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {
+    SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onResponseData: %lu", self.protocol, length);
     NSData *data = [NSData dataWithBytes:bytes length:length];
     [[self.protocol client] URLProtocol:self.protocol didLoadData:data];
     return length;
 }
 
 - (void)onStreamClose {
+    SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onStreamClose", self.protocol);
     self.protocol.closed = YES;
     [[self.protocol client] URLProtocolDidFinishLoading:self.protocol];
 }
@@ -181,11 +189,13 @@ static NSMutableDictionary *disabledHosts;
 }
 
 - (void)startLoading {
+    SPDY_DEBUG_LOG(@"Start loading SpdyURLConnection: %@ with URL: %@", self, [[self request] URL])
     SpdyUrlCallback *delegate = [[[SpdyUrlCallback alloc] initWithConnection:self] autorelease];
     [[SPDY sharedSPDY] fetchFromRequest:[self request] delegate:delegate];
 }
 
 - (void)stopLoading {
+    SPDY_DEBUG_LOG(@"Stop loading SpdyURLConnection: %@ with URL: %@", self, [[self request] URL])
     if (self.closed)
         return;
     self.cancelled = YES;
