@@ -53,7 +53,7 @@ enum SpdyErrors {
 + (SPDY *)sharedSPDY;
 
 // Call registerForNSURLConnection to enable spdy when using NSURLConnection.  SPDY responses can be identified (in iOS 5.0+) by looking for
-// the @"protocol-was: spdy" header with the value @"YES".  "protocol-was: spdy" is not a valid http header, thus it is save to add it.
+// the @"protocol-was: spdy" header with the value @"YES".  "protocol-was: spdy" is not a valid http header, thus it is safe to add it.
 // WARNING: Using NSURLConnection means that upload progress can not be monitored.  This is because of a lack of an API in URLProtocolClient.
 - (void)registerForNSURLConnection;
 - (BOOL)isSpdyRegistered;
@@ -92,7 +92,7 @@ enum SpdyErrors {
 - (void)onResponse:(CFHTTPMessageRef)response;
 - (void)onError:(NSError *)error;
 
-@property (retain) NSURL *url;
+@property (nonatomic, retain) NSURL *url;
 
 @end
 
