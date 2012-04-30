@@ -312,6 +312,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         [self sslError];
         return;
     }
+    SSL_set_tlsext_host_name(ssl, [[self.host host] UTF8String]);
     if (SSL_set_fd(ssl, sock) == 0) {
         [self sslError];
         return;
