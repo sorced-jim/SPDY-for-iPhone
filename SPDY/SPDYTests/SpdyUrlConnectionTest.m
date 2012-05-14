@@ -46,4 +46,20 @@
     [SpdyUrlConnection disableUrl:url444];
     STAssertFalse([SpdyUrlConnection canInitWithUrl:url444], @"%@", url444);
 }
+
+- (void)testGzipHeader {
+    NSURL *url = [NSURL URLWithString:@"https://t.ca"];
+    CFHTTPMessageRef request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, CFSTR("GET"), (CFURLRef)url, kCFHTTPVersion1_1);
+    CFHTTPMessageSetHeaderFieldValue(request, CFSTR("content-EncodinG"), CFSTR("gzip"));
+    CFHTTPMessageSetHeaderFieldValue(request, CFSTR("unKnown-heaDeR"), CFSTR("value"));
+    
+    NSHTTPURLResponse *response = [SpdyUrlResponse responseWithURL:url withResponse:request withRequestBytes:45];
+    STAssertNotNil(response, @"Have response");
+    STAssertNotNil([response allHeaderFields], @"Have headers");
+    // In iOS 4.3 and below CFHTTPMessage uppercases the first letter of each word in the http header key.  In iOS 5 and up the headers
+    // from CFHTTPMessage are case insenstive.
+    STAssertEquals([[response allHeaderFields] objectForKey:@"Content-Encoding"], @"gzip", @"Has content-encoding %@", [response allHeaderFields]);
+    STAssertEquals([[response allHeaderFields] objectForKey:@"Unknown-Header"], @"value", @"Case insensitive dictionary %@", [response allHeaderFields]);
+}
+
 @end

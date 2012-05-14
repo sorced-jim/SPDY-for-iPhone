@@ -31,12 +31,14 @@ static NSMutableDictionary *disabledHosts;
 @synthesize allHeaderFields = _allHeaderFields;
 @synthesize requestBytes = _requestBytes;
 
+// In iOS 4.3 and below CFHTTPMessage uppercases the first letter of each word in the http header key.  In iOS 5 and up the headers
+// from CFHTTPMessage are case insenstive.  Thus all header objectForKeys must use Word-Word casing.
 + (NSHTTPURLResponse *)responseWithURL:(NSURL *)url withResponse:(CFHTTPMessageRef)headers withRequestBytes:(NSInteger)requestBytesSent {
     NSMutableDictionary *headersDict = [[[NSMakeCollectable(CFHTTPMessageCopyAllHeaderFields(headers)) autorelease] mutableCopy] autorelease];
     [headersDict setObject:@"YES" forKey:@"protocol-was: spdy"];
     NSNumberFormatter *f = [[[NSNumberFormatter alloc] init] autorelease];
-    NSString *contentType = [headersDict objectForKey:@"content-type"];
-    NSString *contentLength = [headersDict objectForKey:@"content-length"];
+    NSString *contentType = [headersDict objectForKey:@"Content-Type"];
+    NSString *contentLength = [headersDict objectForKey:@"Content-Length"];
     NSNumber *length = [f numberFromString:contentLength];
     NSInteger statusCode = CFHTTPMessageGetResponseStatusCode(headers);
     NSString *version = [NSMakeCollectable(CFHTTPMessageCopyVersion(headers)) autorelease];
@@ -113,7 +115,7 @@ static NSMutableDictionary *disabledHosts;
 
 - (void)onResponseHeaders:(CFHTTPMessageRef)headers {
     NSHTTPURLResponse *response = [SpdyUrlResponse responseWithURL:[self.protocol.spdyIdentifier url] withResponse:headers withRequestBytes:self.requestBytesSent];
-    if ([[response.allHeaderFields objectForKey:@"content-encoding"] hasPrefix:@"gzip"]) {
+    if ([[response.allHeaderFields objectForKey:@"Content-Encoding"] hasPrefix:@"gzip"]) {
         self.needUnzip = YES;
         memset(&_zlibContext, 0, sizeof(_zlibContext));
         inflateInit2(&_zlibContext, 16+MAX_WBITS);
