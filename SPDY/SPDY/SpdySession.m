@@ -338,7 +338,10 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         if (![self submitRequest:stream]) {
             return;
         }
-        spdylay_session_send(self.session);
+        int err = spdylay_session_send(self.session);
+        if (err != 0) {
+            SPDY_LOG(@"Error (%d) sending data for %@", err, stream);
+        }
     }
 }
     
@@ -526,7 +529,10 @@ static void sessionCallBack(CFSocketRef s,
 
     spdylay_session *laySession = [session session];
     if (callbackType & kCFSocketWriteCallBack) {
-        spdylay_session_send(laySession);
+        int err = spdylay_session_send(laySession);
+        if (err != 0) {
+            SPDY_LOG(@"Error writing data in write callback for session %@", session);
+        }
     }
     if (callbackType & kCFSocketReadCallBack) {
         spdylay_session_recv(laySession);
