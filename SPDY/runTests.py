@@ -38,7 +38,7 @@ def _kill_server(server):
 
 
 def main(basedir, test_driver):
-  builddir = basedir + '/../build/i386/bin'
+  builddir = basedir + '/../build/native/bin'
   datadir = basedir + '/../spdylay/tests/testdata'
   result = -2
   server = _run_server(builddir, datadir, _PORT)
