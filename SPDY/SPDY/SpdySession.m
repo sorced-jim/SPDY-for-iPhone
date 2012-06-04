@@ -54,12 +54,13 @@ static const int priority = 1;
 - (void)invalidateSocket;
 - (void)removeStream:(SpdyStream *)stream;
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags;
-- (void)setup_ssl_ctx;
+- (void)setUpSslCtx;
 - (BOOL)sslConnect;
 - (BOOL)sslHandshake;  // Returns true if the handshake completed.
 - (void)sslError;
 - (BOOL)submitRequest:(SpdyStream *)stream;
 - (BOOL)wouldBlock:(int)r;
+- (ssize_t)fixUpCallbackValue:(int)r;
 @end
 
 
@@ -108,11 +109,12 @@ static int select_next_proto_cb(SSL *ssl,
   socket = nil;
 }
 
-- (void)setup_ssl_ctx {
+- (void)setUpSslCtx {
     /* Disable SSLv2 and enable all workarounds for buggy servers */
     SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
     SSL_CTX_set_mode(ssl_ctx, SSL_MODE_AUTO_RETRY);
     SSL_CTX_set_mode(ssl_ctx, SSL_MODE_RELEASE_BUFFERS);
+    SSL_CTX_set_mode(ssl_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
     SSL_CTX_set_next_proto_select_cb(ssl_ctx, select_next_proto_cb, self);
 }
 
@@ -306,7 +308,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         [self sslError];
         return;
     }
-    [self setup_ssl_ctx];
+    [self setUpSslCtx];
     ssl = SSL_new(ssl_ctx);
     if (ssl == NULL) {
         [self sslError];
@@ -342,6 +344,8 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         if (err != 0) {
             SPDY_LOG(@"Error (%d) sending data for %@", err, stream);
         }
+    } else {
+        SPDY_LOG(@"Post-poning %@ until a connection has been established, current state %d", stream, self.connectState);
     }
 }
     
@@ -382,23 +386,26 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     return e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE;
 }
 
-static ssize_t fixUpCallbackValue(SpdySession *ss, int r) {
+- (ssize_t)fixUpCallbackValue:(int)r {
     if (r < 0) {
-        if ([ss wouldBlock:r]) {
+        if ([self wouldBlock:r]) {
             r = SPDYLAY_ERR_WOULDBLOCK;
         } else {
+            SPDY_LOG(@"SSL Error %d", SSL_get_error(ssl, r));
             r = SPDYLAY_ERR_CALLBACK_FAILURE;
         }
     } else if(r == 0) {
         r = SPDYLAY_ERR_CALLBACK_FAILURE;
     }
+    // Clear any errors that we could have encountered.
+    ERR_clear_error();
     return r;
 }
 
 static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len, int flags, void *user_data) {
     SpdySession *ss = (SpdySession *)user_data;
     int r = [ss recv_data:data len:len flags:flags];
-    return fixUpCallbackValue(ss, r);
+    return [ss fixUpCallbackValue:r];
 }
 
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags {
@@ -414,7 +421,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data) {
     SpdySession *ss = (SpdySession*)user_data;
     int r = [ss send_data:data len:len flags:flags];
-    return fixUpCallbackValue(ss, r);
+    return [ss fixUpCallbackValue:r];
 }
 
 static void on_data_chunk_recv_callback(spdylay_session *session, uint8_t flags, int32_t stream_id,
