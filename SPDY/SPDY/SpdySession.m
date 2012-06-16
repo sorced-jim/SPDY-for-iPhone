@@ -143,7 +143,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     }
     SpdyStream *spdyStream = spdylay_session_get_stream_user_data(session, stream_id);
     if (bytesRead > 0) {
-        [[spdyStream delegate]onRequestBytesSent:bytesRead];
+        [[spdyStream delegate] onRequestBytesSent:bytesRead];
     }
     return bytesRead;
 }
@@ -371,32 +371,37 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 }
 
 - (int)recv_data:(uint8_t *)data len:(size_t)len flags:(int)flags {
-    int r;
-    r = SSL_read(ssl, data, (int)len);
-    if (r == 0) {
-        SPDY_LOG(@"Closing connection from read = 0");
-        [self connectionFailed:ECONNRESET domain:(NSString *)kCFErrorDomainPOSIX];
-        [self invalidateSocket];
-    }
-    return r;
+    return SSL_read(ssl, data, (int)len);
 }
 
-- (BOOL)wouldBlock:(int)r {
-    int e = SSL_get_error(ssl, r);
-    return e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE;
+- (BOOL)wouldBlock:(int)sslError {
+    return sslError == SSL_ERROR_WANT_READ || sslError == SSL_ERROR_WANT_WRITE;
 }
 
 - (ssize_t)fixUpCallbackValue:(int)r {
-    if (r < 0) {
-        if ([self wouldBlock:r]) {
-            r = SPDYLAY_ERR_WOULDBLOCK;
-        } else {
-            SPDY_LOG(@"SSL Error %d", SSL_get_error(ssl, r));
-            r = SPDYLAY_ERR_CALLBACK_FAILURE;
+    if (r > 0)
+        return r;
+
+    int sslError = SSL_get_error(ssl, r);
+    if (r < 0 && [self wouldBlock:sslError]) {
+        r = SPDYLAY_ERR_WOULDBLOCK;
+    } else {
+        int sysError = sslError;
+        if (sslError == SSL_ERROR_SYSCALL) {
+            sysError = ERR_get_error();
+            if (sysError == 0) {
+                if (r == 0)
+                    sysError = -1;
+                else
+                    sysError = errno;
+            }
         }
-    } else if(r == 0) {
+        SPDY_LOG(@"SSL Error %d, System error %d, retValue %d, closing connection", sslError, sysError, r);
         r = SPDYLAY_ERR_CALLBACK_FAILURE;
+        [self connectionFailed:ECONNRESET domain:(NSString *)kCFErrorDomainPOSIX];
+        [self invalidateSocket];
     }
+
     // Clear any errors that we could have encountered.
     ERR_clear_error();
     return r;
@@ -409,13 +414,7 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 }
 
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags {
-    int r = SSL_write(ssl, data, (int)len);
-    if (r == 0) {
-        SPDY_LOG(@"Closing connection from write = 0");
-        [self connectionFailed:ECONNRESET domain:(NSString *)kCFErrorDomainPOSIX];
-        [self invalidateSocket];
-    }
-    return r;
+    return SSL_write(ssl, data, (int)len);
 }
 
 static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data) {
