@@ -61,6 +61,7 @@ static const int priority = 1;
 - (BOOL)submitRequest:(SpdyStream *)stream;
 - (BOOL)wouldBlock:(int)r;
 - (ssize_t)fixUpCallbackValue:(int)r;
+- (void)enableWriteCallback;
 @end
 
 
@@ -379,6 +380,8 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 }
 
 - (ssize_t)fixUpCallbackValue:(int)r {
+    [self enableWriteCallback];
+
     if (r > 0)
         return r;
 
@@ -415,6 +418,11 @@ static ssize_t recv_callback(spdylay_session *session, uint8_t *data, size_t len
 
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags {
     return SSL_write(ssl, data, (int)len);
+}
+
+- (void)enableWriteCallback {
+    if (socket != NULL)
+        CFSocketEnableCallBacks(socket, kCFSocketWriteCallBack | kCFSocketReadCallBack);    
 }
 
 static ssize_t send_callback(spdylay_session *session, const uint8_t *data, size_t len, int flags, void *user_data) {
@@ -509,6 +517,7 @@ static void sessionCallBack(CFSocketRef s,
                             CFDataRef address,
                             const void *data,
                             void *info) {
+    //SPDY_DEBUG_LOG(@"Calling session callback: %p", info);
     if (info == NULL) {
         return;
     }
