@@ -27,7 +27,7 @@ set -e
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Download source
-ZLIB_VERSION=${ZLIB_VERSION:-1.2.6}
+ZLIB_VERSION=${ZLIB_VERSION:-1.2.7}
 if [ ! -e "zlib-${ZLIB_VERSION}.tar.gz" ]
 then
   curl -O "http://zlib.net/zlib-${ZLIB_VERSION}.tar.gz"
