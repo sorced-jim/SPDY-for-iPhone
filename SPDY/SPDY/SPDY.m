@@ -223,6 +223,10 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
     [SpdyUrlConnection registerSpdyWithDelegate:delegate];
 }
 
+- (BOOL)isSpdyRegistered {
+    return [SpdyUrlConnection isRegistered];
+}
+
 - (BOOL)isSpdyRegisteredForUrl:(NSURL *)url {
     return [SpdyUrlConnection isRegistered] && [SpdyUrlConnection canInitWithUrl:url];
 }

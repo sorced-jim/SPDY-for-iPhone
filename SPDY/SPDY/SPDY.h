@@ -65,6 +65,7 @@ enum SpdyErrors {
 - (void)registerForNSURLConnection;
 
 - (void)registerForNSURLConnectionWithDelegate:(NSObject <SpdyUrlConnectionDelegate> *)delegate;
+- (BOOL)isSpdyRegistered;
 - (BOOL)isSpdyRegisteredForUrl:(NSURL *)url;
 - (void)unregisterForNSURLConnection;
 
