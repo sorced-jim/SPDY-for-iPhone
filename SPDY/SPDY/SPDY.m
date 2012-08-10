@@ -270,6 +270,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (id)init {
     self = [super init];
     self.url = nil;
+    _headers = NULL;
     self.body = CFDataCreateMutable(NULL, 0);
     return self;
 }
@@ -284,7 +285,8 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (void)setHeaders:(CFHTTPMessageRef)h {
     CFHTTPMessageRef oldRef = _headers;
     _headers = CFHTTPMessageCreateCopy(NULL, h);
-    CFRelease(oldRef);
+    if (oldRef)
+        CFRelease(oldRef);
 }
 
 - (void)onConnect:(id<SpdyRequestIdentifier>)u {
