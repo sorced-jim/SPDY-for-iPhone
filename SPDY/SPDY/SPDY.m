@@ -59,13 +59,14 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body;
 + (SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host;
 
+@property (nonatomic, retain) NSMutableDictionary *sessions;
+
 @end
 
-@implementation SPDY {
-    NSMutableDictionary *sessions;
-}
+@implementation SPDY
 
 @synthesize logger = _logger;
+@synthesize sessions = _sessions;
 
 // This logic was stripped from Apple's Reachability.m sample application.
 + (SpdyNetworkStatus)networkStatusForReachabilityFlags:(SCNetworkReachabilityFlags)flags {
@@ -107,13 +108,13 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (SpdySession *)getSession:(NSURL *)url withError:(NSError **)error {
     assert(error != NULL);
     SpdySessionKey *key = [[[SpdySessionKey alloc] initFromUrl:url] autorelease];
-    SpdySession *session = [sessions objectForKey:key];
+    SpdySession *session = [self.sessions objectForKey:key];
     SPDY_LOG(@"Looking up %@, found %@", key, session);
     SpdyNetworkStatus currentStatus = [self.class reachabilityStatusForHost:key.host];
     if (session != nil && ([session isInvalid] || currentStatus != session.networkStatus)) {
         SPDY_LOG(@"Resetting %@ because invalid: %i or %d != %d", session, [session isInvalid], currentStatus, session.networkStatus);
         [session resetStreamsAndGoAway];
-        [sessions removeObjectForKey:key];
+        [self.sessions removeObjectForKey:key];
         session = nil;
     }
     if (session == nil) {
@@ -123,10 +124,10 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
             SPDY_LOG(@"Could not connect to %@ because %@", url, *error);
             return nil;
         }
-        SPDY_LOG(@"Adding %@ to sessions (size = %u)", key, [sessions count] + 1);
+        SPDY_LOG(@"Adding %@ to sessions (size = %u)", key, [self.sessions count] + 1);
         currentStatus = [self.class reachabilityStatusForHost:key.host];
         session.networkStatus = currentStatus;
-        [sessions setObject:session forKey:key];
+        [self.sessions setObject:session forKey:key];
         [session addToLoop];
     }
     return session;
@@ -177,28 +178,28 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 
 - (NSInteger)closeAllSessions {
     NSInteger cancelledRequests = 0;
-    NSEnumerator *enumerator = [sessions objectEnumerator];
+    NSEnumerator *enumerator = [self.sessions objectEnumerator];
     SpdySession *session;
     
     while ((session = (SpdySession *)[enumerator nextObject])) {
         cancelledRequests += [session resetStreamsAndGoAway];
     }
-    [sessions removeAllObjects];
+    [self.sessions removeAllObjects];
     return cancelledRequests;
 }
 
 - (SPDY *)init {
     self = [super init];
     if (self) {
-        sessions = [[NSMutableDictionary alloc] init];
         self.logger = [[[SpdyLogImpl alloc] init] autorelease];
+        self.sessions = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
 
 - (void)dealloc {
     [_logger release];
-    [sessions release];
+    [_sessions release];
     [super dealloc];
 }
 
@@ -211,9 +212,15 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
     return spdy;
 }
 
+#pragma mark - NSURLConnection related methods.
+
 // These methods are object methods so that sharedSpdy is called before registering SpdyUrlConnection with NSURLConnection.
 - (void)registerForNSURLConnection {
     [SpdyUrlConnection registerSpdy];
+}
+
+- (void)registerForNSURLConnectionWithDelegate:(NSObject <SpdyUrlConnectionDelegate> *)delegate {
+    [SpdyUrlConnection registerSpdyWithDelegate:delegate];
 }
 
 - (BOOL)isSpdyRegistered {

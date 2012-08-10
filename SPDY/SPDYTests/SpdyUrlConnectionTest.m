@@ -20,6 +20,19 @@
 #import "SpdyUrlConnectionTest.h"
 #import "SpdyUrlConnection.h"
 
+@interface SpdyTestDelegate : NSObject <SpdyUrlConnectionDelegate>
+@property (nonatomic, assign) BOOL shouldUseSpdy;
+@end
+
+@implementation SpdyTestDelegate
+@synthesize shouldUseSpdy;
+
+- (BOOL)shouldUseSpdyForUrl:(NSURL *)url {
+    return shouldUseSpdy;
+}
+
+@end
+
 @implementation SpdyUrlConnectionTest
 
 - (void)setUp {
@@ -60,6 +73,18 @@
     // from CFHTTPMessage are case insenstive.
     STAssertEquals([[response allHeaderFields] objectForKey:@"Content-Encoding"], @"gzip", @"Has content-encoding %@", [response allHeaderFields]);
     STAssertEquals([[response allHeaderFields] objectForKey:@"Unknown-Header"], @"value", @"Case insensitive dictionary %@", [response allHeaderFields]);
+}
+
+- (void)testCheckDelegateCanInitWithUrl {
+    [SpdyUrlConnection unregister];
+    SpdyTestDelegate *delegate = [[[SpdyTestDelegate alloc] init] autorelease];
+    [SpdyUrlConnection registerSpdyWithDelegate:delegate];
+    NSURL *url = [NSURL URLWithString:@"https://t.ca"];
+    delegate.shouldUseSpdy = YES;
+    STAssertTrue([SpdyUrlConnection canInitWithUrl:url], @"%@", url);
+
+    delegate.shouldUseSpdy = NO;
+    STAssertFalse([SpdyUrlConnection canInitWithUrl:url], @"%@", url);
 }
 
 @end

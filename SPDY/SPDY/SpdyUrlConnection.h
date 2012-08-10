@@ -33,6 +33,7 @@
 // Registers and unregisters the SpdyUrlConnection with NSURLProtocol.  Any hosts found not to support spdy after register is called
 // are cleared when unregister is called.
 + (void)registerSpdy;
++ (void)registerSpdyWithDelegate:(NSObject <SpdyUrlConnectionDelegate> *)delegate;
 + (BOOL)isRegistered;
 + (void)unregister;
 

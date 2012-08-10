@@ -25,6 +25,8 @@
 // This is actually a dictionary of sets.  The first set is the host names, the second is a set of ports.
 static NSMutableDictionary *disabledHosts;
 
+// The delegate is called each time on a url to determine if a request should use spdy.
+static NSObject <SpdyUrlConnectionDelegate> *globalDelegate;
 
 @implementation SpdyUrlResponse
 @synthesize statusCode = _statusCode;
@@ -166,8 +168,13 @@ static NSMutableDictionary *disabledHosts;
 @synthesize closed = _closed;
 
 + (void)registerSpdy {
+    [self registerSpdyWithDelegate:nil];
+}
+
++ (void)registerSpdyWithDelegate:(NSObject <SpdyUrlConnectionDelegate> *)delegate {
     disabledHosts = [[NSMutableDictionary alloc] init];
-    [NSURLProtocol registerClass:[SpdyUrlConnection class]];
+    globalDelegate = [delegate retain];
+    [NSURLProtocol registerClass:[SpdyUrlConnection class]];    
 }
 
 + (BOOL)isRegistered {
@@ -178,6 +185,8 @@ static NSMutableDictionary *disabledHosts;
     [NSURLProtocol unregisterClass:[SpdyUrlConnection class]];
     [disabledHosts release];
     disabledHosts = nil;
+    [globalDelegate release];
+    globalDelegate = nil;
 }
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request {
@@ -195,6 +204,13 @@ static NSMutableDictionary *disabledHosts;
             if ([ports containsObject:port])
                 return NO;
         }
+
+        if (globalDelegate) {
+            BOOL useSpdy = [globalDelegate shouldUseSpdyForUrl:url];
+            SPDY_LOG(@"Delegate says %d for %@", useSpdy, url);
+            return useSpdy;
+        }
+        
         SPDY_LOG(@"Can use spdy for: %@", url);
         return YES;
     }
