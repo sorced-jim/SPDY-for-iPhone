@@ -520,9 +520,11 @@ static void CloseReadStreamClientCallBack(CFReadStreamRef readStream, CFStreamEv
 }
 
 - (void)testRegisteredForSpdy {
-    STAssertTrue([[SPDY sharedSPDY] isSpdyRegistered], @"Spdy should be registered");
+    NSURL *url = [NSURL URLWithString:@"https://a.ca"];
+    STAssertTrue([[SPDY sharedSPDY] isSpdyRegisteredForUrl:url], @"Spdy should be registered");
+    STAssertFalse([[SPDY sharedSPDY] isSpdyRegisteredForUrl:[NSURL URLWithString:@"http://t.ca"]], @"Spdy is only registered for https.");
     [[SPDY sharedSPDY] unregisterForNSURLConnection];
-    STAssertFalse([[SPDY sharedSPDY] isSpdyRegistered], @"Spdy should no longer be registered");
+    STAssertFalse([[SPDY sharedSPDY] isSpdyRegisteredForUrl:url], @"Spdy should no longer be registered");
 }
 
 @end

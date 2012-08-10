@@ -43,6 +43,12 @@ enum SpdyErrors {
 - (void)close;
 @end
 
+@protocol SpdyUrlConnectionDelegate
+
+- (BOOL)shouldUseSpdyForUrl:(NSURL *)url;
+
+@end
+
 // The SpdyLogger protocol is used to log from the spdy library.  The default SpdyLogger prints out ugly logs with NSLog.  You'll probably
 // want to override the default.
 @protocol SpdyLogger
@@ -57,7 +63,9 @@ enum SpdyErrors {
 // the @"protocol-was: spdy" header with the value @"YES".  "protocol-was: spdy" is not a valid http header, thus it is safe to add it.
 // WARNING: Using NSURLConnection means that upload progress can not be monitored.  This is because of a lack of an API in URLProtocolClient.
 - (void)registerForNSURLConnection;
-- (BOOL)isSpdyRegistered;
+
+- (void)registerForNSURLConnectionWithDelegate:(NSObject <SpdyUrlConnectionDelegate> *)delegate;
+- (BOOL)isSpdyRegisteredForUrl:(NSURL *)url;
 - (void)unregisterForNSURLConnection;
 
 // A reference to delegate is kept until the stream is closed.  The caller will get an onError or onStreamClose before the stream is closed.
