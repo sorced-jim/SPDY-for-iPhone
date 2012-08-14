@@ -43,7 +43,7 @@ enum SpdyErrors {
 - (void)close;
 @end
 
-@protocol SpdyUrlConnectionDelegate
+@protocol SpdyUrlConnectionCallback <NSObject>
 
 - (BOOL)shouldUseSpdyForUrl:(NSURL *)url;
 
@@ -64,7 +64,7 @@ enum SpdyErrors {
 // WARNING: Using NSURLConnection means that upload progress can not be monitored.  This is because of a lack of an API in URLProtocolClient.
 - (void)registerForNSURLConnection;
 
-- (void)registerForNSURLConnectionWithDelegate:(NSObject <SpdyUrlConnectionDelegate> *)delegate;
+- (void)registerForNSURLConnectionWithCallback:(id <SpdyUrlConnectionCallback>)callback;
 - (BOOL)isSpdyRegistered;
 - (BOOL)isSpdyRegisteredForUrl:(NSURL *)url;
 - (void)unregisterForNSURLConnection;

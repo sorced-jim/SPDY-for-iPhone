@@ -20,11 +20,11 @@
 #import "SpdyUrlConnectionTest.h"
 #import "SpdyUrlConnection.h"
 
-@interface SpdyTestDelegate : NSObject <SpdyUrlConnectionDelegate>
+@interface SpdyTestCallback <SpdyUrlConnectionCallback>
 @property (nonatomic, assign) BOOL shouldUseSpdy;
 @end
 
-@implementation SpdyTestDelegate
+@implementation SpdyTestCallback
 @synthesize shouldUseSpdy;
 
 - (BOOL)shouldUseSpdyForUrl:(NSURL *)url {
@@ -75,15 +75,15 @@
     STAssertEquals([[response allHeaderFields] objectForKey:@"Unknown-Header"], @"value", @"Case insensitive dictionary %@", [response allHeaderFields]);
 }
 
-- (void)testCheckDelegateCanInitWithUrl {
+- (void)testCheckCallbackCanInitWithUrl {
     [SpdyUrlConnection unregister];
-    SpdyTestDelegate *delegate = [[[SpdyTestDelegate alloc] init] autorelease];
-    [SpdyUrlConnection registerSpdyWithDelegate:delegate];
+    SpdyTestCallback *callback = [[[SpdyTestCallback alloc] init] autorelease];
+    [SpdyUrlConnection registerSpdyWithCallback:callback];
     NSURL *url = [NSURL URLWithString:@"https://t.ca"];
-    delegate.shouldUseSpdy = YES;
+    callback.shouldUseSpdy = YES;
     STAssertTrue([SpdyUrlConnection canInitWithUrl:url], @"%@", url);
 
-    delegate.shouldUseSpdy = NO;
+    callback.shouldUseSpdy = NO;
     STAssertFalse([SpdyUrlConnection canInitWithUrl:url], @"%@", url);
 }
 

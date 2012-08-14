@@ -26,7 +26,7 @@
 static NSMutableDictionary *disabledHosts;
 
 // The delegate is called each time on a url to determine if a request should use spdy.
-static NSObject <SpdyUrlConnectionDelegate> *globalDelegate;
+static id <SpdyUrlConnectionCallback> globalCallback;
 
 @implementation SpdyUrlResponse
 @synthesize statusCode = _statusCode;
@@ -168,12 +168,12 @@ static NSObject <SpdyUrlConnectionDelegate> *globalDelegate;
 @synthesize closed = _closed;
 
 + (void)registerSpdy {
-    [self registerSpdyWithDelegate:nil];
+    [self registerSpdyWithCallback:nil];
 }
 
-+ (void)registerSpdyWithDelegate:(NSObject <SpdyUrlConnectionDelegate> *)delegate {
++ (void)registerSpdyWithCallback:(id <SpdyUrlConnectionCallback>)callback {
     disabledHosts = [[NSMutableDictionary alloc] init];
-    globalDelegate = [delegate retain];
+    globalCallback = [callback retain];
     [NSURLProtocol registerClass:[SpdyUrlConnection class]];    
 }
 
@@ -185,8 +185,8 @@ static NSObject <SpdyUrlConnectionDelegate> *globalDelegate;
     [NSURLProtocol unregisterClass:[SpdyUrlConnection class]];
     [disabledHosts release];
     disabledHosts = nil;
-    [globalDelegate release];
-    globalDelegate = nil;
+    [globalCallback release];
+    globalCallback = nil;
 }
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request {
@@ -205,9 +205,9 @@ static NSObject <SpdyUrlConnectionDelegate> *globalDelegate;
                 return NO;
         }
 
-        if (globalDelegate) {
-            BOOL useSpdy = [globalDelegate shouldUseSpdyForUrl:url];
-            SPDY_LOG(@"Delegate says %d for %@", useSpdy, url);
+        if (globalCallback) {
+            BOOL useSpdy = [globalCallback shouldUseSpdyForUrl:url];
+            SPDY_LOG(@"Callback says %d for %@", useSpdy, url);
             return useSpdy;
         }
         

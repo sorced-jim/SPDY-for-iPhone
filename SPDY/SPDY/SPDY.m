@@ -219,8 +219,8 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
     [SpdyUrlConnection registerSpdy];
 }
 
-- (void)registerForNSURLConnectionWithDelegate:(NSObject <SpdyUrlConnectionDelegate> *)delegate {
-    [SpdyUrlConnection registerSpdyWithDelegate:delegate];
+- (void)registerForNSURLConnectionWithCallback:(id <SpdyUrlConnectionCallback>)callback {
+    [SpdyUrlConnection registerSpdyWithCallback:callback];
 }
 
 - (BOOL)isSpdyRegistered {
