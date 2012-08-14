@@ -20,7 +20,7 @@
 #import "SpdyUrlConnectionTest.h"
 #import "SpdyUrlConnection.h"
 
-@interface SpdyTestCallback <SpdyUrlConnectionCallback>
+@interface SpdyTestCallback : NSObject <SpdyUrlConnectionCallback>
 @property (nonatomic, assign) BOOL shouldUseSpdy;
 @end
 
