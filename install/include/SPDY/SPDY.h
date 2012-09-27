@@ -41,6 +41,7 @@ enum SpdyErrors {
 @protocol SpdyRequestIdentifier
 - (NSURL *)url;
 - (void)close;
+- (NSString *)description;
 @end
 
 @protocol SpdyUrlConnectionCallback <NSObject>
