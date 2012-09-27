@@ -38,10 +38,9 @@ enum SpdyErrors {
     kSpdyInvalidResponseHeaders = 4,
 };
 
-@protocol SpdyRequestIdentifier
+@protocol SpdyRequestIdentifier <NSObject>
 - (NSURL *)url;
 - (void)close;
-- (NSString *)description;
 @end
 
 @protocol SpdyUrlConnectionCallback <NSObject>

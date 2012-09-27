@@ -40,7 +40,7 @@
 + (void)disableUrl:(NSURL *)url;
 + (BOOL)canInitWithUrl:(NSURL *)url;
 
-@property (assign) id<SpdyRequestIdentifier> spdyIdentifier;
+@property (retain) id<SpdyRequestIdentifier> spdyIdentifier;
 @property (assign, readonly) BOOL cancelled;
 @property (assign) BOOL closed;
 

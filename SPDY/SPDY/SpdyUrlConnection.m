@@ -94,7 +94,7 @@ static id <SpdyUrlConnectionCallback> globalCallback;
 }
 
 - (void)onError:(NSError *)error {
-    SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onError: %@", self.protocol, error);
+    SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onError: %@, %@", self.protocol, error, self.protocol.spdyIdentifier);
     if (!self.protocol.cancelled) {
         [[self.protocol client] URLProtocol:self.protocol didFailWithError:error];
     }
@@ -153,6 +153,7 @@ static id <SpdyUrlConnectionCallback> globalCallback;
 - (void)onStreamClose {
     SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onStreamClose", self.protocol);
     self.protocol.closed = YES;
+    self.protocol.spdyIdentifier = nil;
     [[self.protocol client] URLProtocolDidFinishLoading:self.protocol];
 }
 
@@ -235,6 +236,11 @@ static id <SpdyUrlConnectionCallback> globalCallback;
 // This could be a good place to remove the connection headers.
 + (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
     return request;
+}
+
+- (void)dealloc {
+    [_spdyIdentifier release];
+    [super dealloc];
 }
 
 - (void)startLoading {
