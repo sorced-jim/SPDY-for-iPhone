@@ -46,15 +46,12 @@ static const int priority = 1;
 
 @interface SpdySession ()
 
-@property (assign) uint16_t spdyVersion;
-
 - (void)_cancelStream:(SpdyStream *)stream;
 - (NSError *)connectTo:(NSURL *)url;
 - (void)connectionFailed:(NSInteger)error domain:(NSString *)domain;
 - (void)invalidateSocket;
 - (void)removeStream:(SpdyStream *)stream;
 - (int)send_data:(const uint8_t *)data len:(size_t)len flags:(int)flags;
-- (void)setUpSslCtx;
 - (BOOL)sslConnect;
 - (BOOL)sslHandshake;  // Returns true if the handshake completed.
 - (void)sslError;
@@ -87,20 +84,6 @@ static void sessionCallBack(CFSocketRef s,
                             const void *data,
                             void *info);
 
-static int select_next_proto_cb(SSL *ssl,
-                                unsigned char **out, unsigned char *outlen,
-                                const unsigned char *in, unsigned int inlen,
-                                void *arg) {
-    SpdySession *sc = (SpdySession *)arg;
-    int spdyVersion = spdylay_select_next_protocol(out, outlen, in, inlen);
-    if (spdyVersion > 0) {
-        sc.spdyVersion = spdyVersion;
-        sc.spdyNegotiated = YES;
-    }
-    
-    return SSL_TLSEXT_ERR_OK;
-}
-
 - (void)invalidateSocket {
   if (socket == nil)
     return;
@@ -108,15 +91,6 @@ static int select_next_proto_cb(SSL *ssl,
   CFSocketInvalidate(socket);
   CFRelease(socket);
   socket = nil;
-}
-
-- (void)setUpSslCtx {
-    /* Disable SSLv2 and enable all workarounds for buggy servers */
-    SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
-    SSL_CTX_set_mode(ssl_ctx, SSL_MODE_AUTO_RETRY);
-    SSL_CTX_set_mode(ssl_ctx, SSL_MODE_RELEASE_BUFFERS);
-    SSL_CTX_set_mode(ssl_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
-    SSL_CTX_set_next_proto_select_cb(ssl_ctx, select_next_proto_cb, self);
 }
 
 - (void)sslError {
@@ -304,12 +278,6 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     // Create SSL context.
     int sock = CFSocketGetNative(socket);
     make_non_block(sock);  // Ensure the SSL methods will not block.
-    ssl_ctx = SSL_CTX_new(SSLv23_client_method());
-    if (ssl_ctx == NULL) {
-        [self sslError];
-        return;
-    }
-    [self setUpSslCtx];
     ssl = SSL_new(ssl_ctx);
     if (ssl == NULL) {
         [self sslError];
@@ -320,6 +288,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         [self sslError];
         return;
     }
+    SSL_set_app_data(ssl, self);
 }
 
 - (BOOL)sslConnect {
@@ -468,8 +437,9 @@ static void before_ctrl_send_callback(spdylay_session *session, spdylay_frame_ty
     [streams removeObject:stream];
 }
 
-- (SpdySession *)init {
+- (SpdySession *)init:(SSL_CTX *)ssl_context {
     self = [super init];
+    ssl_ctx = ssl_context;
 
     callbacks = malloc(sizeof(*callbacks));
     memset(callbacks, 0, sizeof(*callbacks));
@@ -500,7 +470,6 @@ static void before_ctrl_send_callback(spdylay_session *session, spdylay_frame_ty
     if (ssl != NULL) {
         SSL_shutdown(ssl);
         SSL_free(ssl);
-        SSL_CTX_free(ssl_ctx);
     }
     [self invalidateSocket];
     free(callbacks);

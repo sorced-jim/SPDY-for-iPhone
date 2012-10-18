@@ -24,12 +24,15 @@
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <CFNetwork/CFNetwork.h>
 
+#include <assert.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netdb.h>
 
 #include "openssl/ssl.h"
+#include "spdylay/spdylay.h"
+
 #import "SpdySession.h"
 #import "SpdyInputStream.h"
 #import "SpdyStream.h"
@@ -40,6 +43,20 @@
 static SPDY *spdy = NULL;
 NSString *kSpdyErrorDomain = @"SpdyErrorDomain";
 NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
+
+static int select_next_proto_cb(SSL *ssl,
+                                unsigned char **out, unsigned char *outlen,
+                                const unsigned char *in, unsigned int inlen,
+                                void *arg) {
+    SpdySession *sc = (SpdySession *)SSL_get_app_data(ssl);
+    int spdyVersion = spdylay_select_next_protocol(out, outlen, in, inlen);
+    if (spdyVersion > 0) {
+        sc.spdyVersion = spdyVersion;
+        sc.spdyNegotiated = YES;
+    }
+    
+    return SSL_TLSEXT_ERR_OK;
+}
 
 @interface SpdyLogImpl : NSObject<SpdyLogger>
 @end
@@ -59,7 +76,10 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (void)fetchFromMessage:(CFHTTPMessageRef)request delegate:(RequestCallback *)delegate body:(NSInputStream *)body;
 + (SpdyNetworkStatus)reachabilityStatusForHost:(NSString *)host;
 
+- (void)setUpSslCtx;
+
 @property (nonatomic, retain) NSMutableDictionary *sessions;
+@property (nonatomic, assign) SSL_CTX *ssl_ctx;
 
 @end
 
@@ -67,6 +87,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 
 @synthesize logger = _logger;
 @synthesize sessions = _sessions;
+@synthesize ssl_ctx =  _ssl_ctx;
 
 // This logic was stripped from Apple's Reachability.m sample application.
 + (SpdyNetworkStatus)networkStatusForReachabilityFlags:(SCNetworkReachabilityFlags)flags {
@@ -118,7 +139,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
         session = nil;
     }
     if (session == nil) {
-        session = [[[SpdySession alloc] init] autorelease];
+        session = [[[SpdySession alloc] init:self.ssl_ctx] autorelease];
         *error = [session connect:url];
         if (*error != nil) {
             SPDY_LOG(@"Could not connect to %@ because %@", url, *error);
@@ -193,6 +214,7 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
     if (self) {
         self.logger = [[[SpdyLogImpl alloc] init] autorelease];
         self.sessions = [[NSMutableDictionary alloc] init];
+        [self setUpSslCtx];
     }
     return self;
 }
@@ -200,8 +222,23 @@ NSString *kOpenSSLErrorDomain = @"OpenSSLErrorDomain";
 - (void)dealloc {
     [_logger release];
     [_sessions release];
+    SSL_CTX_free(_ssl_ctx);
     [super dealloc];
 }
+
+- (void)setUpSslCtx {
+    self.ssl_ctx = SSL_CTX_new(SSLv23_client_method());
+    assert(self.ssl_ctx);
+    
+    /* Disable SSLv2 and enable all workarounds for buggy servers */
+    SSL_CTX_set_options(self.ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
+    SSL_CTX_set_mode(self.ssl_ctx, SSL_MODE_AUTO_RETRY);
+    SSL_CTX_set_mode(self.ssl_ctx, SSL_MODE_RELEASE_BUFFERS);
+    SSL_CTX_set_mode(self.ssl_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
+    SSL_CTX_set_next_proto_select_cb(self.ssl_ctx, select_next_proto_cb, self);
+    SSL_CTX_set_session_cache_mode(self.ssl_ctx, SSL_SESS_CACHE_CLIENT);
+}
+
 
 + (SPDY *)sharedSPDY {
     if (spdy == NULL) {

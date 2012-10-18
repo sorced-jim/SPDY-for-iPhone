@@ -45,11 +45,12 @@ typedef enum {
     SpdyNetworkStatus networkStatus;
 }
 
-@property BOOL spdyNegotiated;
-@property struct spdylay_session *session;
+@property (assign) BOOL spdyNegotiated;
+@property (assign) uint16_t spdyVersion;
+@property (assign) struct spdylay_session *session;
 @property (retain) NSURL *host;
-@property enum ConnectState connectState;
-@property SpdyNetworkStatus networkStatus;
+@property (assign) enum ConnectState connectState;
+@property (assign) SpdyNetworkStatus networkStatus;
 
 // Returns nil if the session is able to start a connection to host.
 - (NSError *)connect:(NSURL *)host;
