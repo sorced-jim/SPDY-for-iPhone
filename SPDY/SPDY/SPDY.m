@@ -132,14 +132,16 @@ static int select_next_proto_cb(SSL *ssl,
     SpdySession *session = [self.sessions objectForKey:key];
     SPDY_LOG(@"Looking up %@, found %@", key, session);
     SpdyNetworkStatus currentStatus = [self.class reachabilityStatusForHost:key.host];
+    SSL_SESSION *oldSslSession =  NULL;
     if (session != nil && ([session isInvalid] || currentStatus != session.networkStatus)) {
         SPDY_LOG(@"Resetting %@ because invalid: %i or %d != %d", session, [session isInvalid], currentStatus, session.networkStatus);
         [session resetStreamsAndGoAway];
         [self.sessions removeObjectForKey:key];
+        oldSslSession = [session getSslSession];
         session = nil;
     }
     if (session == nil) {
-        session = [[[SpdySession alloc] init:self.ssl_ctx] autorelease];
+        session = [[[SpdySession alloc] init:self.ssl_ctx oldSession:oldSslSession] autorelease];
         *error = [session connect:url];
         if (*error != nil) {
             SPDY_LOG(@"Could not connect to %@ because %@", url, *error);

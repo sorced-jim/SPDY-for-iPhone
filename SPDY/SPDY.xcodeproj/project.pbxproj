@@ -510,6 +510,7 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../build/include";
 				INFOPLIST_FILE = "SPDYTests/SPDYTests-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -532,6 +533,7 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SPDY/SPDY-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../build/include";
 				INFOPLIST_FILE = "SPDYTests/SPDYTests-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

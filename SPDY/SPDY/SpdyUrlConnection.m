@@ -124,7 +124,7 @@ static id <SpdyUrlConnectionCallback> globalCallback;
     }
     SPDY_DEBUG_LOG(@"SpdyURLConnection: %@ onResponseHeaders: %@", self.protocol, [response allHeaderFields]);
 
-    [[self.protocol client] URLProtocol:self.protocol didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+    [[self.protocol client] URLProtocol:self.protocol didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
 }
 
 - (size_t)onResponseData:(const uint8_t *)bytes length:(size_t)length {

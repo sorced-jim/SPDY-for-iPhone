@@ -68,6 +68,7 @@ static const int priority = 1;
     CFSocketRef socket;
     SSL *ssl;
     SSL_CTX *ssl_ctx;
+    SSL_SESSION *oldSslSession;
     spdylay_session_callbacks *callbacks;
 }
 
@@ -215,6 +216,12 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
     return cancelledStreams;
 }
 
+- (SSL_SESSION *)getSslSession {
+    if (ssl)
+        return SSL_get1_session(ssl);
+    return NULL;
+}
+
 - (BOOL)isInvalid {
     return socket == nil;
 }
@@ -259,6 +266,7 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
                 [streams removeObject:stream];
             }
         }
+        SPDY_LOG(@"Reused session: %ld", SSL_session_reused(ssl));
         return YES;
     }
     if (r == 0) {
@@ -289,6 +297,8 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         return;
     }
     SSL_set_app_data(ssl, self);
+    if (oldSslSession)
+        SSL_set_session(ssl, oldSslSession);
 }
 
 - (BOOL)sslConnect {
@@ -437,10 +447,11 @@ static void before_ctrl_send_callback(spdylay_session *session, spdylay_frame_ty
     [streams removeObject:stream];
 }
 
-- (SpdySession *)init:(SSL_CTX *)ssl_context {
+- (SpdySession *)init:(SSL_CTX *)ssl_context oldSession:(SSL_SESSION *)oldSession {
     self = [super init];
     ssl_ctx = ssl_context;
-
+    oldSslSession = oldSession;
+    
     callbacks = malloc(sizeof(*callbacks));
     memset(callbacks, 0, sizeof(*callbacks));
     callbacks->send_callback = send_callback;

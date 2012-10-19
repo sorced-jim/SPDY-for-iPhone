@@ -18,11 +18,13 @@
 // limitations under the License.
 
 #import <Foundation/Foundation.h>
+#include "openssl/ssl.h"
 
 @class RequestCallback;
 @class SpdyStream;
 
 struct spdylay_session;
+
 enum ConnectState {
     NOT_CONNECTED,
     CONNECTING,
@@ -52,6 +54,8 @@ typedef enum {
 @property (assign) enum ConnectState connectState;
 @property (assign) SpdyNetworkStatus networkStatus;
 
+- (SpdySession *)init:(SSL_CTX *)ssl_ctx oldSession:(SSL_SESSION *)oldSession;
+
 // Returns nil if the session is able to start a connection to host.
 - (NSError *)connect:(NSURL *)host;
 - (void)fetch:(NSURL *)path delegate:(RequestCallback *)delegate;
@@ -60,6 +64,8 @@ typedef enum {
 - (void)addToLoop;
 
 - (NSInteger)resetStreamsAndGoAway;
+- (SSL_SESSION *)getSslSession;
+
 
 // Indicates if the session has entered an invalid state.
 - (BOOL)isInvalid;
