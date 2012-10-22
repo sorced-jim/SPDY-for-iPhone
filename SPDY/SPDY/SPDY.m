@@ -136,8 +136,8 @@ static int select_next_proto_cb(SSL *ssl,
     if (session != nil && ([session isInvalid] || currentStatus != session.networkStatus)) {
         SPDY_LOG(@"Resetting %@ because invalid: %i or %d != %d", session, [session isInvalid], currentStatus, session.networkStatus);
         [session resetStreamsAndGoAway];
-        [self.sessions removeObjectForKey:key];
         oldSslSession = [session getSslSession];
+        [self.sessions removeObjectForKey:key];
         session = nil;
     }
     if (session == nil) {

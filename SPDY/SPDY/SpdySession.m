@@ -297,8 +297,11 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
         return;
     }
     SSL_set_app_data(ssl, self);
-    if (oldSslSession)
+    if (oldSslSession) {
         SSL_set_session(ssl, oldSslSession);
+        SSL_SESSION_free(oldSslSession);  // Reference taken in getSslSession.
+        oldSslSession = NULL;
+    }
 }
 
 - (BOOL)sslConnect {
