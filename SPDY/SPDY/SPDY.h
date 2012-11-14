@@ -29,6 +29,8 @@ CFReadStreamRef SpdyCreateSpdyReadStream(CFAllocatorRef alloc, CFHTTPMessageRef 
 
 extern NSString *kSpdyErrorDomain;
 extern NSString *kOpenSSLErrorDomain;
+extern NSString *kSpdyTimeoutHeader;
+
 
 enum SpdyErrors {
     kSpdyConnectionOk = 0,
@@ -77,6 +79,9 @@ enum SpdyErrors {
 
 // Cancels all active requests and closes all connections.  Returns the number of requests that were cancelled.  Ideally this should be called when all requests have already been canceled.
 - (NSInteger)closeAllSessions;
+
+// Like closeAllSessions above, but only cancels and closes for url.host:url.port.
+- (NSInteger)closeAllSessionsForURL:(NSURL *)url;
 
 @property (retain) NSObject<SpdyLogger> *logger;
 @end

@@ -46,6 +46,8 @@ static const int priority = 1;
 
 @interface SpdySession ()
 
+@property (retain, nonatomic) NSDate *lastCallbackTime;
+
 - (void)_cancelStream:(SpdyStream *)stream;
 - (NSError *)connectTo:(NSURL *)url;
 - (void)connectionFailed:(NSInteger)error domain:(NSString *)domain;
@@ -202,6 +204,8 @@ static ssize_t read_from_data_callback(spdylay_session *session, int32_t stream_
 - (void)cancelStream:(SpdyStream *)stream {
     // Do not remove the stream here as it will be removed on the close callback when spdylay is done with the object.
     [self _cancelStream:stream];
+    if ([[NSDate date] compare:[self.lastCallbackTime dateByAddingTimeInterval:stream.streamTimeoutInterval]] == NSOrderedDescending)
+        SPDY_LOG(@"Stream %@ timed out, timeout set at %fs", stream, stream.streamTimeoutInterval);
 }
 
 - (NSInteger)resetStreamsAndGoAway {
@@ -505,6 +509,7 @@ static void sessionCallBack(CFSocketRef s,
         return;
     }
     SpdySession *session = (SpdySession *)info;
+    session.lastCallbackTime = [NSDate date];
     if (session.connectState == CONNECTING) {
         if (data != NULL) {
             int e = *(int *)data;

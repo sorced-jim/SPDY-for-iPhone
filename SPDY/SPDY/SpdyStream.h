@@ -51,10 +51,13 @@
 + (void)staticInit;
 
 @property const char **nameValues;
-@property (retain) RequestCallback *delegate;
-@property (retain) NSInputStream *body;
-@property (assign) NSInteger streamId;
-@property (retain) SpdySession *parentSession;
+@property (retain, nonatomic) RequestCallback *delegate;
+@property (retain, nonatomic) NSInputStream *body;
+@property (assign, nonatomic) NSInteger streamId;
+@property (retain, nonatomic) SpdySession *parentSession;
+
+// If a stream is closed after the timeout the session should probably be closed.
+@property (assign, nonatomic) NSTimeInterval streamTimeoutInterval;
 
 @end
 

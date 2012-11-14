@@ -22,6 +22,7 @@
 #import "SpdySession.h"
 
 static NSSet *headersNotToCopy = nil;
+NSString *kSpdyTimeoutHeader = @"x-spdy-timeout";
 
 @interface SpdyStream ()
 - (void)fixArena:(NSInteger)length;
@@ -51,7 +52,7 @@ static NSSet *headersNotToCopy = nil;
 
 + (void)staticInit {
     if (headersNotToCopy == nil) {
-        headersNotToCopy = [[NSSet alloc] initWithObjects:@"host", @"connection", nil];
+        headersNotToCopy = [[NSSet alloc] initWithObjects:@"host", @"connection", kSpdyTimeoutHeader, nil];
     }
 }
 
@@ -247,6 +248,8 @@ static NSSet *headersNotToCopy = nil;
             nv[nameValueIndex] = [self copyString:key];
             nv[nameValueIndex + 1] = [self copyString:value];
             nameValueIndex += 2;
+        } else if ([kSpdyTimeoutHeader isEqualToString:key]) {
+            self.streamTimeoutInterval = [[headers objectForKey:key] doubleValue];
         }
     }
     return nameValueIndex;
@@ -301,6 +304,10 @@ static NSSet *headersNotToCopy = nil;
     if (request.HTTPBodyStream == nil && request.HTTPBody != nil)
         stream.body = [NSInputStream inputStreamWithData:request.HTTPBody];
 
+    if (stream.streamTimeoutInterval == 0.0)
+        stream.streamTimeoutInterval = [request timeoutInterval];
+    else
+        stream.streamTimeoutInterval = MIN([request timeoutInterval], stream.streamTimeoutInterval);
     return stream;
 }
 
